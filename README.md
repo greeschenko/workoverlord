@@ -33,11 +33,11 @@ Maind: [                                    //user second brain database object
         synapses: [                         //list of connections for an element
             Synapse11...,
             Synapse12{
-                positions: [][3]int         //connection line ends coordinates X,Y,Z
+                points: [][3]int            //connection line ends coordinates X,Y,Z
                 size: int                   //line width
                 color: string               //line color
-                type: string                //line type solid | dashed ...
-                end: [2]string              //line end style none, none | none, arrow | point, point ... etc
+                linetype: string            //line type solid | dashed ...
+                endtype: string             //line end style none, none | none, arrow | point, point ... etc
             },
             Synapse13...,
             ...

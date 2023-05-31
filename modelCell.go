@@ -13,15 +13,22 @@ import (
 )
 
 type Cell struct {
-	ID       string   `json:"id"`
-	Data     string   `json:"data"`
-	Status   string   `json:"status"`
-	Tags     string   `json:"tags,omitempty"`
-	Size     [2]int   `json:"size,omitempty"`
-	Position [2]int   `json:"position,omitempty"`
-	Routs    [][2]int `json:"routs,omitempty"`
-	Pointers [][2]int `json:"pointers,omitempty"`
-	Cells    []Cell   `json:"cells"`
+	ID       string    `json:"id"`
+	Data     string    `json:"data"`
+	Status   string    `json:"status"`
+	Tags     string    `json:"tags,omitempty"`
+	Size     [2]int    `json:"size,omitempty"`
+	Position [3]int    `json:"position,omitempty"`
+	Cells    []Cell    `json:"cells,omitempty"`
+	Synapses []Synapse `json:"synapses,omitempty"`
+}
+
+type Synapse struct {
+	Points   [][3]int `json:"points,omitempty"`
+	Size     int      `json:"size,omitempty"`
+	Color    string   `json:"color,omitempty"`
+	Linetype string   `json:"linetype,omitempty"`
+	Endtype  string   `json:"endtype,omitempty"`
 }
 
 func (s Cell) getValue(name string) string {
