@@ -111,10 +111,10 @@ func main() {
 	}
 
 	App.R.HandleFunc("/", actionIndex).Methods("GET")
-	//App.R.HandleFunc("/synapse", actionSynapseGet).Methods("GET")
-	App.R.HandleFunc("/synapse/{id}", actionSynapseCreate).Methods("POST")
-	App.R.HandleFunc("/synapse/{id}", actionSynapseUpdate).Methods("PATCH")
-	//App.R.HandleFunc("/synapse/{id}", actionSynapseDelete).Methods("DELETE")
+	//App.R.HandleFunc("/cells", actionCellsGet).Methods("GET")
+	App.R.HandleFunc("/cells/{id}", actionCellsCreate).Methods("POST")
+	App.R.HandleFunc("/cells/{id}", actionCellsUpdate).Methods("PATCH")
+	//App.R.HandleFunc("/cells/{id}", actionCellsDelete).Methods("DELETE")
 
 	go saveData()
 
@@ -152,9 +152,9 @@ func actionIndex(w http.ResponseWriter, r *http.Request) {
 	w.Write(rsp.Make())
 }
 
-func actionSynapseCreate(w http.ResponseWriter, r *http.Request) {
+func actionCellsCreate(w http.ResponseWriter, r *http.Request) {
 	var (
-		model Synapse
+		model Cell
 		rsp   = core.Response{Data: &model, Req: r}
 		vars  = mux.Vars(r)
 	)
@@ -166,9 +166,9 @@ func actionSynapseCreate(w http.ResponseWriter, r *http.Request) {
 	w.Write(rsp.Make())
 }
 
-func actionSynapseUpdate(w http.ResponseWriter, r *http.Request) {
+func actionCellsUpdate(w http.ResponseWriter, r *http.Request) {
 	var (
-		model Synapse
+		model Cell
 		rsp   = core.Response{Data: &model, Req: r}
 		vars  = mux.Vars(r)
 	)

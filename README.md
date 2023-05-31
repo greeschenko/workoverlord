@@ -5,8 +5,8 @@
 # HOW it work
 
 - User run app by first time and set up the SECRETKEY for data enscription 
-- User create data map by eding infinity count of primitive data elements (synapses) 
-- each synapse can store text, image, video, map, link.. etc. and as many as need nested elements 
+- User create data map by eding infinity count of primitive data elements (cells) 
+- each cell can store text, image, video, map, link.. etc. and as many as need nested elements 
 - User can add reminding to the any place on the data map
 - User can run any system app with reminding 
 - all data store only on local device storage
@@ -15,8 +15,8 @@
 # TODO
 
 - [ ] basic backend
-- [ ] backend test
 - [ ] encription
+- [ ] backend test
 - [ ] build in maindmap frontend
 - [ ] AI implementation for auto remindings, auto element position etc.
 ...
@@ -24,26 +24,37 @@
 # Data structure
 
 ```
-Maind: [
-    Synapse1...,
-    Synapse2: {
-        size: [2]int
-        position: [2]int
-        routs: [][2]int
-        pointers: [][2]int
-        data: string
-        synapses: [
+Maind: [                                    //user second brain database object
+    Cell1...,                               //data element
+    Cell2: {                                //list of child elements
+        size: [2]int                        //geometric width and height for frontend
+        position: [3]int                    //position on the map, X, Y and Z
+        data: string                        //user data
+        synapses: [                         //list of connections for an element
             Synapse11...,
-            Synapse12...,
+            Synapse12{
+                positions: [][3]int         //connection line ends coordinates X,Y,Z
+                size: int                   //line width
+                color: string               //line color
+                type: string                //line type solid | dashed ...
+                end: [2]string              //line end style none, none | none, arrow | point, point ... etc
+            },
             Synapse13...,
             ...
             Synapse1N...,
         ],
-        tags: string,
+        cells: [
+            Cell11...,
+            Cell12...,
+            Cell13...,
+            ...
+            Cell1N...,
+        ],
+        tags: string,                       //list of element tags
     }
-    Synapse3...,
+    Cell3...,
     ...
-    SynapseN...,
+    CellN...,
 ]
 
 ```

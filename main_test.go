@@ -11,7 +11,7 @@ import (
 type TestDataItem struct {
 	name    string
 	proto   string
-	args    Synapse
+	args    Cell
 	indexes [4]int
 }
 
@@ -23,7 +23,7 @@ var (
 			{
 				"check id gen",
 				"0",
-				Synapse{
+				Cell{
 					Data:   fake.Words(),
 					Status: "new",
 					Tags:   "tag1, tag2, tag3",
@@ -33,7 +33,7 @@ var (
 			{
 				"check id gen for parent",
 				"ff00",
-				Synapse{
+				Cell{
 					Data:   fake.Words(),
 					Status: "new",
 					Tags:   "tag1, tag2, tag3",
@@ -42,11 +42,11 @@ var (
 			},
 		},
 		"createroot": {
-			//create two synapse in root
+			//create two Cell in root
 			{
-				"create synapse #1",
+				"create Cell #1",
 				"POST",
-				Synapse{
+				Cell{
 					Data:   fake.Words(),
 					Status: "new",
 					Tags:   "tag1, tag2, tag3",
@@ -54,9 +54,9 @@ var (
 				[4]int{0, 0, 0, 0},
 			},
 			{
-				"create synapse #2",
+				"create Cell #2",
 				"POST",
-				Synapse{
+				Cell{
 					Data:   fake.Words(),
 					Status: "new",
 					Tags:   "tag1, tag2",
@@ -66,9 +66,9 @@ var (
 		},
 		"addchildren": {
 			{
-				"add synapse #3 to #1",
+				"add Cell #3 to #1",
 				"POST",
-				Synapse{
+				Cell{
 					Data:   fake.Words(),
 					Status: "new",
 					Tags:   "tag1, tag4",
@@ -76,9 +76,9 @@ var (
 				[4]int{0, 0, 0, 0},
 			},
 			{
-				"add synapse #4 to #1",
+				"add Cell #4 to #1",
 				"POST",
-				Synapse{
+				Cell{
 					Data:   fake.Words(),
 					Status: "new",
 					Tags:   "tag5",
@@ -88,34 +88,34 @@ var (
 		},
 		"update": {
 			{
-				"update synapse #1",
+				"update Cell #1",
 				"PATCH",
-				Synapse{
+				Cell{
 					Data: fake.Words(),
 				},
 				[4]int{0, 0, 0, 0},
 			},
 			{
-				"update synapse #1",
+				"update Cell #1",
 				"PATCH",
-				Synapse{
+				Cell{
 					Data: fake.Words(),
 					Tags: "tag1",
 				},
 				[4]int{0, 0, 0, 0},
 			},
 			{
-				"archive synapse #1",
+				"archive Cell #1",
 				"PATCH",
-				Synapse{
+				Cell{
 					Status: "archived",
 				},
 				[4]int{0, 0, 0, 0},
 			},
 			{
-				"delete synapse #1",
+				"delete Cell #1",
 				"PATCH",
-				Synapse{
+				Cell{
 					Status: "deleted",
 				},
 				[4]int{0, 0, 0, 0},
@@ -125,21 +125,21 @@ var (
 			{
 				"get all data",
 				"GET",
-				Synapse{},
+				Cell{},
 				[4]int{0, 0, 0, 0},
 			},
 		},
 		"move": {
 			{
-				"move synapse #3 to #2",
+				"move Cell #3 to #2",
 				"PATCH",
-				Synapse{},
+				Cell{},
 				[4]int{0, 0, 1, 0}, //move from position 0 0 to position 1 0
 			},
 			{
-				"move synapse #4 to #2",
+				"move Cell #4 to #2",
 				"PATCH",
-				Synapse{},
+				Cell{},
 				[4]int{0, 0, 1, 0}, //repeat move from 0 0 to 1 0
 			},
 		},
@@ -147,7 +147,7 @@ var (
 			{
 				"change sub element order in #2",
 				"PATCH",
-				Synapse{},
+				Cell{},
 				[4]int{1, 1, 1, 0}, //change position from 1 1 to 1 0
 			},
 		},
@@ -172,7 +172,7 @@ var (
 
 // Test actions without auntification
 /*func Test_actionsWithoutAuntification(t *testing.T) {
-	var url = Apiurl + "/synapse"
+	var url = Apiurl + "/cells"
 	tests := TestData["auntification"]
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -195,16 +195,16 @@ func Test_GenID(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 
-			tmpsynapse := tt.args
+			tmpCell := tt.args
 
-			tmpsynapse.genID(tt.proto)
+			tmpCell.genID(tt.proto)
 
-			if tmpsynapse.ID == "" {
+			if tmpCell.ID == "" {
 				t.Errorf("ID is empty, gen dont work")
 			}
 
-			if len(tmpsynapse.ID) != 4 && len(tmpsynapse.ID) != 9 {
-				t.Errorf("ID has wrong len = %d, want %v", len(tmpsynapse.ID), 4)
+			if len(tmpCell.ID) != 4 && len(tmpCell.ID) != 9 {
+				t.Errorf("ID has wrong len = %d, want %v", len(tmpCell.ID), 4)
 			}
 		})
 	}
@@ -212,12 +212,12 @@ func Test_GenID(t *testing.T) {
 
 // Test create actions
 func Test_actionsCreateRoot(t *testing.T) {
-	var url = Apiurl + "/synapse"
+	var url = Apiurl + "/cells"
 	tests := TestData["createroot"]
 	//get test user auntification token
 	for k, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var synapse SynapseData
+			var Cell CellData
 			iurl := url + "/0"
 
 			userJson, err := json.MarshalIndent(tt.args, " ", " ")
@@ -231,23 +231,23 @@ func Test_actionsCreateRoot(t *testing.T) {
 				t.Errorf("Wrong Response status = %s, want %v", resp.Status, 200)
 			}
 
-			synapse.Read(resp)
+			Cell.Read(resp)
 
-			if synapse.Data.ID == "" {
-				t.Errorf("Wrong ID synapse not created")
+			if Cell.Data.ID == "" {
+				t.Errorf("Wrong ID Cell not created")
 			}
-			TestData["createroot"][k].args.ID = synapse.Data.ID
+			TestData["createroot"][k].args.ID = Cell.Data.ID
 		})
 	}
 }
 
 func Test_actionsCreateChildren(t *testing.T) {
-	var url = Apiurl + "/synapse"
+	var url = Apiurl + "/cells"
 	tests := TestData["addchildren"]
 	//get test user auntification token
 	for k, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var synapse SynapseData
+			var Cell CellData
 			iurl := url + "/" + TestData["createroot"][0].args.ID
 
 			userJson, err := json.MarshalIndent(tt.args, " ", " ")
@@ -261,23 +261,23 @@ func Test_actionsCreateChildren(t *testing.T) {
 				t.Errorf("Wrong Response status = %s, want %v", resp.Status, 200)
 			}
 
-			synapse.Read(resp)
+			Cell.Read(resp)
 
-			if synapse.Data.ID == "" {
-				t.Errorf("Wrong ID synapse not created")
+			if Cell.Data.ID == "" {
+				t.Errorf("Wrong ID Cell not created")
 			}
-			TestData["addchildren"][k].args.ID = synapse.Data.ID
+			TestData["addchildren"][k].args.ID = Cell.Data.ID
 		})
 	}
 }
 
 func Test_actionsUpdate(t *testing.T) {
-	var url = Apiurl + "/synapse"
+	var url = Apiurl + "/cells"
 	tests := TestData["update"]
 	//get test user auntification token
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var synapse SynapseData
+			var Cell CellData
 			iurl := url + "/" + TestData["createroot"][0].args.ID
 
 			userJson, err := json.MarshalIndent(tt.args, " ", " ")
@@ -291,10 +291,10 @@ func Test_actionsUpdate(t *testing.T) {
 				t.Errorf("Wrong Response status = %s, want %v", resp.Status, 200)
 			}
 
-			synapse.Read(resp)
+			Cell.Read(resp)
 
-			if len(synapse.Errors) > 0 {
-				t.Error("Api return Errs", synapse.Errors)
+			if len(Cell.Errors) > 0 {
+				t.Error("Api return Errs", Cell.Errors)
 			}
 		})
 	}
