@@ -111,7 +111,7 @@ func main() {
 	}
 
 	App.R.HandleFunc("/", actionIndex).Methods("GET")
-	//App.R.HandleFunc("/cells", actionCellsGet).Methods("GET")
+	App.R.HandleFunc("/cells", actionCellsGet).Methods("GET")
 	App.R.HandleFunc("/cells/{id}", actionCellsCreate).Methods("POST")
 	App.R.HandleFunc("/cells/{id}", actionCellsUpdate).Methods("PATCH")
 	//App.R.HandleFunc("/cells/{id}", actionCellsDelete).Methods("DELETE")
@@ -140,6 +140,21 @@ func doRequest(url, proto, userJson, token string) *http.Response {
 }
 
 func actionIndex(w http.ResponseWriter, r *http.Request) {
+
+    dat, err := os.ReadFile("index.html")
+	if err != nil {
+		log.Fatal(err)
+	}
+    fmt.Print(dat)
+
+	//fmt.Println("USERMIND", USERMIND)
+
+	//data = USERMIND
+
+	w.Write([]byte(dat))
+}
+
+func actionCellsGet(w http.ResponseWriter, r *http.Request) {
 	var (
 		data Mind
 		rsp  = core.Response{Data: &data, Req: r}
