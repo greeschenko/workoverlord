@@ -4,42 +4,37 @@ import './App.css';
 import Cell from './components/Cell'
 import Synapse from './components/Synapse'
 
+
+
 const tmpdata = `
-    <div>
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed mollis mollis
-        mi ut ultricies. Nullam magna ipsum, porta vel dui convallis, rutrum
-        imperdiet eros. Aliquam erat volutpat.
-    </div>
-    <br />
-    <iframe
-        width="350"
-        height="200"
-        src="https://www.youtube.com/embed/wHPaGn5Q5ug"
-        title="YouTube video player"
-    ></iframe>
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed mollis mollis mi ut ultricies. Nullam magna ipsum, porta vel dui convallis, rutrum
+imperdiet eros. Aliquam erat volutpat.
+
+https://www.youtube.com/embed/wHPaGn5Q5ug
 `;
 
 const tmpdata1 = `
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed mollis mollis
-        mi ut ultricies. Nullam magna ipsum, porta vel dui convallis, rutrum
-        imperdiet eros. Aliquam erat volutpat.
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed mollis mollis
+mi ut ultricies. Nullam magna ipsum, porta vel dui convallis, rutrum
+imperdiet eros. Aliquam erat volutpat.
 
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed mollis mollis
-        mi ut ultricies. Nullam magna ipsum, porta vel dui convallis, rutrum
-        imperdiet eros. Aliquam erat volutpat.
+    - lsdjflsdjf
+    - lsdjflsdjf
 
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed mollis mollis
-        mi ut ultricies. Nullam magna ipsum, porta vel dui convallis, rutrum
-        imperdiet eros. Aliquam erat volutpat.
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed mollis mollis
+mi ut ultricies. Nullam magna ipsum, porta vel dui convallis, rutrum
+imperdiet eros. Aliquam erat volutpat.
 
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed mollis mollis
-        mi ut ultricies. Nullam magna ipsum, porta vel dui convallis, rutrum
-        imperdiet eros. Aliquam erat volutpat.
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed mollis mollis
+mi ut ultricies. Nullam magna ipsum, porta vel dui convallis, rutrum
+imperdiet eros. Aliquam erat volutpat.
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed mollis mollis
+mi ut ultricies. Nullam magna ipsum, porta vel dui convallis, rutrum
+imperdiet eros. Aliquam erat volutpat.
 `;
 
-const tmpdata2 = `
-    <img width="300" src="https://cdna.artstation.com/p/assets/images/images/053/956/262/medium/sentron-edgerunner-copy.jpg?1663424023"/>
-`;
+const tmpdata2 = `https://cdna.artstation.com/p/assets/images/images/053/956/262/medium/sentron-edgerunner-copy.jpg`;
 
 function App() {
     return (
