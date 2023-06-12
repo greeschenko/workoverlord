@@ -106,7 +106,7 @@ function App() {
                     </b>
                 </p>
             </div>
-            <svg width={1000} height={1000} xmlns="http://www.w3.org/2000/svg">
+            <svg width={10000} height={10000} xmlns="http://www.w3.org/2000/svg">
                 <Cell
                     x={100}
                     y={20}
@@ -123,7 +123,7 @@ function App() {
                     x={100}
                     y={400}
                     width={320}
-                    height={300}
+                    height={550}
                     data={tmpdata1}
                     selected={selected == "1"}
                     onClick={() => {

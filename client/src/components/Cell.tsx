@@ -55,7 +55,7 @@ export default function Test(
                 height={height}
                 x={cX}
                 y={cY}
-                fill="#282c34"
+                fill="none"
                 stroke={selected ? "tomato" : "cadetblue"}
                 stroke-width={2}
             />
