@@ -1,8 +1,30 @@
 import React from 'react';
+import {XY} from '../models/XY'
 
-export default function Test({ data, x, y, width, height }: { data: any, x: number, y: number, width: number, height: number }) {
+export default function Test(
+    { data, x, y, width, height, selected, onClick, mousePosition }:
+        {
+            data: any,
+            x: number,
+            y: number,
+            width: number,
+            height: number,
+            selected: boolean,
+            onClick: () => void,
+            mousePosition: XY,
+        }) {
 
-    const [selected, setSelected] = React.useState(false);
+    const [isMoved, setIsMoved] = React.useState(false);
+    const [isResized, setIsResized] = React.useState(false);
+    const [cX, setCX] = React.useState(x);
+    const [cY, setCY] = React.useState(y);
+
+    React.useEffect(() => {
+        if (isMoved) {
+            setCX(mousePosition.x + 24/2);
+            setCY(mousePosition.y + 24/2)
+        }
+    }, [mousePosition]);
 
     const handleLinks = (data: string): string => {
 
@@ -13,24 +35,36 @@ export default function Test({ data, x, y, width, height }: { data: any, x: numb
         return data
     };
 
+    const handleMove = () => {
+        console.log("move move move");
+    }
+
+    const handleAdd = () => {
+        console.log("add add add");
+    }
+
+    const handleResize = () => {
+        console.log("resize resize");
+    }
+
     return (
         <g fill="white" stroke="green" stroke-width="5">
             <rect
                 rx="6"
                 width={width}
                 height={height}
-                x={x}
-                y={y}
+                x={cX}
+                y={cY}
                 fill="#282c34"
                 stroke={selected ? "tomato" : "cadetblue"}
                 stroke-width={2}
             />
             <foreignObject
-                x={x + 10}
-                y={y + 10}
+                x={cX + 10}
+                y={cY + 10}
                 width={width - 20}
                 height={height - 20}
-                onClick={() => { setSelected(!selected) }}
+                onClick={onClick}
             >
                 <div
                     style={{ color: "pink", whiteSpace: "pre-wrap" }}
@@ -41,34 +75,38 @@ export default function Test({ data, x, y, width, height }: { data: any, x: numb
                 rx="3"
                 width={20}
                 height={20}
-                x={x - 24}
-                y={y - 24}
+                x={cX - 24}
+                y={cY - 24}
                 fill="#282c34"
                 stroke={selected ? "tomato" : "cadetblue"}
                 stroke-width={2}
                 display={selected ? "inherit" : "none"}
+                onMouseDown={() => setIsMoved(true)}
+                onMouseUp={() => setIsMoved(false)}
             />
             <rect
                 rx="3"
                 width={20}
                 height={20}
-                x={x + width + 4}
-                y={y - 24}
+                x={cX + width + 4}
+                y={cY - 24}
                 fill="#282c34"
                 stroke={selected ? "tomato" : "cadetblue"}
                 stroke-width={2}
                 display={selected ? "inherit" : "none"}
+                onClick={handleAdd}
             />
             <rect
                 rx="3"
                 width={20}
                 height={20}
-                x={x + width + 4}
-                y={y + height + 4}
+                x={cX + width + 4}
+                y={cY + height + 4}
                 fill="#282c34"
                 stroke={selected ? "tomato" : "cadetblue"}
                 stroke-width={2}
                 display={selected ? "inherit" : "none"}
+                onClick={handleResize}
             />
         </g>
     );
