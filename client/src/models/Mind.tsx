@@ -1,17 +1,17 @@
-export type Mind = Cell[]
+export type MindModel = CellModel[]
 
-export type Cell = {
+export type CellModel = {
     id: string;
     data: string;
     status: string;
     tags?: string;
-    size?: number[];
-    position?: number[];
-    cells?: Cell[];
-    synapses?: Synapse[];
+    size: number[];
+    position: number[];
+    cells?: CellModel[];
+    synapses?: SynapseModel[];
 }
 
-export type Synapse = {
+export type SynapseModel = {
     points?: number[][];
     size?: number;
     color?: string;

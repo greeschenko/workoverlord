@@ -4,6 +4,7 @@ import './App.css';
 import Cell from './components/Cell'
 import Synapse from './components/Synapse'
 import { XY } from './models/XY'
+import { MindModel, CellModel, SynapseModel } from './models/Mind'
 
 const tmpdata = `
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed mollis mollis mi ut ultricies. Nullam magna ipsum, porta vel dui convallis, rutrum
@@ -35,7 +36,34 @@ imperdiet eros. Aliquam erat volutpat.
 
 const tmpdata2 = `https://cdna.artstation.com/p/assets/images/images/053/956/262/medium/sentron-edgerunner-copy.jpg`;
 
+const Cells = ({ data, selected, coords, setSelected }: { data: CellModel[], selected: string, coords: XY, setSelected: any }) => {
+    return (
+        <g>
+            {data.map(cell => {
+                return (
+                    <g>
+                    <Cell
+                        x={cell.position[0]}
+                        y={cell.position[1]}
+                        width={cell.size[0]}
+                        height={cell.size[1]}
+                        data={cell.data}
+                        selected={selected == "0"}
+                        onClick={() => {
+                            setSelected("0");
+                        }}
+                        mousePosition={coords}
+                    />
+                   <Cells data={cell.cells || []} selected={selected} coords={coords} setSelected={setSelected} />
+                    </g>
+                );
+            })}
+        </g>
+    );
+}
+
 function App() {
+    const [data, setData] = React.useState<MindModel>([]);
 
     const [selected, setSelected] = React.useState("");
 
@@ -64,7 +92,7 @@ function App() {
                         if (res.errors != null) {
                             console.log(res.errors);
                         } else {
-                            console.log(res);
+                            setData(res.data);
                         }
                     });
                 } else {
@@ -78,6 +106,9 @@ function App() {
         );
     }, [datachange]);
 
+    React.useEffect(() => {
+        console.log("DATA", data);
+    }, [data]);
 
     React.useEffect(() => {
         const handleWindowMouseMove = (event: any) => {
@@ -107,6 +138,8 @@ function App() {
                 </p>
             </div>
             <svg width={10000} height={10000} xmlns="http://www.w3.org/2000/svg">
+                <Cells data={data} selected={selected} coords={coords} setSelected={setSelected} />
+                {/*
                 <Cell
                     x={100}
                     y={20}
@@ -147,6 +180,7 @@ function App() {
                 <Synapse x1={250} y1={320} x2={250} y2={400} size={2} />
                 <Synapse x1={420} y1={620} x2={650} y2={620} size={2} />
                 <Synapse x1={650} y1={620} x2={650} y2={550} size={2} />
+                */}
             </svg>
         </div>
     );

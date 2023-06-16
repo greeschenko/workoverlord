@@ -48,7 +48,7 @@ export default function Test(
     }
 
     return (
-        <g fill="white" stroke="green" stroke-width="5">
+        <g style={{userSelect: selected ? "auto": "none"}} fill="white" stroke="green" stroke-width="5">
             <rect
                 rx="6"
                 width={width}
