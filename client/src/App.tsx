@@ -48,9 +48,9 @@ const Cells = ({ data, selected, coords, setSelected }: { data: CellModel[], sel
                         width={cell.size[0]}
                         height={cell.size[1]}
                         data={cell.data}
-                        selected={selected == "0"}
+                        selected={selected == cell.id}
                         onClick={() => {
-                            setSelected("0");
+                            setSelected(cell.id);
                         }}
                         mousePosition={coords}
                     />
