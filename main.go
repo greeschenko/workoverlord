@@ -1,6 +1,5 @@
 package main
 
-
 import (
 	"crypto/sha256"
 	"errors"
@@ -139,14 +138,13 @@ func doRequest(url, proto, userJson, token string) *http.Response {
 	return resp
 }
 
-
 func actionIndex(w http.ResponseWriter, r *http.Request) {
 
-    dat, err := os.ReadFile("index.html")
+	dat, err := os.ReadFile("index.html")
 	if err != nil {
 		log.Fatal(err)
 	}
-    fmt.Print(dat)
+	fmt.Print(dat)
 
 	//fmt.Println("USERMIND", USERMIND)
 
@@ -161,10 +159,10 @@ func actionCellsGet(w http.ResponseWriter, r *http.Request) {
 		rsp  = core.Response{Data: &data, Req: r}
 	)
 
-    w.Header().Set("Content-Type", "application/json; charset=utf-8")
-    w.Header().Set("Access-Control-Allow-Origin", "*")
-    w.Header().Set("Access-Control-Max-Age", "15")
-    w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Authorization")
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Max-Age", "15")
+	w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Authorization")
 
 	fmt.Println("USERMIND", USERMIND)
 

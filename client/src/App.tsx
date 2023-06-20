@@ -39,22 +39,22 @@ const tmpdata2 = `https://cdna.artstation.com/p/assets/images/images/053/956/262
 const Cells = ({ data, selected, coords, setSelected }: { data: CellModel[], selected: string, coords: XY, setSelected: any }) => {
     return (
         <g>
-            {data.map(cell => {
+            {data != null && data.map(cell => {
                 return (
                     <g>
-                    <Cell
-                        x={cell.position[0]}
-                        y={cell.position[1]}
-                        width={cell.size[0]}
-                        height={cell.size[1]}
-                        data={cell.data}
-                        selected={selected == cell.id}
-                        onClick={() => {
-                            setSelected(cell.id);
-                        }}
-                        mousePosition={coords}
-                    />
-                   <Cells data={cell.cells || []} selected={selected} coords={coords} setSelected={setSelected} />
+                        <Cell
+                            x={cell.position[0]}
+                            y={cell.position[1]}
+                            width={cell.size[0]}
+                            height={cell.size[1]}
+                            data={cell.data}
+                            selected={selected == cell.id}
+                            onClick={() => {
+                                setSelected(cell.id);
+                            }}
+                            mousePosition={coords}
+                        />
+                        <Cells data={cell.cells || []} selected={selected} coords={coords} setSelected={setSelected} />
                     </g>
                 );
             })}
