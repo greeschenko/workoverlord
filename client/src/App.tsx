@@ -6,35 +6,9 @@ import Synapse from './components/Synapse'
 import { XY } from './models/XY'
 import { MindModel, CellModel, SynapseModel } from './models/Mind'
 
-const tmpdata = `
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed mollis mollis mi ut ultricies. Nullam magna ipsum, porta vel dui convallis, rutrum
-imperdiet eros. Aliquam erat volutpat.
+import Fab from '@mui/material/Fab';
+import AddIcon from '@mui/icons-material/Add';
 
-https://www.youtube.com/embed/wHPaGn5Q5ug
-`;
-
-const tmpdata1 = `
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed mollis mollis
-mi ut ultricies. Nullam magna ipsum, porta vel dui convallis, rutrum
-imperdiet eros. Aliquam erat volutpat.
-
-    - lsdjflsdjf
-    - lsdjflsdjf
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed mollis mollis
-mi ut ultricies. Nullam magna ipsum, porta vel dui convallis, rutrum
-imperdiet eros. Aliquam erat volutpat.
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed mollis mollis
-mi ut ultricies. Nullam magna ipsum, porta vel dui convallis, rutrum
-imperdiet eros. Aliquam erat volutpat.
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed mollis mollis
-mi ut ultricies. Nullam magna ipsum, porta vel dui convallis, rutrum
-imperdiet eros. Aliquam erat volutpat.
-`;
-
-const tmpdata2 = `https://cdna.artstation.com/p/assets/images/images/053/956/262/medium/sentron-edgerunner-copy.jpg`;
 
 const Cells = ({ data, selected, coords, setSelected }: { data: CellModel[], selected: string, coords: XY, setSelected: any }) => {
     return (
@@ -129,6 +103,9 @@ function App() {
 
     return (
         <div className="App">
+            <Fab style={{position: "absolute", top: "90%", left: "90%"}} size="large" color="primary" aria-label="add">
+                <AddIcon />
+            </Fab>
             <div style={{ color: "white", position: "fixed", top: "10px", right: "10px" }}>
                 <p>
                     Mouse positioned at:{' '}
