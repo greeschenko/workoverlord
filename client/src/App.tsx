@@ -9,7 +9,6 @@ import { MindModel, CellModel, SynapseModel } from './models/Mind'
 import Fab from '@mui/material/Fab';
 import AddIcon from '@mui/icons-material/Add';
 
-
 const Cells = ({ data, selected, coords, setSelected }: { data: CellModel[], selected: string, coords: XY, setSelected: any }) => {
     return (
         <g>
