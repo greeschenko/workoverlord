@@ -5,11 +5,8 @@ import Cell from './components/Cell'
 import Synapse from './components/Synapse'
 import { XY } from './models/XY'
 import { MindModel, CellModel, SynapseModel } from './models/Mind'
-
-import Fab from '@mui/material/Fab';
-import AddIcon from '@mui/icons-material/Add';
-
 import Slider from './components/Slider'
+import CellForm from './components/CellForm'
 
 const Cells = ({ data, selected, coords, setSelected }: { data: CellModel[], selected: string, coords: XY, setSelected: any }) => {
     return (
@@ -24,7 +21,8 @@ const Cells = ({ data, selected, coords, setSelected }: { data: CellModel[], sel
                             height={cell.size[1]}
                             data={cell.data}
                             selected={selected == cell.id}
-                            onClick={() => {
+                            onClick={(event: any) => {
+                                event.stopPropagation();
                                 setSelected(cell.id);
                             }}
                             mousePosition={coords}
@@ -111,7 +109,7 @@ function App() {
 
     React.useEffect(() => {
         const handleWindowMouseMove = (event: any) => {
-            console.log(event);
+            //console.log(event);
             setCoords({
                 x: event.clientX,
                 y: event.clientY,
@@ -132,9 +130,7 @@ function App() {
     return (
         <div className="App">
             <Slider scaleIndex={scaleIndex} setValue={setScaleIndex} />
-            <Fab style={{ position: "absolute", bottom: "2em", right: "2em" }} size="large" color="primary" aria-label="add">
-                <AddIcon />
-            </Fab>
+            <CellForm />
             <div style={{ color: "white", position: "fixed", top: "10px", right: "10px" }}>
                 <p>
                     Mouse positioned at:{' '}
@@ -156,22 +152,14 @@ function App() {
                 </p>
             </div>
             <svg
+                onClick={() => {
+                    console.log("click back");
+                    setSelected("")
+                }}
                 onMouseDown={() => setIsViewMoved(true)}
                 onMouseUp={() => setIsViewMoved(false)}
                 viewBox={`${viewX} ${viewY} ${scaleIndex * width} ${scaleIndex * height}`} style={{ border: "1px solid red" }} xmlns="http://www.w3.org/2000/svg">
                 <Cells data={data} selected={selected} coords={coords} setSelected={setSelected} />
-                <Cell
-                    x={100}
-                    y={20}
-                    width={320}
-                    height={300}
-                    data={"sdlfjsdlfjsdl"}
-                    selected={selected == "0"}
-                    onClick={() => {
-                        setSelected("0");
-                    }}
-                    mousePosition={coords}
-                />
                 {/*
                 <Cell
                     x={100}

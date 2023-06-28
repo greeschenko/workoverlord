@@ -10,7 +10,7 @@ export default function Test(
             width: number,
             height: number,
             selected: boolean,
-            onClick: () => void,
+            onClick: (event: any) => void,
             mousePosition: XY,
         }) {
 
