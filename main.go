@@ -178,6 +178,11 @@ func actionCellsCreate(w http.ResponseWriter, r *http.Request) {
 		vars  = mux.Vars(r)
 	)
 
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Max-Age", "15")
+	w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Authorization")
+
 	if rsp.IsJsonParseDone(r.Body) && rsp.IsValidate() {
 		model = USERMIND.Extend(model, vars["id"])
 	}
@@ -191,6 +196,11 @@ func actionCellsUpdate(w http.ResponseWriter, r *http.Request) {
 		rsp   = core.Response{Data: &model, Req: r}
 		vars  = mux.Vars(r)
 	)
+
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Max-Age", "15")
+	w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Authorization")
 
 	if rsp.IsJsonParseDone(r.Body) && rsp.IsValidate() {
 		USERMIND.Find("id", vars["id"], true).Update(&model)

@@ -1,5 +1,9 @@
 import React from 'react';
-import {XY} from '../models/XY'
+import { XY } from '../models/XY'
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
 
 export default function Test(
     { data, x, y, width, height, selected, onClick, mousePosition }:
@@ -14,6 +18,7 @@ export default function Test(
             mousePosition: XY,
         }) {
 
+    const [deleteopen, setDeleteopen] = React.useState(false);
     const [isMoved, setIsMoved] = React.useState(false);
     const [isResized, setIsResized] = React.useState(false);
     const [cX, setCX] = React.useState(x);
@@ -21,8 +26,8 @@ export default function Test(
 
     React.useEffect(() => {
         if (isMoved) {
-            setCX(mousePosition.x + 24/2);
-            setCY(mousePosition.y + 24/2)
+            setCX(mousePosition.x + 24 / 2);
+            setCY(mousePosition.y + 24 / 2)
         }
     }, [mousePosition]);
 
@@ -48,8 +53,30 @@ export default function Test(
         console.log("resize resize");
     }
 
+    const handleDeleteStart = (event: any) => {
+        event.stopPropagation();
+        setDeleteopen(true);
+    }
+
+    const handleDeleteClose = () => {
+        setDeleteopen(false);
+    }
+
+    const handleDeleteSubmit = () => {
+        console.log("lsjdflsdjfl");
+    }
+
     return (
-        <g style={{userSelect: selected ? "auto": "none"}} fill="white" stroke="green" stroke-width="5">
+        <g style={{ userSelect: selected ? "auto" : "none" }} fill="white" stroke="green" stroke-width="5">
+            <Dialog fullWidth={false} open={deleteopen} onClose={handleDeleteClose}>
+                <DialogContent>
+                    You are shure?
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleDeleteClose}>Cancel</Button>
+                    <Button onClick={handleDeleteSubmit}>Save</Button>
+                </DialogActions>
+            </Dialog>
             <rect
                 rx="6"
                 width={width}
@@ -95,7 +122,7 @@ export default function Test(
                 stroke={selected ? "tomato" : "cadetblue"}
                 stroke-width={2}
                 display={selected ? "inherit" : "none"}
-                onClick={handleAdd}
+                onClick={handleDeleteStart}
             />
             <rect
                 rx="3"

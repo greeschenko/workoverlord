@@ -4,16 +4,76 @@ import TextField from '@mui/material/TextField';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
 import Fab from '@mui/material/Fab';
 import AddIcon from '@mui/icons-material/Add';
+import Alert from '@mui/material/Alert';
+import Stack from '@mui/material/Stack';
 
-export default function FormDialog() {
+import { CellModel } from '../models/Mind'
+import { XY } from '../models/XY'
+
+
+
+export default function FormDialog(
+    { coords, setDataChange }: {
+        coords: XY,
+        setDataChange: React.Dispatch<React.SetStateAction<number>>
+    }) {
+    const [pendingPosition, setPendingPosition] = React.useState(false);
+    const [pendingSize, setPendingSize] = React.useState(false);
     const [open, setOpen] = React.useState(false);
 
-    const handleClickOpen = () => {
-        setOpen(true);
+    const [formdata, setFormdata] = React.useState<CellModel>({
+        data: "",
+        tags: "",
+        position: [0, 0, 0],
+        size: [0, 0]
+    });
+
+    React.useEffect(() => {
+        console.log("FORMDATA", formdata);
+    }, [formdata]);
+
+    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setFormdata({ ...formdata, [event.target.name]: event.target.value });
+    }
+
+    const handleSubmit = () => {
+        const url = "http://localhost:2222/cells/0";
+        fetch(url, {
+            method: "POST",
+            //mode: "no-cors",
+            body: JSON.stringify(formdata),
+            headers: {
+                //"Content-Type": "application/json",
+                //Authorization: "Bearer " + "sdflsdjfl",
+            },
+            //credentials: "same-origin",
+        }).then(
+            function(response) {
+                if (response.status === 200) {
+                    response.json().then(function(res) {
+                        console.log(res);
+                        if (res.errors != null) {
+                            console.log(res.errors);
+                        } else {
+                            setOpen(false);
+                            setDataChange(Date.now());
+                        }
+                    });
+                } else {
+                    console.log(response);
+                    alert("ERROR: " + response.status + " - " + response.statusText);
+                }
+            },
+            function(error) {
+                alert(error.message);
+            }
+        );
+    }
+
+    const handleClickPending = () => {
+        setPendingPosition(true);
     };
 
     const handleClose = () => {
@@ -22,35 +82,80 @@ export default function FormDialog() {
 
     return (
         <div>
+            <div
+                style={{
+                    display: pendingPosition || pendingSize ? "block" : "none",
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    width: "100%",
+                    height: "100%",
+                    cursor: "crosshair",
+                }}
+                onClick={(e) => {
+                    console.log(e);
+                    if (pendingPosition) {
+                        setPendingPosition(false);
+                        setPendingSize(true);
+                        setFormdata({ ...formdata, ['position']: [coords.x, coords.y, 0] });
+                    } else if (pendingSize) {
+                        setPendingPosition(false);
+                        setPendingSize(false);
+                        setFormdata({ ...formdata, ['size']: [coords.x, coords.y] });
+                        setOpen(true);
+                    }
+                }}
+            ></div>
+            <Stack sx={{
+                position: "absolute",
+                top: "2em",
+                left: "2em",
+                display: pendingPosition || pendingSize ? "block" : "none",
+            }} spacing={2}>
+                <Alert variant="filled" severity="info">
+                    {pendingPosition
+                        ? "Select the element position on screen"
+                        : "Select the element size on screen"}
+                </Alert>
+            </Stack>
             <Fab
                 style={{ position: "absolute", bottom: "2em", right: "2em" }}
                 size="large"
-                color="primary"
+                color={pendingPosition || pendingSize ? "default" : "primary"}
                 aria-label="add"
-                onClick={handleClickOpen}
+                onClick={handleClickPending}
             >
                 <AddIcon />
             </Fab>
-            <Dialog open={open} onClose={handleClose}>
-                <DialogTitle>Subscribe</DialogTitle>
+            <Dialog fullWidth={true} open={open} onClose={handleClose}>
                 <DialogContent>
-                    <DialogContentText>
-                        To subscribe to this website, please enter your email address here. We
-                        will send updates occasionally.
-                    </DialogContentText>
                     <TextField
                         autoFocus
+                        multiline
+                        maxRows={6}
                         margin="dense"
-                        id="name"
-                        label="Email Address"
-                        type="email"
+                        id="data"
+                        name="data"
+                        label="Data"
                         fullWidth
                         variant="standard"
+                        value={formdata.data}
+                        onChange={handleChange}
+                    />
+                    <TextField
+                        margin="dense"
+                        id="tags"
+                        name="tags"
+                        label="Tags"
+                        fullWidth
+                        variant="standard"
+                        value={formdata.tags}
+                        onChange={handleChange}
                     />
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleClose}>Cancel</Button>
-                    <Button onClick={handleClose}>Subscribe</Button>
+                    <Button onClick={handleSubmit}>Save</Button>
                 </DialogActions>
             </Dialog>
         </div>

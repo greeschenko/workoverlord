@@ -1,9 +1,9 @@
 export type MindModel = CellModel[]
 
 export type CellModel = {
-    id: string;
+    id?: string;
     data: string;
-    status: string;
+    status?: string;
     tags?: string;
     size: number[];
     position: number[];

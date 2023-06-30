@@ -37,14 +37,9 @@ const Cells = ({ data, selected, coords, setSelected }: { data: CellModel[], sel
 
 function App() {
     const [data, setData] = React.useState<MindModel>([]);
-
     const [selected, setSelected] = React.useState("");
-
-    const start: XY = { x: 0, y: 0, movX: 0, movY: 0 };
-
-    const [coords, setCoords] = React.useState(start);
+    const [coords, setCoords] = React.useState<XY>({ x: 0, y: 0, movX: 0, movY: 0 });
     const [scaleIndex, setScaleIndex] = React.useState(1);
-
     const [datachange, setDataChange] = React.useState(0);
     const [width, setWidth] = React.useState(window.innerWidth);
     const [height, setHeight] = React.useState(window.innerHeight);
@@ -130,7 +125,7 @@ function App() {
     return (
         <div className="App">
             <Slider scaleIndex={scaleIndex} setValue={setScaleIndex} />
-            <CellForm />
+            <CellForm coords={coords} setDataChange={setDataChange}/>
             <div style={{ color: "white", position: "fixed", top: "10px", right: "10px" }}>
                 <p>
                     Mouse positioned at:{' '}
