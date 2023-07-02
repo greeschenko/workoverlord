@@ -6,8 +6,9 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 
 export default function Test(
-    { data, x, y, width, height, selected, onClick, mousePosition }:
+    { id, data, x, y, width, height, selected, onClick, mousePosition }:
         {
+            id: string,
             data: any,
             x: number,
             y: number,
@@ -18,7 +19,7 @@ export default function Test(
             mousePosition: XY,
         }) {
 
-    const [deleteopen, setDeleteopen] = React.useState(false);
+    const [archiveopen, setArchiveopen] = React.useState(false);
     const [isMoved, setIsMoved] = React.useState(false);
     const [isResized, setIsResized] = React.useState(false);
     const [cX, setCX] = React.useState(x);
@@ -53,28 +54,28 @@ export default function Test(
         console.log("resize resize");
     }
 
-    const handleDeleteStart = (event: any) => {
+    const handleArchiveStart = (event: any) => {
         event.stopPropagation();
-        setDeleteopen(true);
+        setArchiveopen(true);
     }
 
-    const handleDeleteClose = () => {
-        setDeleteopen(false);
+    const handleArchiveClose = () => {
+        setArchiveopen(false);
     }
 
-    const handleDeleteSubmit = () => {
-        console.log("lsjdflsdjfl");
+    const handleArchiveSubmit = () => {
+        console.log(id);
     }
 
     return (
         <g style={{ userSelect: selected ? "auto" : "none" }} fill="white" stroke="green" stroke-width="5">
-            <Dialog fullWidth={false} open={deleteopen} onClose={handleDeleteClose}>
+            <Dialog fullWidth={false} open={archiveopen} onClose={handleArchiveClose}>
                 <DialogContent>
-                    You are shure?
+                    Put to the archive. You are shure?
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleDeleteClose}>Cancel</Button>
-                    <Button onClick={handleDeleteSubmit}>Save</Button>
+                    <Button onClick={handleArchiveClose}>Cancel</Button>
+                    <Button onClick={handleArchiveSubmit}>Submit</Button>
                 </DialogActions>
             </Dialog>
             <rect
@@ -112,18 +113,21 @@ export default function Test(
                 onMouseDown={() => setIsMoved(true)}
                 onMouseUp={() => setIsMoved(false)}
             />
-            <rect
-                rx="3"
-                width={20}
-                height={20}
-                x={cX + width + 4}
-                y={cY - 24}
-                fill="#282c34"
-                stroke={selected ? "tomato" : "cadetblue"}
-                stroke-width={2}
-                display={selected ? "inherit" : "none"}
-                onClick={handleDeleteStart}
-            />
+            <g display={selected ? "inherit" : "none"}>
+                <rect
+                    rx="3"
+                    width={20}
+                    height={20}
+                    x={cX + width + 4}
+                    y={cY - 24}
+                    fill="#282c34"
+                    stroke={selected ? "tomato" : "cadetblue"}
+                    stroke-width={2}
+                    onClick={handleArchiveStart}
+                />
+                <line x1={cX + width + 4} y1={cY - 24} x2={cX + width + 4 + 20} y2={cY - 24 + 20} stroke="pink" stroke-width="1" />
+                <line x1={cX + width + 4} y1={cY - 24 + 20} x2={cX + width + 4 + 20} y2={cY - 24} stroke="pink" stroke-width="1" />
+            </g>
             <rect
                 rx="3"
                 width={20}

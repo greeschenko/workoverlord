@@ -15,6 +15,7 @@ const Cells = ({ data, selected, coords, setSelected }: { data: CellModel[], sel
                 return (
                     <g>
                         <Cell
+                            id={cell.id}
                             x={cell.position[0]}
                             y={cell.position[1]}
                             width={cell.size[0]}
