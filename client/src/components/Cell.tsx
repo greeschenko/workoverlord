@@ -100,19 +100,22 @@ export default function Test(
                     dangerouslySetInnerHTML={{ __html: handleLinks(data) }}
                 />
             </foreignObject>
-            <rect
-                rx="3"
-                width={20}
-                height={20}
-                x={cX - 24}
-                y={cY - 24}
-                fill="#282c34"
-                stroke={selected ? "tomato" : "cadetblue"}
-                stroke-width={2}
-                display={selected ? "inherit" : "none"}
-                onMouseDown={() => setIsMoved(true)}
-                onMouseUp={() => setIsMoved(false)}
-            />
+            <g display={selected ? "inherit" : "none"} >
+                <rect
+                    rx="3"
+                    width={20}
+                    height={20}
+                    x={cX - 24}
+                    y={cY - 24}
+                    fill="#282c34"
+                    stroke={selected ? "tomato" : "cadetblue"}
+                    stroke-width={2}
+                    onMouseDown={() => setIsMoved(true)}
+                    onMouseUp={() => setIsMoved(false)}
+                />
+                <line x1={cX - 24 + 10} y1={cY - 24 + 5} x2={cX - 24 + 10} y2={cY - 4 - 5} stroke="pink" stroke-width="1" />
+                <line x1={cX - 24 + 5} y1={cY - 24 + 10} x2={cX - 24 + 20 - 5} y2={cY - 24 + 10} stroke="pink" stroke-width="1" />
+            </g>
             <g display={selected ? "inherit" : "none"}>
                 <rect
                     rx="3"
@@ -125,21 +128,24 @@ export default function Test(
                     stroke-width={2}
                     onClick={handleArchiveStart}
                 />
-                <line x1={cX + width + 4} y1={cY - 24} x2={cX + width + 4 + 20} y2={cY - 24 + 20} stroke="pink" stroke-width="1" />
-                <line x1={cX + width + 4} y1={cY - 24 + 20} x2={cX + width + 4 + 20} y2={cY - 24} stroke="pink" stroke-width="1" />
+                <line x1={cX + width + 4 + 5} y1={cY - 24 + 5} x2={cX + width + 4 + 20 - 5} y2={cY - 24 + 20 - 5} stroke="pink" stroke-width="1" />
+                <line x1={cX + width + 4 + 5} y1={cY - 24 + 20 - 5} x2={cX + width + 4 + 20 - 5} y2={cY - 24 + 5} stroke="pink" stroke-width="1" />
             </g>
-            <rect
-                rx="3"
-                width={20}
-                height={20}
-                x={cX + width + 4}
-                y={cY + height + 4}
-                fill="#282c34"
-                stroke={selected ? "tomato" : "cadetblue"}
-                stroke-width={2}
-                display={selected ? "inherit" : "none"}
-                onClick={handleResize}
-            />
+            <g display={selected ? "inherit" : "none"}>
+                <rect
+                    rx="3"
+                    width={20}
+                    height={20}
+                    x={cX + width + 4}
+                    y={cY + height + 4}
+                    fill="#282c34"
+                    stroke={selected ? "tomato" : "cadetblue"}
+                    stroke-width={2}
+                    onClick={handleResize}
+                />
+                <line x1={cX + width + 4 + 5} y1={cY + height + 4 + 20 - 5} x2={cX + width + 4 + 20 - 5} y2={cY + height + 4 + 20 - 5} stroke="pink" stroke-width="1" />
+                <line x1={cX + width + 4 + 20 - 5} y1={cY + height + 4 + 20 - 5} x2={cX + width + 4 + 20 - 5} y2={cY + height + 4 + 5} stroke="pink" stroke-width="1" />
+            </g>
         </g>
     );
 
