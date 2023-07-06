@@ -6,7 +6,7 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 
 export default function Test(
-    { id, data, x, y, width, height, selected, onClick, mousePosition }:
+    { id, data, x, y, width, height, selected, setSelected, mousePosition }:
         {
             id: string,
             data: any,
@@ -15,7 +15,7 @@ export default function Test(
             width: number,
             height: number,
             selected: boolean,
-            onClick: (event: any) => void,
+            setSelected: any,
             mousePosition: XY,
         }) {
 
@@ -24,11 +24,17 @@ export default function Test(
     const [isResized, setIsResized] = React.useState(false);
     const [cX, setCX] = React.useState(x);
     const [cY, setCY] = React.useState(y);
+    const [cW, setCW] = React.useState(width);
+    const [cH, setCH] = React.useState(height);
 
     React.useEffect(() => {
         if (isMoved) {
-            setCX(mousePosition.x + 24 / 2);
-            setCY(mousePosition.y + 24 / 2)
+            setCX(cX + mousePosition.movX);
+            setCY(cY + mousePosition.movY)
+        }
+        if (isResized) {
+            setCW(cW + mousePosition.movX);
+            setCH(cH + mousePosition.movY);
         }
     }, [mousePosition]);
 
@@ -42,16 +48,8 @@ export default function Test(
         return data
     };
 
-    const handleMove = () => {
-        console.log("move move move");
-    }
-
     const handleAdd = () => {
         console.log("add add add");
-    }
-
-    const handleResize = () => {
-        console.log("resize resize");
     }
 
     const handleArchiveStart = (event: any) => {
@@ -80,8 +78,8 @@ export default function Test(
             </Dialog>
             <rect
                 rx="6"
-                width={width}
-                height={height}
+                width={cW}
+                height={cH}
                 x={cX}
                 y={cY}
                 fill="none"
@@ -91,9 +89,20 @@ export default function Test(
             <foreignObject
                 x={cX + 10}
                 y={cY + 10}
-                width={width - 20}
-                height={height - 20}
-                onClick={onClick}
+                width={cW - 20}
+                height={cH - 20}
+                onClick={(event)=>{
+                    event.stopPropagation();
+                    setSelected(id);
+                }}
+                onDoubleClick={()=>alert("lsdjfldsfj")}
+                onMouseDown={(event) => {
+                    event.stopPropagation();
+                    setIsMoved(true)
+                }}
+                onMouseUp={() => {
+                    setIsMoved(false)
+                }}
             >
                 <div
                     style={{ color: "pink", whiteSpace: "pre-wrap" }}
@@ -110,8 +119,6 @@ export default function Test(
                     fill="#282c34"
                     stroke={selected ? "tomato" : "cadetblue"}
                     stroke-width={2}
-                    onMouseDown={() => setIsMoved(true)}
-                    onMouseUp={() => setIsMoved(false)}
                 />
                 <line x1={cX - 24 + 10} y1={cY - 24 + 5} x2={cX - 24 + 10} y2={cY - 4 - 5} stroke="pink" stroke-width="1" />
                 <line x1={cX - 24 + 5} y1={cY - 24 + 10} x2={cX - 24 + 20 - 5} y2={cY - 24 + 10} stroke="pink" stroke-width="1" />
@@ -121,30 +128,36 @@ export default function Test(
                     rx="3"
                     width={20}
                     height={20}
-                    x={cX + width + 4}
+                    x={cX + cW + 4}
                     y={cY - 24}
                     fill="#282c34"
                     stroke={selected ? "tomato" : "cadetblue"}
                     stroke-width={2}
                     onClick={handleArchiveStart}
                 />
-                <line x1={cX + width + 4 + 5} y1={cY - 24 + 5} x2={cX + width + 4 + 20 - 5} y2={cY - 24 + 20 - 5} stroke="pink" stroke-width="1" />
-                <line x1={cX + width + 4 + 5} y1={cY - 24 + 20 - 5} x2={cX + width + 4 + 20 - 5} y2={cY - 24 + 5} stroke="pink" stroke-width="1" />
+                <line x1={cX + cW + 4 + 5} y1={cY - 24 + 5} x2={cX + cW + 4 + 20 - 5} y2={cY - 24 + 20 - 5} stroke="pink" stroke-width="1" />
+                <line x1={cX + cW + 4 + 5} y1={cY - 24 + 20 - 5} x2={cX + cW + 4 + 20 - 5} y2={cY - 24 + 5} stroke="pink" stroke-width="1" />
             </g>
             <g display={selected ? "inherit" : "none"}>
                 <rect
                     rx="3"
                     width={20}
                     height={20}
-                    x={cX + width + 4}
-                    y={cY + height + 4}
+                    x={cX + cW + 4}
+                    y={cY + cH + 4}
                     fill="#282c34"
                     stroke={selected ? "tomato" : "cadetblue"}
                     stroke-width={2}
-                    onClick={handleResize}
+                    onMouseDown={(event) => {
+                        event.stopPropagation();
+                        setIsResized(true)
+                    }}
+                    onMouseUp={() => {
+                        setIsResized(false)
+                    }}
                 />
-                <line x1={cX + width + 4 + 5} y1={cY + height + 4 + 20 - 5} x2={cX + width + 4 + 20 - 5} y2={cY + height + 4 + 20 - 5} stroke="pink" stroke-width="1" />
-                <line x1={cX + width + 4 + 20 - 5} y1={cY + height + 4 + 20 - 5} x2={cX + width + 4 + 20 - 5} y2={cY + height + 4 + 5} stroke="pink" stroke-width="1" />
+                <line x1={cX + cW + 4 + 5} y1={cY + cH + 4 + 20 - 5} x2={cX + cW + 4 + 20 - 5} y2={cY + cH + 4 + 20 - 5} stroke="pink" stroke-width="1" />
+                <line x1={cX + cW + 4 + 20 - 5} y1={cY + cH + 4 + 20 - 5} x2={cX + cW + 4 + 20 - 5} y2={cY + cH + 4 + 5} stroke="pink" stroke-width="1" />
             </g>
         </g>
     );

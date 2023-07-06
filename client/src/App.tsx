@@ -2,9 +2,8 @@ import React from 'react';
 //import logo from './logo.svg';
 import './App.css';
 import Cell from './components/Cell'
-import Synapse from './components/Synapse'
 import { XY } from './models/XY'
-import { MindModel, CellModel, SynapseModel } from './models/Mind'
+import { MindModel, CellModel} from './models/Mind'
 import Slider from './components/Slider'
 import CellForm from './components/CellForm'
 
@@ -22,10 +21,7 @@ const Cells = ({ data, selected, coords, setSelected }: { data: CellModel[], sel
                             height={cell.size[1]}
                             data={cell.data}
                             selected={selected == cell.id}
-                            onClick={(event: any) => {
-                                event.stopPropagation();
-                                setSelected(cell.id);
-                            }}
+                            setSelected={setSelected}
                             mousePosition={coords}
                         />
                         <Cells data={cell.cells || []} selected={selected} coords={coords} setSelected={setSelected} />
@@ -156,48 +152,6 @@ function App() {
                 onMouseUp={() => setIsViewMoved(false)}
                 viewBox={`${viewX} ${viewY} ${scaleIndex * width} ${scaleIndex * height}`} style={{ border: "1px solid red" }} xmlns="http://www.w3.org/2000/svg">
                 <Cells data={data} selected={selected} coords={coords} setSelected={setSelected} />
-                {/*
-                <Cell
-                    x={100}
-                    y={20}
-                    width={320}
-                    height={300}
-                    data={tmpdata}
-                    selected={selected == "0"}
-                    onClick={() => {
-                        setSelected("0");
-                    }}
-                    mousePosition={coords}
-                />
-                <Cell
-                    x={100}
-                    y={400}
-                    width={320}
-                    height={550}
-                    data={tmpdata1}
-                    selected={selected == "1"}
-                    onClick={() => {
-                        setSelected("1");
-                    }}
-                    mousePosition={coords}
-                />
-                <Cell
-                    x={500}
-                    y={250}
-                    width={320}
-                    height={300}
-                    data={tmpdata2}
-                    selected={selected == "2"}
-                    onClick={() => {
-                        setSelected("2");
-                    }}
-                    mousePosition={coords}
-                />
-                <Synapse x1={420} y1={50} x2={600} y2={250} size={2} />
-                <Synapse x1={250} y1={320} x2={250} y2={400} size={2} />
-                <Synapse x1={420} y1={620} x2={650} y2={620} size={2} />
-                <Synapse x1={650} y1={620} x2={650} y2={550} size={2} />
-                */}
             </svg>
         </div>
     );
