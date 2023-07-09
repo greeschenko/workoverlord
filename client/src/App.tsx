@@ -3,11 +3,12 @@ import React from 'react';
 import './App.css';
 import Cell from './components/Cell'
 import { XY } from './models/XY'
-import { MindModel, CellModel} from './models/Mind'
+import { MindModel, CellModel } from './models/Mind'
 import Slider from './components/Slider'
 import CellForm from './components/CellForm'
 
-const Cells = ({ data, selected, coords, setSelected }: { data: CellModel[], selected: string, coords: XY, setSelected: any }) => {
+const Cells = ({ data, selected, coords, setSelected, scaleIndex }:
+    { data: CellModel[], selected: string, coords: XY, setSelected: any, scaleIndex: number }) => {
     return (
         <g>
             {data != null && data.map(cell => {
@@ -23,8 +24,9 @@ const Cells = ({ data, selected, coords, setSelected }: { data: CellModel[], sel
                             selected={selected == cell.id}
                             setSelected={setSelected}
                             mousePosition={coords}
+                            scaleIndex={scaleIndex}
                         />
-                        <Cells data={cell.cells || []} selected={selected} coords={coords} setSelected={setSelected} />
+                        <Cells data={cell.cells || []} selected={selected} coords={coords} setSelected={setSelected} scaleIndex={scaleIndex} />
                     </g>
                 );
             })}
@@ -37,6 +39,7 @@ function App() {
     const [selected, setSelected] = React.useState("");
     const [coords, setCoords] = React.useState<XY>({ x: 0, y: 0, movX: 0, movY: 0 });
     const [scaleIndex, setScaleIndex] = React.useState(1);
+    const [lastScaleIndex, setLastScaleIndex] = React.useState(1);
     const [datachange, setDataChange] = React.useState(0);
     const [width, setWidth] = React.useState(window.innerWidth);
     const [height, setHeight] = React.useState(window.innerHeight);
@@ -96,6 +99,21 @@ function App() {
     }, [datachange]);
 
     React.useEffect(() => {
+        if (lastScaleIndex < scaleIndex) {
+            setViewX(viewX - width/20);
+            setViewY(viewY - height/20);
+        }else if(lastScaleIndex > scaleIndex){
+            setViewX(viewX + width/20);
+            setViewY(viewY + height/20);
+        }
+        setLastScaleIndex(scaleIndex);
+    }, [scaleIndex]);
+
+    React.useEffect(() => {
+        console.log("ViewXY", viewX, viewY);
+    }, [viewX]);
+
+    React.useEffect(() => {
         console.log("DATA", data);
     }, [data]);
 
@@ -122,7 +140,7 @@ function App() {
     return (
         <div className="App">
             <Slider scaleIndex={scaleIndex} setValue={setScaleIndex} />
-            <CellForm coords={coords} setDataChange={setDataChange}/>
+            <CellForm coords={coords} setDataChange={setDataChange} />
             <div style={{ color: "white", position: "fixed", top: "10px", right: "10px" }}>
                 <p>
                     Mouse positioned at:{' '}
@@ -150,8 +168,8 @@ function App() {
                 }}
                 onMouseDown={() => setIsViewMoved(true)}
                 onMouseUp={() => setIsViewMoved(false)}
-                viewBox={`${viewX} ${viewY} ${scaleIndex * width} ${scaleIndex * height}`} style={{ border: "1px solid red" }} xmlns="http://www.w3.org/2000/svg">
-                <Cells data={data} selected={selected} coords={coords} setSelected={setSelected} />
+                viewBox={`${viewX} ${viewY} ${scaleIndex * width} ${scaleIndex * height}`} xmlns="http://www.w3.org/2000/svg">
+                <Cells data={data} selected={selected} coords={coords} setSelected={setSelected} scaleIndex={scaleIndex} />
             </svg>
         </div>
     );

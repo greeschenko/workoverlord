@@ -24,6 +24,7 @@ export default function FormDialog(
     const [open, setOpen] = React.useState(false);
 
     const [formdata, setFormdata] = React.useState<CellModel>({
+        id: "0",
         data: "",
         tags: "",
         position: [0, 0, 0],

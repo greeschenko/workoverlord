@@ -5,8 +5,8 @@ import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 
-export default function Test(
-    { id, data, x, y, width, height, selected, setSelected, mousePosition }:
+export default function Cell(
+    { id, data, x, y, width, height, selected, setSelected, mousePosition, scaleIndex }:
         {
             id: string,
             data: any,
@@ -17,6 +17,7 @@ export default function Test(
             selected: boolean,
             setSelected: any,
             mousePosition: XY,
+            scaleIndex: number,
         }) {
 
     const [archiveopen, setArchiveopen] = React.useState(false);
@@ -27,16 +28,38 @@ export default function Test(
     const [cW, setCW] = React.useState(width);
     const [cH, setCH] = React.useState(height);
 
+    const btnWstart = 20
+    const btnHstart = 20
+
+    const [btnW, setBtnW] = React.useState(btnWstart * scaleIndex);
+    const [btnH, setBtnH] = React.useState(btnHstart * scaleIndex);
+
+    {/*
+      *React.useEffect(() => {
+      *    setBtnW(btnWstart * scaleIndex);
+      *    setBtnH(btnHstart * scaleIndex);
+      *}, [scaleIndex]);
+      */}
+
     React.useEffect(() => {
         if (isMoved) {
-            setCX(cX + mousePosition.movX);
-            setCY(cY + mousePosition.movY)
+            setCX(cX + mousePosition.movX * scaleIndex);
+            setCY(cY + mousePosition.movY * scaleIndex)
         }
         if (isResized) {
-            setCW(cW + mousePosition.movX);
-            setCH(cH + mousePosition.movY);
+            setCW(cW + mousePosition.movX * scaleIndex);
+            setCH(cH + mousePosition.movY * scaleIndex);
         }
     }, [mousePosition]);
+
+    React.useEffect(() => {
+        if (!selected && isMoved) {
+            setIsMoved(false);
+        }
+        if (!selected && isResized) {
+            setIsResized(false);
+        }
+    }, [selected]);
 
     const handleLinks = (data: string): string => {
 
@@ -112,37 +135,37 @@ export default function Test(
             <g display={selected ? "inherit" : "none"} >
                 <rect
                     rx="3"
-                    width={20}
-                    height={20}
-                    x={cX - 24}
-                    y={cY - 24}
+                    width={btnW}
+                    height={btnH}
+                    x={cX - btnW - 4}
+                    y={cY - btnH - 4}
                     fill="#282c34"
                     stroke={selected ? "tomato" : "cadetblue"}
                     stroke-width={2}
                 />
-                <line x1={cX - 24 + 10} y1={cY - 24 + 5} x2={cX - 24 + 10} y2={cY - 4 - 5} stroke="pink" stroke-width="1" />
-                <line x1={cX - 24 + 5} y1={cY - 24 + 10} x2={cX - 24 + 20 - 5} y2={cY - 24 + 10} stroke="pink" stroke-width="1" />
+                <line x1={cX - btnW - 4 + 10} y1={cY - btnW - 4 + 5} x2={cX - btnW - 4 + 10} y2={cY - 4 - 5} stroke="pink" stroke-width="1" />
+                <line x1={cX - btnW - 4 + 5} y1={cY - btnW - 4 + 10} x2={cX - 4 - 5} y2={cY - btnW - 4 + 10} stroke="pink" stroke-width="1" />
             </g>
             <g display={selected ? "inherit" : "none"}>
                 <rect
                     rx="3"
-                    width={20}
-                    height={20}
+                    width={btnW}
+                    height={btnH}
                     x={cX + cW + 4}
-                    y={cY - 24}
+                    y={cY - btnW - 4}
                     fill="#282c34"
                     stroke={selected ? "tomato" : "cadetblue"}
                     stroke-width={2}
                     onClick={handleArchiveStart}
                 />
-                <line x1={cX + cW + 4 + 5} y1={cY - 24 + 5} x2={cX + cW + 4 + 20 - 5} y2={cY - 24 + 20 - 5} stroke="pink" stroke-width="1" />
-                <line x1={cX + cW + 4 + 5} y1={cY - 24 + 20 - 5} x2={cX + cW + 4 + 20 - 5} y2={cY - 24 + 5} stroke="pink" stroke-width="1" />
+                <line x1={cX + cW + 4 + 5} y1={cY - btnW - 4 + 5} x2={cX + cW + 4 + btnW - 5} y2={cY - 4 - 5} stroke="pink" stroke-width="1" />
+                <line x1={cX + cW + 4 + 5} y1={cY - 4 - 5} x2={cX + cW + 4 + btnW - 5} y2={cY - btnW - 4 + 5} stroke="pink" stroke-width="1" />
             </g>
             <g display={selected ? "inherit" : "none"}>
                 <rect
                     rx="3"
-                    width={20}
-                    height={20}
+                    width={btnW}
+                    height={btnW}
                     x={cX + cW + 4}
                     y={cY + cH + 4}
                     fill="#282c34"
@@ -156,8 +179,8 @@ export default function Test(
                         setIsResized(false)
                     }}
                 />
-                <line x1={cX + cW + 4 + 5} y1={cY + cH + 4 + 20 - 5} x2={cX + cW + 4 + 20 - 5} y2={cY + cH + 4 + 20 - 5} stroke="pink" stroke-width="1" />
-                <line x1={cX + cW + 4 + 20 - 5} y1={cY + cH + 4 + 20 - 5} x2={cX + cW + 4 + 20 - 5} y2={cY + cH + 4 + 5} stroke="pink" stroke-width="1" />
+                <line x1={cX + cW + 4 + 5} y1={cY + cH + 4 + btnW - 5} x2={cX + cW + 4 + btnW - 5} y2={cY + cH + 4 + btnW - 5} stroke="pink" stroke-width="1" />
+                <line x1={cX + cW + 4 + btnW - 5} y1={cY + cH + 4 + btnW - 5} x2={cX + cW + 4 + btnW - 5} y2={cY + cH + 4 + 5} stroke="pink" stroke-width="1" />
             </g>
         </g>
     );
