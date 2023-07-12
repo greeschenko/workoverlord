@@ -113,7 +113,7 @@ func main() {
 	App.R.HandleFunc("/cells", actionCellsGet).Methods("GET")
 	App.R.HandleFunc("/cells/{id}", actionCellsCreate).Methods("POST")
 	App.R.HandleFunc("/cells/{id}", actionCellsUpdate).Methods("PATCH")
-	//App.R.HandleFunc("/cells/{id}", actionCellsDelete).Methods("DELETE")
+	App.R.HandleFunc("/cells/{id}", actionCellsDelete).Methods("DELETE")
 
 	go saveData()
 
@@ -204,6 +204,25 @@ func actionCellsUpdate(w http.ResponseWriter, r *http.Request) {
 
 	if rsp.IsJsonParseDone(r.Body) && rsp.IsValidate() {
 		USERMIND.Find("id", vars["id"], true).Update(&model)
+	}
+
+	w.Write(rsp.Make())
+}
+
+func actionCellsDelete(w http.ResponseWriter, r *http.Request) {
+	var (
+		model Cell
+		rsp   = core.Response{Data: &model, Req: r}
+		vars  = mux.Vars(r)
+	)
+
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Max-Age", "15")
+	w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Authorization")
+
+	if rsp.IsJsonParseDone(r.Body) && rsp.IsValidate() {
+		USERMIND.Find("id", vars["id"], true).Delete()
 	}
 
 	w.Write(rsp.Make())

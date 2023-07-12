@@ -71,32 +71,43 @@ export default function Cell(
         return data
     };
 
-    const handleAdd = () => {
+    const handleAdd = (event: any) => {
+        event.stopPropagation();
         console.log("add add add");
     }
 
-    const handleArchiveStart = (event: any) => {
+    const handleDone = (event: any) => {
+        event.stopPropagation();
+        console.log("done done");
+    }
+
+    const handleArchive = (event: any) => {
+        event.stopPropagation();
+        console.log("archive archive");
+    }
+
+    const handleDeleteStart = (event: any) => {
         event.stopPropagation();
         setArchiveopen(true);
     }
 
-    const handleArchiveClose = () => {
+    const handleDeleteClose = () => {
         setArchiveopen(false);
     }
 
-    const handleArchiveSubmit = () => {
-        console.log(id);
+    const handleDeleteSubmit = () => {
+        console.log("permanently delete", id);
     }
 
     return (
         <g style={{ userSelect: selected ? "auto" : "none" }} fill="white" stroke="green" stroke-width="5">
-            <Dialog fullWidth={false} open={archiveopen} onClose={handleArchiveClose}>
+            <Dialog fullWidth={false} open={archiveopen} onClose={handleDeleteClose}>
                 <DialogContent>
-                    Put to the archive. You are shure?
+                    Delete permanently. You are shure?
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleArchiveClose}>Cancel</Button>
-                    <Button onClick={handleArchiveSubmit}>Submit</Button>
+                    <Button onClick={handleDeleteClose}>Cancel</Button>
+                    <Button variant="outlined" color="error" onClick={handleDeleteSubmit}>DELETE</Button>
                 </DialogActions>
             </Dialog>
             <rect
@@ -114,11 +125,11 @@ export default function Cell(
                 y={cY + 10}
                 width={cW - 20}
                 height={cH - 20}
-                onClick={(event)=>{
+                onClick={(event) => {
                     event.stopPropagation();
                     setSelected(id);
                 }}
-                onDoubleClick={()=>alert("lsdjfldsfj")}
+                onDoubleClick={() => alert("lsdjfldsfj")}
                 onMouseDown={(event) => {
                     event.stopPropagation();
                     setIsMoved(true)
@@ -132,35 +143,89 @@ export default function Cell(
                     dangerouslySetInnerHTML={{ __html: handleLinks(data) }}
                 />
             </foreignObject>
-            <g display={selected ? "inherit" : "none"} >
-                <rect
-                    rx="3"
-                    width={btnW}
-                    height={btnH}
-                    x={cX - btnW - 4}
-                    y={cY - btnH - 4}
-                    fill="#282c34"
-                    stroke={selected ? "tomato" : "cadetblue"}
-                    stroke-width={2}
-                />
-                <line x1={cX - btnW - 4 + 10} y1={cY - btnW - 4 + 5} x2={cX - btnW - 4 + 10} y2={cY - 4 - 5} stroke="pink" stroke-width="1" />
-                <line x1={cX - btnW - 4 + 5} y1={cY - btnW - 4 + 10} x2={cX - 4 - 5} y2={cY - btnW - 4 + 10} stroke="pink" stroke-width="1" />
-            </g>
             <g display={selected ? "inherit" : "none"}>
-                <rect
-                    rx="3"
-                    width={btnW}
-                    height={btnH}
-                    x={cX + cW + 4}
-                    y={cY - btnW - 4}
-                    fill="#282c34"
-                    stroke={selected ? "tomato" : "cadetblue"}
-                    stroke-width={2}
-                    onClick={handleArchiveStart}
-                />
-                <line x1={cX + cW + 4 + 5} y1={cY - btnW - 4 + 5} x2={cX + cW + 4 + btnW - 5} y2={cY - 4 - 5} stroke="pink" stroke-width="1" />
-                <line x1={cX + cW + 4 + 5} y1={cY - 4 - 5} x2={cX + cW + 4 + btnW - 5} y2={cY - btnW - 4 + 5} stroke="pink" stroke-width="1" />
+                <text
+                    className="svgbtn"
+                    fill="tomato"
+                    stroke="none"
+                    font-size="14"
+                    font-family="monospace"
+                    x={cX + cW + 4 + 5}
+                    y={cY + 8}
+                    onClick={handleAdd}
+                >
+                    ADD SUBCELL
+                </text>
+                <text
+                    className="svgbtn"
+                    fill="tomato"
+                    stroke="none"
+                    font-size="14"
+                    font-family="monospace"
+                    x={cX + cW + 4 + 5}
+                    y={cY + 8 + 16}
+                    onClick={handleDone}
+                >
+                    DONE
+                </text>
+                <text
+                    className="svgbtn"
+                    fill="tomato"
+                    stroke="none"
+                    font-size="14"
+                    font-family="monospace"
+                    x={cX + cW + 4 + 5}
+                    y={cY + 8 + 16 * 2}
+                    onClick={handleArchive}
+                >
+                    ARCHIVE
+                </text>
+                <text
+                    className="svgbtn"
+                    fill="tomato"
+                    stroke="none"
+                    font-size="14"
+                    font-family="monospace"
+                    x={cX + cW + 4 + 5}
+                    y={cY + 8 + 16 * 3}
+                    onClick={handleDeleteStart}
+                >
+                    DELETE
+                </text>
             </g>
+            {/*
+              *<g display={selected ? "inherit" : "none"} >
+              *    <rect
+              *        rx="3"
+              *        width={btnW}
+              *        height={btnH}
+              *        x={cX - btnW - 4}
+              *        y={cY - btnH - 4}
+              *        fill="#282c34"
+              *        stroke={selected ? "tomato" : "cadetblue"}
+              *        stroke-width={2}
+              *    />
+              *    <line x1={cX - btnW - 4 + 10} y1={cY - btnW - 4 + 5} x2={cX - btnW - 4 + 10} y2={cY - 4 - 5} stroke="pink" stroke-width="1" />
+              *    <line x1={cX - btnW - 4 + 5} y1={cY - btnW - 4 + 10} x2={cX - 4 - 5} y2={cY - btnW - 4 + 10} stroke="pink" stroke-width="1" />
+              *</g>
+              */}
+            {/*
+              *<g display={selected ? "inherit" : "none"}>
+              *    <rect
+              *        rx="3"
+              *        width={btnW}
+              *        height={btnH}
+              *        x={cX + cW + 4}
+              *        y={cY - btnW - 4}
+              *        fill="#282c34"
+              *        stroke={selected ? "tomato" : "cadetblue"}
+              *        stroke-width={2}
+              *        onClick={handleArchiveStart}
+              *    />
+              *    <line x1={cX + cW + 4 + 5} y1={cY - btnW - 4 + 5} x2={cX + cW + 4 + btnW - 5} y2={cY - 4 - 5} stroke="pink" stroke-width="1" />
+              *    <line x1={cX + cW + 4 + 5} y1={cY - 4 - 5} x2={cX + cW + 4 + btnW - 5} y2={cY - btnW - 4 + 5} stroke="pink" stroke-width="1" />
+              *</g>
+              */}
             <g display={selected ? "inherit" : "none"}>
                 <rect
                     rx="3"

@@ -68,6 +68,10 @@ func (s *Cell) Update(newdata *Cell) {
 	s = newdata
 }
 
+func (s *Cell) Delete() {
+	s = nil
+}
+
 type CellData struct {
 	Errors []core.ErrorMsg `json:"errors"`
 	Data   Cell            `json:"data"`

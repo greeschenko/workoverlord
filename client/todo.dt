@@ -1,0 +1,26 @@
+TODO
+
+add close btn functions
+  three btns in dialog
+    done
+    archive
+    permanent delete
+  color indication for diferent statuses
+  status display when element active
+add multiselect for cells
+  add move for all selected elements
+  add btns for all selected element
+    done
+    archive
+    permanent delete
+scale index change by mouse scroll
+add child cell
+  connections auto generation
+fix cell create position selection
+  fix wrong position
+  add scale suport
+fix btn size after create element with scale index != 1
+fix elements rattling during zooming
+add zoom position correction to zoom selection by click
+add full vim like keyboard controls
+add events for tochscreens

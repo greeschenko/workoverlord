@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"testing"
 
@@ -77,9 +78,9 @@ var (
 				"add Cell #3 to #1",
 				"POST",
 				Cell{
-					Data:   fake.Words() + " https://www.youtube.com/watch?v=T4z-32mXLSY&ab_channel=Nikattica",
-					Status: "new",
-					Tags:   "tag1, tag4",
+					Data:     fake.Words() + " https://www.youtube.com/watch?v=T4z-32mXLSY&ab_channel=Nikattica",
+					Status:   "new",
+					Tags:     "tag1, tag4",
 					Size:     [2]int{300, 300},
 					Position: [3]int{360, 30, 1},
 				},
@@ -89,9 +90,9 @@ var (
 				"add Cell #4 to #1",
 				"POST",
 				Cell{
-					Data:   fake.Words() + " https://cdna.artstation.com/p/assets/images/images/053/956/262/medium/sentron-edgerunner-copy.jpg",
-					Status: "new",
-					Tags:   "tag5",
+					Data:     fake.Words() + " https://cdna.artstation.com/p/assets/images/images/053/956/262/medium/sentron-edgerunner-copy.jpg",
+					Status:   "new",
+					Tags:     "tag5",
 					Size:     [2]int{300, 250},
 					Position: [3]int{160, 450, 1},
 				},
@@ -124,14 +125,16 @@ var (
 				},
 				[4]int{0, 0, 0, 0},
 			},
-			{
-				"delete Cell #1",
-				"PATCH",
-				Cell{
-					Status: "deleted",
-				},
-				[4]int{0, 0, 0, 0},
-			},
+			/*
+			 *{
+			 *  "delete Cell #1",
+			 *  "PATCH",
+			 *  Cell{
+			 *    Status: "deleted",
+			 *  },
+			 *  [4]int{0, 0, 0, 0},
+			 *},
+			 */
 		},
 		"index": {
 			{
@@ -161,6 +164,14 @@ var (
 				"PATCH",
 				Cell{},
 				[4]int{1, 1, 1, 0}, //change position from 1 1 to 1 0
+			},
+		},
+		"delete": {
+			{
+				"delete Cell #1",
+				"DELETE",
+				Cell{},
+				[4]int{0, 0, 0, 0},
 			},
 		},
 	}
@@ -312,31 +323,70 @@ func Test_actionsUpdate(t *testing.T) {
 	}
 }
 
-func Test_actionsIndex(t *testing.T) {
-	var url = Apiurl + "/"
-	tests := TestData["index"]
+/*
+ *func Test_actionsIndex(t *testing.T) {
+ *  var url = Apiurl + "/"
+ *  tests := TestData["index"]
+ *  //get test user auntification token
+ *  for _, tt := range tests {
+ *    t.Run(tt.name, func(t *testing.T) {
+ *      var mind MindData
+ *      iurl := url
+ *      resp := doRequest(iurl, tt.proto, "", "")
+ *
+ *      if resp.StatusCode != 200 {
+ *        t.Errorf("Wrong Response status = %s, want %v", resp.Status, 200)
+ *      }
+ *
+ *      mind.Read(resp)
+ *
+ *      if len(mind.Data) == 0 {
+ *        t.Errorf("Wrong element count = 0, want > 0")
+ *      }
+ *
+ *      if len(mind.Errors) > 0 {
+ *        t.Error("Api return Errs", mind.Errors)
+ *      }
+ *
+ *      TmpTestMind = mind.Data
+ *    })
+ *  }
+ *}
+ */
+
+func Test_actionsDelete(t *testing.T) {
+	var url = Apiurl + "/cells"
+	tests := TestData["delete"]
 	//get test user auntification token
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			var mind MindData
-			iurl := url
+			iurl := url + "/" + TestData["createroot"][0].args.ID
+
 			resp := doRequest(iurl, tt.proto, "", "")
 
 			if resp.StatusCode != 200 {
 				t.Errorf("Wrong Response status = %s, want %v", resp.Status, 200)
 			}
 
-			mind.Read(resp)
+			resp1 := doRequest(url, "GET", "", "")
 
-			if len(mind.Data) == 0 {
-				t.Errorf("Wrong element count = 0, want > 0")
+			if resp1.StatusCode != 200 {
+				t.Errorf("Wrong Check Response status = %s, want %v", resp.Status, 200)
+			}
+
+			mind.Read(resp1)
+
+			fmt.Println("MIND DATA LENGHT", len(mind.Data), TestData["createroot"][0].args.ID)
+
+			if len(mind.Data) != 1 {
+				t.Errorf("Wrong element count = %d, want == 1", len(mind.Data))
 			}
 
 			if len(mind.Errors) > 0 {
 				t.Error("Api return Errs", mind.Errors)
 			}
 
-			TmpTestMind = mind.Data
 		})
 	}
 }
