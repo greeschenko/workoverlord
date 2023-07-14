@@ -5,6 +5,8 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+    "fmt"
+    "strings"
 
 	"github.com/go-rest-framework/core"
 )
@@ -43,6 +45,55 @@ func (m Mind) Find(name, mach string, fool bool) *Cell {
 	res := <-c
 
 	return res
+}
+
+func (m *Mind) DeleteCell(id string) {
+
+	idlist := strings.Split(id, " ")
+	idlistres := []string{}
+	tmpid := ""
+
+	tmp := *m
+
+	for k := range idlist {
+		if k == 0 {
+			tmpid = idlist[k]
+		} else {
+			tmpid = tmpid + " " + idlist[k]
+		}
+		idlistres = append(idlistres, tmpid)
+	}
+
+	fmt.Println("OOOOOOO", idlistres)
+	fmt.Println("IDDDDDD", id)
+
+	tmp = deleteCellListHandle(tmp, id, idlistres, 0)
+
+	*m = tmp
+}
+
+func deleteCellListHandle(cc []Cell, id string, idlistres []string, idindex int) []Cell {
+    fmt.Println("EEEEEEEEEEEEEE", cc, id, idlistres, idindex)
+	for j := range cc {
+		if cc[j].ID == idlistres[idindex] {
+			if cc[j].ID == id {
+				var tmpres []Cell
+
+				for i := range cc {
+					if cc[i].ID != id {
+						tmpres = append(tmpres, cc[i])
+					}
+				}
+
+				cc = tmpres
+			} else {
+				cc[j].Cells = deleteCellListHandle(cc[j].Cells, id, idlistres, idindex+1)
+                fmt.Println("RRRRRRRR", cc[j].Cells)
+			}
+			break
+		}
+	}
+	return cc
 }
 
 func (m *Mind) Extend(s Cell, parentid string) Cell {

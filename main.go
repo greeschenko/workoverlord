@@ -221,8 +221,8 @@ func actionCellsDelete(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Max-Age", "15")
 	w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Authorization")
 
-	if rsp.IsJsonParseDone(r.Body) && rsp.IsValidate() {
-		USERMIND.Find("id", vars["id"], true).Delete()
+	if rsp.IsValidate() {
+		USERMIND.DeleteCell(vars["id"])
 	}
 
 	w.Write(rsp.Make())

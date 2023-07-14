@@ -168,7 +168,13 @@ var (
 		},
 		"delete": {
 			{
-				"delete Cell #1",
+				"delete Cell #2",
+				"DELETE",
+				Cell{},
+				[4]int{0, 0, 0, 0},
+			},
+			{
+				"delete Cell #1 1",
 				"DELETE",
 				Cell{},
 				[4]int{0, 0, 0, 0},
@@ -361,7 +367,12 @@ func Test_actionsDelete(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			var mind MindData
-			iurl := url + "/" + TestData["createroot"][0].args.ID
+            var iurl string
+            if tt.name == "delete Cell #2" {
+			    iurl = url + "/" + TestData["createroot"][1].args.ID
+            }else if tt.name == "delete Cell #1 1"{
+			    iurl = url + "/" + TestData["addchildren"][0].args.ID
+            }
 
 			resp := doRequest(iurl, tt.proto, "", "")
 
