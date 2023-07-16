@@ -91,7 +91,7 @@ func init() {
     js1, _ := os.ReadFile("./client/build/static/js/787.eaddd2cd.chunk.js")
     postjs1 := []byte("</script>")
     prejs2 := []byte("<script>")
-    js2, _ := os.ReadFile("./client/build/static/js/main.ab0fd91c.js")
+    js2, _ := os.ReadFile("./client/build/static/js/main.82ce2a1f.js")
     postjs2 := []byte("</script>")
 
     frontend = append(frontend, index...)
@@ -135,7 +135,8 @@ func main() {
 	}
 
 	App.R.HandleFunc("/", actionIndex).Methods("GET")
-	App.R.HandleFunc("/cells", actionCellsGet).Methods("GET")
+	App.R.HandleFunc("/cells", actionCellsGetAll).Methods("GET")
+	App.R.HandleFunc("/cells/{id}", actionCellsOne).Methods("GET")
 	App.R.HandleFunc("/cells/{id}", actionCellsCreate).Methods("POST")
 	App.R.HandleFunc("/cells/{id}", actionCellsUpdate).Methods("PATCH")
 	App.R.HandleFunc("/cells/{id}", actionCellsDelete).Methods("DELETE")
@@ -167,7 +168,7 @@ func actionIndex(w http.ResponseWriter, r *http.Request) {
 	w.Write(frontend)
 }
 
-func actionCellsGet(w http.ResponseWriter, r *http.Request) {
+func actionCellsGetAll(w http.ResponseWriter, r *http.Request) {
 	var (
 		data Mind
 		rsp  = core.Response{Data: &data, Req: r}
@@ -176,6 +177,21 @@ func actionCellsGet(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("USERMIND", USERMIND)
 
 	data = USERMIND
+
+	w.Write(rsp.Make())
+}
+
+func actionCellsOne(w http.ResponseWriter, r *http.Request) {
+	var (
+		data *Cell
+		rsp  = core.Response{Data: &data, Req: r}
+		vars  = mux.Vars(r)
+	)
+
+	fmt.Println("USERMIND", USERMIND)
+
+    res := USERMIND.Find("id", vars["id"], true)
+	data = res
 
 	w.Write(rsp.Make())
 }
@@ -201,7 +217,10 @@ func actionCellsUpdate(w http.ResponseWriter, r *http.Request) {
 		vars  = mux.Vars(r)
 	)
 
+    fmt.Println("TEST UPDATE 1", model)
+
 	if rsp.IsJsonParseDone(r.Body) && rsp.IsValidate() {
+        fmt.Println("TEST UPDATE", model)
 		USERMIND.Find("id", vars["id"], true).Update(&model)
 	}
 

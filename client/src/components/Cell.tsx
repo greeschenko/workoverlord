@@ -75,12 +75,74 @@ export default function Cell(
 
   const handleDone = (event: any) => {
     event.stopPropagation();
-    console.log("done done");
+    var tmpdata = data
+    tmpdata.status = "done"
+    const url = "http://localhost:2222/cells/" + data.id;
+    fetch(url, {
+      method: "PATCH",
+      //mode: "no-cors",
+      body: JSON.stringify(tmpdata),
+      headers: {
+        //"Content-Type": "application/json",
+        //Authorization: "Bearer " + "sdflsdjfl",
+      },
+      //credentials: "same-origin",
+    }).then(
+      function(response) {
+        if (response.status === 200) {
+          response.json().then(function(res) {
+            console.log(res);
+            if (res.errors != null) {
+              console.log(res.errors);
+            } else {
+              setDataChange(Date.now());
+            }
+          });
+        } else {
+          console.log(response);
+          alert("ERROR: " + response.status + " - " + response.statusText);
+        }
+      },
+      function(error) {
+        alert(error.message);
+      }
+    );
   }
 
   const handleArchive = (event: any) => {
     event.stopPropagation();
-    console.log("archive archive");
+    var tmpdata = data
+    tmpdata.status = "archive"
+    const url = "http://localhost:2222/cells/" + data.id;
+    fetch(url, {
+      method: "PATCH",
+      //mode: "no-cors",
+      body: JSON.stringify(tmpdata),
+      headers: {
+        //"Content-Type": "application/json",
+        //Authorization: "Bearer " + "sdflsdjfl",
+      },
+      //credentials: "same-origin",
+    }).then(
+      function(response) {
+        if (response.status === 200) {
+          response.json().then(function(res) {
+            console.log(res);
+            if (res.errors != null) {
+              console.log(res.errors);
+            } else {
+              setDataChange(Date.now());
+            }
+          });
+        } else {
+          console.log(response);
+          alert("ERROR: " + response.status + " - " + response.statusText);
+        }
+      },
+      function(error) {
+        alert(error.message);
+      }
+    );
   }
 
   const handleDeleteStart = (event: any) => {
@@ -167,6 +229,10 @@ export default function Cell(
         <div
           style={{ color: "pink", whiteSpace: "pre-wrap" }}
           dangerouslySetInnerHTML={{ __html: handleLinks(data.data) }}
+        />
+        <div
+          style={{ color: "pink", whiteSpace: "pre-wrap" }}
+          dangerouslySetInnerHTML={{ __html: handleLinks(data.status || "") }}
         />
       </foreignObject>
       <g display={selected ? "inherit" : "none"}>

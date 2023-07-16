@@ -28,7 +28,8 @@ export default function FormDialog(
         data: "",
         tags: "",
         position: [0, 0, 0],
-        size: [0, 0]
+        size: [0, 0],
+        status: "new",
     });
 
     React.useEffect(() => {

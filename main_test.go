@@ -104,16 +104,23 @@ var (
 				"update Cell #1",
 				"PATCH",
 				Cell{
-					Data: fake.Words(),
+					Data:     fake.WordsN(30),
+					Status:   "new",
+					Tags:     "tag1, tag2, tag3",
+					Size:     [2]int{300, 300},
+					Position: [3]int{50, 50, 0},
 				},
 				[4]int{0, 0, 0, 0},
 			},
 			{
-				"update Cell #1",
+				"done Cell #1",
 				"PATCH",
 				Cell{
-					Data: fake.Words(),
-					Tags: "tag1",
+					Data:     fake.WordsN(30),
+					Status:   "done",
+					Tags:     "tag1, tag2",
+					Size:     [2]int{300, 300},
+					Position: [3]int{50, 50, 0},
 				},
 				[4]int{0, 0, 0, 0},
 			},
@@ -121,7 +128,11 @@ var (
 				"archive Cell #1",
 				"PATCH",
 				Cell{
-					Status: "archived",
+					Data:     fake.WordsN(20),
+					Status:   "archive",
+					Tags:     "tag1, tag2, tag3",
+					Size:     [2]int{300, 300},
+					Position: [3]int{50, 50, 0},
 				},
 				[4]int{0, 0, 0, 0},
 			},
@@ -325,6 +336,29 @@ func Test_actionsUpdate(t *testing.T) {
 			if len(Cell.Errors) > 0 {
 				t.Error("Api return Errs", Cell.Errors)
 			}
+
+			var Cell2 CellData
+
+			resp1 := doRequest(url+"/"+TestData["createroot"][0].args.ID, "GET", "", "")
+
+			if resp1.StatusCode != 200 {
+				t.Errorf("Wrong Check Response status = %s, want %v", resp.Status, 200)
+			}
+
+			Cell2.Read(resp1)
+
+			if Cell.Data.Data != Cell2.Data.Data {
+				t.Errorf("Wrong Updated Data")
+			}
+
+			if Cell.Data.Tags != Cell2.Data.Tags {
+				t.Errorf("Wrong Updated Tags = %s, want %s", Cell.Data.Tags, Cell2.Data.Tags)
+
+			}
+
+			if Cell.Data.Status != Cell2.Data.Status {
+				t.Errorf("Wrong Updated Status = %s, want %s", Cell.Data.Status, Cell2.Data.Status)
+			}
 		})
 	}
 }
@@ -367,12 +401,12 @@ func Test_actionsDelete(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			var mind MindData
-            var iurl string
-            if tt.name == "delete Cell #2" {
-			    iurl = url + "/" + TestData["createroot"][1].args.ID
-            }else if tt.name == "delete Cell #1 1"{
-			    iurl = url + "/" + TestData["addchildren"][0].args.ID
-            }
+			var iurl string
+			if tt.name == "delete Cell #2" {
+				iurl = url + "/" + TestData["createroot"][1].args.ID
+			} else if tt.name == "delete Cell #1 1" {
+				iurl = url + "/" + TestData["addchildren"][0].args.ID
+			}
 
 			resp := doRequest(iurl, tt.proto, "", "")
 
