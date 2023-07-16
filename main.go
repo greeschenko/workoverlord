@@ -32,6 +32,8 @@ var (
 
 	Dbpath = os.Getenv("HOME") + "/prodev2/"
 	Dbfile = Dbpath + "MIND"
+
+    frontend []byte
 )
 
 func askPass() (string, error) {
@@ -79,6 +81,29 @@ func init() {
 	if len(tmpdata) == 0 {
 		USERMIND = Mind{}
 	}
+
+    //compile frontend
+    index, _ := os.ReadFile("./client/build/index.html")
+    precss := []byte("<style type='text/css'>")
+    css, _ := os.ReadFile("./client/build/static/css/main.8d1ec2ef.css")
+    postcss := []byte("</style>")
+    prejs1 := []byte("<script>")
+    js1, _ := os.ReadFile("./client/build/static/js/787.eaddd2cd.chunk.js")
+    postjs1 := []byte("</script>")
+    prejs2 := []byte("<script>")
+    js2, _ := os.ReadFile("./client/build/static/js/main.ab0fd91c.js")
+    postjs2 := []byte("</script>")
+
+    frontend = append(frontend, index...)
+    frontend = append(frontend, precss...)
+    frontend = append(frontend, css...)
+    frontend = append(frontend, postcss...)
+    frontend = append(frontend, prejs1...)
+    frontend = append(frontend, js1...)
+    frontend = append(frontend, postjs1...)
+    frontend = append(frontend, prejs2...)
+    frontend = append(frontend, js2...)
+    frontend = append(frontend, postjs2...)
 }
 
 func saveData() {
@@ -139,18 +164,7 @@ func doRequest(url, proto, userJson, token string) *http.Response {
 }
 
 func actionIndex(w http.ResponseWriter, r *http.Request) {
-
-	dat, err := os.ReadFile("index.html")
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Print(dat)
-
-	//fmt.Println("USERMIND", USERMIND)
-
-	//data = USERMIND
-
-	w.Write([]byte(dat))
+	w.Write(frontend)
 }
 
 func actionCellsGet(w http.ResponseWriter, r *http.Request) {
@@ -158,11 +172,6 @@ func actionCellsGet(w http.ResponseWriter, r *http.Request) {
 		data Mind
 		rsp  = core.Response{Data: &data, Req: r}
 	)
-
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Max-Age", "15")
-	w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Authorization")
 
 	fmt.Println("USERMIND", USERMIND)
 
@@ -178,11 +187,6 @@ func actionCellsCreate(w http.ResponseWriter, r *http.Request) {
 		vars  = mux.Vars(r)
 	)
 
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Max-Age", "15")
-	w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Authorization")
-
 	if rsp.IsJsonParseDone(r.Body) && rsp.IsValidate() {
 		model = USERMIND.Extend(model, vars["id"])
 	}
@@ -197,11 +201,6 @@ func actionCellsUpdate(w http.ResponseWriter, r *http.Request) {
 		vars  = mux.Vars(r)
 	)
 
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Max-Age", "15")
-	w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Authorization")
-
 	if rsp.IsJsonParseDone(r.Body) && rsp.IsValidate() {
 		USERMIND.Find("id", vars["id"], true).Update(&model)
 	}
@@ -215,11 +214,6 @@ func actionCellsDelete(w http.ResponseWriter, r *http.Request) {
 		rsp   = core.Response{Data: &model, Req: r}
 		vars  = mux.Vars(r)
 	)
-
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Max-Age", "15")
-	w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Authorization")
 
 	if rsp.IsValidate() {
 		USERMIND.DeleteCell(vars["id"])

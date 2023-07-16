@@ -24,3 +24,4 @@ fix elements rattling during zooming
 add zoom position correction to zoom selection by click
 add full vim like keyboard controls
 add events for tochscreens
+img not resize during cell resize
