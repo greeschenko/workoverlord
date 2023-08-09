@@ -103,7 +103,7 @@ export default function FormDialog(
                     } else if (pendingSize) {
                         setPendingPosition(false);
                         setPendingSize(false);
-                        setFormdata({ ...formdata, ['size']: [coords.x, coords.y] });
+                        setFormdata({ ...formdata, ['size']: [coords.x - formdata.position[0], coords.y - formdata.position[1]] });
                         setOpen(true);
                     }
                 }}

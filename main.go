@@ -33,7 +33,7 @@ var (
 	Dbpath = os.Getenv("HOME") + "/prodev2/"
 	Dbfile = Dbpath + "MIND"
 
-    frontend []byte
+	frontend []byte
 )
 
 func askPass() (string, error) {
@@ -82,28 +82,28 @@ func init() {
 		USERMIND = Mind{}
 	}
 
-    //compile frontend
-    index, _ := os.ReadFile("./client/build/index.html")
-    precss := []byte("<style type='text/css'>")
-    css, _ := os.ReadFile("./client/build/static/css/main.8d1ec2ef.css")
-    postcss := []byte("</style>")
-    prejs1 := []byte("<script>")
-    js1, _ := os.ReadFile("./client/build/static/js/787.eaddd2cd.chunk.js")
-    postjs1 := []byte("</script>")
-    prejs2 := []byte("<script>")
-    js2, _ := os.ReadFile("./client/build/static/js/main.82ce2a1f.js")
-    postjs2 := []byte("</script>")
+	//compile frontend
+	index, _ := os.ReadFile("./client/build/index.html")
+	precss := []byte("<style type='text/css'>")
+	css, _ := os.ReadFile("./client/build/static/css/main.8d1ec2ef.css")
+	postcss := []byte("</style>")
+	prejs1 := []byte("<script>")
+	js1, _ := os.ReadFile("./client/build/static/js/787.eaddd2cd.chunk.js")
+	postjs1 := []byte("</script>")
+	prejs2 := []byte("<script>")
+	js2, _ := os.ReadFile("./client/build/static/js/main.6d6d345f.js")
+	postjs2 := []byte("</script>")
 
-    frontend = append(frontend, index...)
-    frontend = append(frontend, precss...)
-    frontend = append(frontend, css...)
-    frontend = append(frontend, postcss...)
-    frontend = append(frontend, prejs1...)
-    frontend = append(frontend, js1...)
-    frontend = append(frontend, postjs1...)
-    frontend = append(frontend, prejs2...)
-    frontend = append(frontend, js2...)
-    frontend = append(frontend, postjs2...)
+	frontend = append(frontend, index...)
+	frontend = append(frontend, precss...)
+	frontend = append(frontend, css...)
+	frontend = append(frontend, postcss...)
+	frontend = append(frontend, prejs1...)
+	frontend = append(frontend, js1...)
+	frontend = append(frontend, postjs1...)
+	frontend = append(frontend, prejs2...)
+	frontend = append(frontend, js2...)
+	frontend = append(frontend, postjs2...)
 }
 
 func saveData() {
@@ -123,6 +123,10 @@ func saveData() {
 		time.Sleep(15000 * time.Millisecond)
 		n++
 	}
+}
+
+func enableCors(w *http.ResponseWriter) {
+	(*w).Header().Set("Access-Control-Allow-Origin", "*")
 }
 
 func main() {
@@ -174,6 +178,8 @@ func actionCellsGetAll(w http.ResponseWriter, r *http.Request) {
 		rsp  = core.Response{Data: &data, Req: r}
 	)
 
+    enableCors(&w)
+
 	fmt.Println("USERMIND", USERMIND)
 
 	data = USERMIND
@@ -185,12 +191,14 @@ func actionCellsOne(w http.ResponseWriter, r *http.Request) {
 	var (
 		data *Cell
 		rsp  = core.Response{Data: &data, Req: r}
-		vars  = mux.Vars(r)
+		vars = mux.Vars(r)
 	)
+
+    enableCors(&w)
 
 	fmt.Println("USERMIND", USERMIND)
 
-    res := USERMIND.Find("id", vars["id"], true)
+	res := USERMIND.Find("id", vars["id"], true)
 	data = res
 
 	w.Write(rsp.Make())
@@ -202,6 +210,8 @@ func actionCellsCreate(w http.ResponseWriter, r *http.Request) {
 		rsp   = core.Response{Data: &model, Req: r}
 		vars  = mux.Vars(r)
 	)
+
+    enableCors(&w)
 
 	if rsp.IsJsonParseDone(r.Body) && rsp.IsValidate() {
 		model = USERMIND.Extend(model, vars["id"])
@@ -217,10 +227,12 @@ func actionCellsUpdate(w http.ResponseWriter, r *http.Request) {
 		vars  = mux.Vars(r)
 	)
 
-    fmt.Println("TEST UPDATE 1", model)
+    enableCors(&w)
+
+	fmt.Println("TEST UPDATE 1", model)
 
 	if rsp.IsJsonParseDone(r.Body) && rsp.IsValidate() {
-        fmt.Println("TEST UPDATE", model)
+		fmt.Println("TEST UPDATE", model)
 		USERMIND.Find("id", vars["id"], true).Update(&model)
 	}
 
@@ -233,6 +245,8 @@ func actionCellsDelete(w http.ResponseWriter, r *http.Request) {
 		rsp   = core.Response{Data: &model, Req: r}
 		vars  = mux.Vars(r)
 	)
+
+    enableCors(&w)
 
 	if rsp.IsValidate() {
 		USERMIND.DeleteCell(vars["id"])
