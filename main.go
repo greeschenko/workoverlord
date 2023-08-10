@@ -127,6 +127,9 @@ func saveData() {
 
 func enableCors(w *http.ResponseWriter) {
 	(*w).Header().Set("Access-Control-Allow-Origin", "*")
+	(*w).Header().Set("Access-Control-Allow-Methods", "GET, POST, PATCH, PUT, DELETE, OPTIONS")
+	(*w).Header().Set("Access-Control-Allow-Headers", "Origin, Content-Type, X-Auth-Token, Authorization")
+	(*w).Header().Set("Content-Type", "application/json")
 }
 
 func main() {
@@ -178,7 +181,7 @@ func actionCellsGetAll(w http.ResponseWriter, r *http.Request) {
 		rsp  = core.Response{Data: &data, Req: r}
 	)
 
-    enableCors(&w)
+	enableCors(&w)
 
 	fmt.Println("USERMIND", USERMIND)
 
@@ -194,7 +197,7 @@ func actionCellsOne(w http.ResponseWriter, r *http.Request) {
 		vars = mux.Vars(r)
 	)
 
-    enableCors(&w)
+	enableCors(&w)
 
 	fmt.Println("USERMIND", USERMIND)
 
@@ -211,7 +214,7 @@ func actionCellsCreate(w http.ResponseWriter, r *http.Request) {
 		vars  = mux.Vars(r)
 	)
 
-    enableCors(&w)
+	enableCors(&w)
 
 	if rsp.IsJsonParseDone(r.Body) && rsp.IsValidate() {
 		model = USERMIND.Extend(model, vars["id"])
@@ -227,7 +230,7 @@ func actionCellsUpdate(w http.ResponseWriter, r *http.Request) {
 		vars  = mux.Vars(r)
 	)
 
-    enableCors(&w)
+	enableCors(&w)
 
 	fmt.Println("TEST UPDATE 1", model)
 
@@ -246,7 +249,7 @@ func actionCellsDelete(w http.ResponseWriter, r *http.Request) {
 		vars  = mux.Vars(r)
 	)
 
-    enableCors(&w)
+	enableCors(&w)
 
 	if rsp.IsValidate() {
 		USERMIND.DeleteCell(vars["id"])
