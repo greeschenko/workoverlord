@@ -61,11 +61,27 @@ function App() {
     setWidth(window.innerWidth);
     setHeight(window.innerHeight - 10);
   }
+
   React.useEffect(() => {
     window.addEventListener("resize", updateDimensions);
     return () => window.removeEventListener("resize", updateDimensions);
   }, []);
 
+  React.useEffect(() => {
+    const updateWheel = (event: any) => {
+      if (event.deltaY > 0) {
+        if (scaleIndex < 10) {
+          setScaleIndex(scaleIndex + 1);
+        }
+      } else {
+        if (scaleIndex > 1) {
+          setScaleIndex(scaleIndex - 1);
+        }
+      }
+    }
+    window.addEventListener("wheel", updateWheel);
+    return () => window.removeEventListener("wheel", updateWheel);
+  }, [scaleIndex]);
 
   React.useEffect(() => {
     const url = "http://localhost:2222/cells";

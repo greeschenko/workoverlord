@@ -85,13 +85,13 @@ func init() {
 	//compile frontend
 	index, _ := os.ReadFile("./client/build/index.html")
 	precss := []byte("<style type='text/css'>")
-	css, _ := os.ReadFile("./client/build/static/css/main.8d1ec2ef.css")
+	css, _ := os.ReadFile("./client/build/static/css/main.css")
 	postcss := []byte("</style>")
 	prejs1 := []byte("<script>")
-	js1, _ := os.ReadFile("./client/build/static/js/787.eaddd2cd.chunk.js")
+	js1, _ := os.ReadFile("./client/build/static/js/chunk.js")
 	postjs1 := []byte("</script>")
 	prejs2 := []byte("<script>")
-	js2, _ := os.ReadFile("./client/build/static/js/main.6d6d345f.js")
+	js2, _ := os.ReadFile("./client/build/static/js/main.js")
 	postjs2 := []byte("</script>")
 
 	frontend = append(frontend, index...)

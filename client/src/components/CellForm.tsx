@@ -134,6 +134,7 @@ export default function FormDialog(
                     <TextField
                         autoFocus
                         multiline
+                        rows={3}
                         maxRows={6}
                         margin="dense"
                         id="data"

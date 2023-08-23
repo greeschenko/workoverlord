@@ -3,11 +3,13 @@ import Box from '@mui/material/Box';
 import Slider from '@mui/material/Slider';
 
 export default function VerticalSlider({ scaleIndex, setValue }: { scaleIndex: number, setValue: any }) {
+
     function preventHorizontalKeyboardNavigation(event: React.KeyboardEvent) {
         if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
             event.preventDefault();
         }
     }
+
     const handleChange = (event: Event, newValue: number | number[]) => {
         setValue(newValue as number);
     };
@@ -22,10 +24,11 @@ export default function VerticalSlider({ scaleIndex, setValue }: { scaleIndex: n
                 }}
                 step={0.1}
                 marks
-                min={0.1}
+                min={1}
                 max={10}
                 orientation="vertical"
                 defaultValue={scaleIndex}
+                value={scaleIndex}
                 aria-label="Temperature"
                 valueLabelDisplay="auto"
                 onChange={handleChange}
