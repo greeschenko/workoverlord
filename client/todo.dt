@@ -1,5 +1,7 @@
 TODO
 
+clear create form after element create
+add zoom position correction to zoom selection by click
 fix cell create position selection
   fix wrong position
   add scale suport
@@ -13,10 +15,9 @@ add close btn functions
   status display when element active
 add child cell
   connections auto generation
-fix btn size after create element with scale index != 1
-fix elements rattling during zooming
-add zoom position correction to zoom selection by click
++fix btn size after create element with scale index != 1
 +scale index change by mouse scroll
++fix elements rattling during zooming
 
 ---- second stage ----
 

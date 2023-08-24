@@ -28,8 +28,8 @@ export default function Cell(
   const btnWstart = 20
   const btnHstart = 20
 
-  const [btnW, setBtnW] = React.useState(btnWstart * scaleIndex);
-  const [btnH, setBtnH] = React.useState(btnHstart * scaleIndex);
+  const [btnW, setBtnW] = React.useState(btnWstart);
+  const [btnH, setBtnH] = React.useState(btnHstart);
 
   {/*
       *React.useEffect(() => {

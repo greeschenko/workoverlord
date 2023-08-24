@@ -22,7 +22,7 @@ export default function VerticalSlider({ scaleIndex, setValue }: { scaleIndex: n
                         WebkitAppearance: 'slider-vertical',
                     },
                 }}
-                step={0.1}
+                step={1}
                 marks
                 min={1}
                 max={10}

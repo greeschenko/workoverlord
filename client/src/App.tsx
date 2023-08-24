@@ -118,11 +118,11 @@ function App() {
 
   React.useEffect(() => {
     if (lastScaleIndex < scaleIndex) {
-      setViewX(viewX - width / 20);
-      setViewY(viewY - height / 20);
+      setViewX(viewX - width / 2);
+      setViewY(viewY - height / 2);
     } else if (lastScaleIndex > scaleIndex) {
-      setViewX(viewX + width / 20);
-      setViewY(viewY + height / 20);
+      setViewX(viewX + width / 2);
+      setViewY(viewY + height / 2);
     }
     setLastScaleIndex(scaleIndex);
   }, [scaleIndex]);
@@ -158,7 +158,7 @@ function App() {
   return (
     <div className="App">
       <Slider scaleIndex={scaleIndex} setValue={setScaleIndex} />
-      <CellForm coords={coords} setDataChange={setDataChange} />
+      <CellForm coords={coords} scaleIndex={scaleIndex} setDataChange={setDataChange} />
       <div style={{ color: "white", position: "fixed", top: "10px", right: "10px" }}>
         <p>
           Mouse positioned at:{' '}
