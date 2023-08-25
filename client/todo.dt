@@ -1,10 +1,5 @@
 TODO
 
-clear create form after element create
-add zoom position correction to zoom selection by click
-fix cell create position selection
-  fix wrong position
-  add scale suport
 img not resize during cell resize
 add close btn functions
   three btns in dialog
@@ -18,6 +13,10 @@ add child cell
 +fix btn size after create element with scale index != 1
 +scale index change by mouse scroll
 +fix elements rattling during zooming
++clear create form after element create
++fix cell create position selection
+  +fix wrong position
+  +add scale suport
 
 ---- second stage ----
 

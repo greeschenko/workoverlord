@@ -15,23 +15,27 @@ import { XY } from '../models/XY'
 
 
 export default function FormDialog(
-  { coords, scaleIndex, setDataChange }: {
+  { coords, scaleIndex, setDataChange, viewX, viewY }: {
     coords: XY,
     scaleIndex: number,
     setDataChange: React.Dispatch<React.SetStateAction<number>>
+    viewX: number,
+    viewY: number,
   }) {
   const [pendingPosition, setPendingPosition] = React.useState(false);
   const [pendingSize, setPendingSize] = React.useState(false);
   const [open, setOpen] = React.useState(false);
 
-  const [formdata, setFormdata] = React.useState<CellModel>({
+  const initialState = {
     id: "0",
     data: "",
     tags: "",
     position: [0, 0, 0],
     size: [0, 0],
     status: "new",
-  });
+  }
+
+  const [formdata, setFormdata] = React.useState<CellModel>(initialState);
 
   React.useEffect(() => {
     console.log("FORMDATA", formdata);
@@ -62,6 +66,7 @@ export default function FormDialog(
             } else {
               setOpen(false);
               setDataChange(Date.now());
+              setFormdata(initialState);
             }
           });
         } else {
@@ -100,13 +105,24 @@ export default function FormDialog(
           if (pendingPosition) {
             setPendingPosition(false);
             setPendingSize(true);
-            setFormdata({ ...formdata, ['position']: [coords.x * scaleIndex, coords.y * scaleIndex, 0] });
+            setFormdata({
+              ...formdata,
+              ['position']:
+                [
+                  Math.ceil(viewX + coords.x * scaleIndex),
+                  Math.ceil(viewY + coords.y * scaleIndex),
+                  0,
+                ]
+            });
           } else if (pendingSize) {
             setPendingPosition(false);
             setPendingSize(false);
             setFormdata({
               ...formdata,
-              ['size']: [coords.x * scaleIndex - formdata.position[0], coords.y * scaleIndex - formdata.position[1]]
+              ['size']: [
+                Math.ceil((viewX + coords.x * scaleIndex) - formdata.position[0]),
+                Math.ceil((viewY + coords.y * scaleIndex) - formdata.position[1]),
+              ]
             });
             setOpen(true);
           }

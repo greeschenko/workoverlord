@@ -158,7 +158,13 @@ function App() {
   return (
     <div className="App">
       <Slider scaleIndex={scaleIndex} setValue={setScaleIndex} />
-      <CellForm coords={coords} scaleIndex={scaleIndex} setDataChange={setDataChange} />
+      <CellForm
+        coords={coords}
+        scaleIndex={scaleIndex}
+        setDataChange={setDataChange}
+        viewX={viewX}
+        viewY={viewY}
+      />
       <div style={{ color: "white", position: "fixed", top: "10px", right: "10px" }}>
         <p>
           Mouse positioned at:{' '}
