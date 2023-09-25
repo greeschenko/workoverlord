@@ -4,7 +4,7 @@ export type CellModel = {
     id: string;
     data: string;
     status?: string;
-    tags?: string;
+    tags: string;
     size: number[];
     position: number[];
     cells?: CellModel[];
