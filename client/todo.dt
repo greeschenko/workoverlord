@@ -1,5 +1,7 @@
 TODO
 
+try to make simple text editor in form or find existing
+move tags to main content with postprocessing
 add child cell
   connections auto generation
 img not resize during cell resize

@@ -138,6 +138,18 @@ export default function FormDialog(
                     }}
                 ></div>
             </foreignObject>
+            <rect
+                display={pendingSize ? "inherit" : "none"}
+                rx="6"
+                width={(viewX + coords.x * scaleIndex) - formdata.position[0]}
+                height={(viewY + coords.y * scaleIndex) - formdata.position[1]}
+                x={cX}
+                y={cY}
+                fill="none"
+                stroke={"cyan"}
+                stroke-width={1}
+                stroke-dasharray={"5,5"}
+            />
             <g display={open ? "inherit" : "none"} >
                 <rect
                     rx="6"
@@ -175,7 +187,7 @@ export default function FormDialog(
                             whiteSpace: "pre-wrap",
                         }}
                         dangerouslySetInnerHTML={{ __html: formdata.data }}
-                        onInput={e => setFormdata({ ...formdata, ["data"]: e.currentTarget.textContent || "" })}
+                        onInput={e => setFormdata({ ...formdata, ["data"]: e.currentTarget.innerHTML || "" })}
                     />
                 </foreignObject>
                 <foreignObject
