@@ -16,7 +16,6 @@ type Cell struct {
 	ID       string    `json:"id"`
 	Data     string    `json:"data"`
 	Status   string    `json:"status"`
-	Tags     string    `json:"tags,omitempty"`
 	Size     [2]int    `json:"size,omitempty"`
 	Position [3]int    `json:"position,omitempty"`
 	Cells    []Cell    `json:"cells,omitempty"`
@@ -40,8 +39,6 @@ func (s Cell) getValue(name string) string {
 		res = s.Data
 	case "status":
 		res = s.Status
-	case "tags":
-		res = s.Tags
 	}
 	return res
 }
@@ -64,8 +61,8 @@ func (s *Cell) genID(parentid string) {
 	fmt.Println("GENERATED ID", s.ID)
 }
 
-func (s *Cell) Update(newdata *Cell) {
-	s = newdata
+func (s *Cell) Update(newdata Cell) {
+	(*s) = newdata
 }
 
 type CellData struct {

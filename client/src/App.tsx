@@ -55,7 +55,6 @@ function App() {
     const [startdata, setStartdata] = React.useState<CellModel>({
         id: "0",
         data: "",
-        tags: "",
         position: [0, 0, 0],
         size: [0, 0],
         status: "",

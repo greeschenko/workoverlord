@@ -24,13 +24,13 @@ export default function FormDialog(
     const initialState = {
         id: "0",
         data: "",
-        tags: "",
         position: [0, 0, 0],
         size: [0, 0],
         status: "",
     }
 
     const [formdata, setFormdata] = React.useState<CellModel>(initialState);
+    const [content, setContent] = React.useState("write something here...");
 
     React.useEffect(() => {
         if (startdata.status == "new") {
@@ -186,36 +186,8 @@ export default function FormDialog(
                             color: "pink",
                             whiteSpace: "pre-wrap",
                         }}
-                        dangerouslySetInnerHTML={{ __html: formdata.data }}
-                        onInput={e => setFormdata({ ...formdata, ["data"]: e.currentTarget.innerHTML || "" })}
-                    />
-                </foreignObject>
-                <foreignObject
-                    x={cX + 10}
-                    y={cY + cH - 40}
-                    width={cW - 20}
-                    height={cH - 20}
-                //onClick={(event) => {
-                //event.stopPropagation();
-                //setSelected(data.id);
-                //}}
-                //onDoubleClick={() => alert("lsdjfldsfj")}
-                //        onMouseDown={(event) => {
-                //          event.stopPropagation();
-                //          setIsMoved(true)
-                //        }}
-                //        onMouseUp={() => {
-                //          setIsMoved(false)
-                //        }}
-                >
-                    <div
-                        contentEditable="true"
-                        style={{
-                            color: "pink",
-                            whiteSpace: "pre-wrap",
-                        }}
-                        dangerouslySetInnerHTML={{ __html: formdata.tags }}
-                        onInput={e => setFormdata({ ...formdata, ["tags"]: e.currentTarget.textContent || "" })}
+                        dangerouslySetInnerHTML={{ __html: content }}
+                        onInput={e => setFormdata({ ...formdata, ["data"]: e.currentTarget.innerText || "" })}
                     />
                 </foreignObject>
                 <text

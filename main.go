@@ -192,7 +192,7 @@ func actionCellsGetAll(w http.ResponseWriter, r *http.Request) {
 
 func actionCellsOne(w http.ResponseWriter, r *http.Request) {
 	var (
-		data *Cell
+		data Cell
 		rsp  = core.Response{Data: &data, Req: r}
 		vars = mux.Vars(r)
 	)
@@ -202,7 +202,7 @@ func actionCellsOne(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("USERMIND", USERMIND)
 
 	res := USERMIND.Find("id", vars["id"], true)
-	data = res
+	data = *res
 
 	w.Write(rsp.Make())
 }
@@ -236,7 +236,7 @@ func actionCellsUpdate(w http.ResponseWriter, r *http.Request) {
 
 	if rsp.IsJsonParseDone(r.Body) && rsp.IsValidate() {
 		fmt.Println("TEST UPDATE", model)
-		USERMIND.Find("id", vars["id"], true).Update(&model)
+		USERMIND.Find("id", vars["id"], true).Update(model)
 	}
 
 	w.Write(rsp.Make())

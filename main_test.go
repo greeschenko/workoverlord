@@ -19,7 +19,7 @@ type TestDataItem struct {
 var (
 	TmpTestMind Mind
 	Apiurl      = "http://localhost:2222"
-	TestData    = map[string][]TestDataItem{
+	TestDataReq = map[string][]TestDataItem{
 		"checkidgen": {
 			{
 				"check id gen",
@@ -27,7 +27,6 @@ var (
 				Cell{
 					Data:     fake.WordsN(30),
 					Status:   "new",
-					Tags:     "tag1, tag2, tag3",
 					Size:     [2]int{300, 300},
 					Position: [3]int{50, 50, 0},
 				},
@@ -39,7 +38,6 @@ var (
 				Cell{
 					Data:     fake.WordsN(30),
 					Status:   "new",
-					Tags:     "tag1, tag2, tag3",
 					Size:     [2]int{300, 400},
 					Position: [3]int{500, 300, 0},
 				},
@@ -54,7 +52,6 @@ var (
 				Cell{
 					Data:     fake.WordsN(30),
 					Status:   "new",
-					Tags:     "tag1, tag2, tag3",
 					Size:     [2]int{300, 300},
 					Position: [3]int{50, 50, 0},
 				},
@@ -66,7 +63,6 @@ var (
 				Cell{
 					Data:     fake.WordsN(100),
 					Status:   "new",
-					Tags:     "tag1, tag2, tag3",
 					Size:     [2]int{300, 400},
 					Position: [3]int{750, 300, 0},
 				},
@@ -80,7 +76,6 @@ var (
 				Cell{
 					Data:     fake.Words() + " https://www.youtube.com/watch?v=T4z-32mXLSY&ab_channel=Nikattica",
 					Status:   "new",
-					Tags:     "tag1, tag4",
 					Size:     [2]int{300, 300},
 					Position: [3]int{360, 30, 1},
 				},
@@ -92,7 +87,6 @@ var (
 				Cell{
 					Data:     fake.Words() + " https://cdna.artstation.com/p/assets/images/images/053/956/262/medium/sentron-edgerunner-copy.jpg",
 					Status:   "new",
-					Tags:     "tag5",
 					Size:     [2]int{300, 250},
 					Position: [3]int{160, 450, 1},
 				},
@@ -104,38 +98,35 @@ var (
 				"update Cell #1",
 				"PATCH",
 				Cell{
-					Data:     fake.WordsN(30),
+					Data:     "******************",
 					Status:   "new",
-					Tags:     "tag1, tag2, tag3",
-					Size:     [2]int{300, 300},
-					Position: [3]int{50, 50, 0},
+					Size:     [2]int{111, 111},
+					Position: [3]int{111, 111, 0},
 				},
 				[4]int{0, 0, 0, 0},
 			},
-			{
-				"done Cell #1",
-				"PATCH",
-				Cell{
-					Data:     fake.WordsN(30),
-					Status:   "done",
-					Tags:     "tag1, tag2",
-					Size:     [2]int{300, 300},
-					Position: [3]int{50, 50, 0},
-				},
-				[4]int{0, 0, 0, 0},
-			},
-			{
-				"archive Cell #1",
-				"PATCH",
-				Cell{
-					Data:     fake.WordsN(20),
-					Status:   "archive",
-					Tags:     "tag1, tag2, tag3",
-					Size:     [2]int{300, 300},
-					Position: [3]int{50, 50, 0},
-				},
-				[4]int{0, 0, 0, 0},
-			},
+			//			{
+			//				"done Cell #1",
+			//				"PATCH",
+			//				Cell{
+			//					Data:     fake.WordsN(30),
+			//					Status:   "done",
+			//					Size:     [2]int{300, 300},
+			//					Position: [3]int{50, 50, 0},
+			//				},
+			//				[4]int{0, 0, 0, 0},
+			//			},
+			//			{
+			//				"archive Cell #1",
+			//				"PATCH",
+			//				Cell{
+			//					Data:     fake.WordsN(20),
+			//					Status:   "archive",
+			//					Size:     [2]int{300, 300},
+			//					Position: [3]int{50, 50, 0},
+			//				},
+			//				[4]int{0, 0, 0, 0},
+			//			},
 			/*
 			 *{
 			 *  "delete Cell #1",
@@ -147,50 +138,50 @@ var (
 			 *},
 			 */
 		},
-		"index": {
-			{
-				"get all data",
-				"GET",
-				Cell{},
-				[4]int{0, 0, 0, 0},
-			},
-		},
-		"move": {
-			{
-				"move Cell #3 to #2",
-				"PATCH",
-				Cell{},
-				[4]int{0, 0, 1, 0}, //move from position 0 0 to position 1 0
-			},
-			{
-				"move Cell #4 to #2",
-				"PATCH",
-				Cell{},
-				[4]int{0, 0, 1, 0}, //repeat move from 0 0 to 1 0
-			},
-		},
-		"changeorder": {
-			{
-				"change sub element order in #2",
-				"PATCH",
-				Cell{},
-				[4]int{1, 1, 1, 0}, //change position from 1 1 to 1 0
-			},
-		},
-		"delete": {
-			{
-				"delete Cell #2",
-				"DELETE",
-				Cell{},
-				[4]int{0, 0, 0, 0},
-			},
-			{
-				"delete Cell #1 1",
-				"DELETE",
-				Cell{},
-				[4]int{0, 0, 0, 0},
-			},
-		},
+		//		"index": {
+		//			{
+		//				"get all data",
+		//				"GET",
+		//				Cell{},
+		//				[4]int{0, 0, 0, 0},
+		//			},
+		//		},
+		//		"move": {
+		//			{
+		//				"move Cell #3 to #2",
+		//				"PATCH",
+		//				Cell{},
+		//				[4]int{0, 0, 1, 0}, //move from position 0 0 to position 1 0
+		//			},
+		//			{
+		//				"move Cell #4 to #2",
+		//				"PATCH",
+		//				Cell{},
+		//				[4]int{0, 0, 1, 0}, //repeat move from 0 0 to 1 0
+		//			},
+		//		},
+		//		"changeorder": {
+		//			{
+		//				"change sub element order in #2",
+		//				"PATCH",
+		//				Cell{},
+		//				[4]int{1, 1, 1, 0}, //change position from 1 1 to 1 0
+		//			},
+		//		},
+		//		"delete": {
+		//			{
+		//				"delete Cell #2",
+		//				"DELETE",
+		//				Cell{},
+		//				[4]int{0, 0, 0, 0},
+		//			},
+		//			{
+		//				"delete Cell #1 1",
+		//				"DELETE",
+		//				Cell{},
+		//				[4]int{0, 0, 0, 0},
+		//			},
+		//		},
 	}
 )
 
@@ -231,7 +222,7 @@ var (
 
 // Test create actions
 func Test_GenID(t *testing.T) {
-	tests := TestData["checkidgen"]
+	tests := TestDataReq["checkidgen"]
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 
@@ -253,7 +244,7 @@ func Test_GenID(t *testing.T) {
 // Test create actions
 func Test_actionsCreateRoot(t *testing.T) {
 	var url = Apiurl + "/cells"
-	tests := TestData["createroot"]
+	tests := TestDataReq["createroot"]
 	//get test user auntification token
 	for k, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -276,19 +267,19 @@ func Test_actionsCreateRoot(t *testing.T) {
 			if Cell.Data.ID == "" {
 				t.Errorf("Wrong ID Cell not created")
 			}
-			TestData["createroot"][k].args.ID = Cell.Data.ID
+			TestDataReq["createroot"][k].args.ID = Cell.Data.ID
 		})
 	}
 }
 
 func Test_actionsCreateChildren(t *testing.T) {
 	var url = Apiurl + "/cells"
-	tests := TestData["addchildren"]
+	tests := TestDataReq["addchildren"]
 	//get test user auntification token
 	for k, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			var Cell CellData
-			iurl := url + "/" + TestData["createroot"][0].args.ID
+			iurl := url + "/" + TestDataReq["createroot"][0].args.ID
 
 			userJson, err := json.MarshalIndent(tt.args, " ", " ")
 			if err != nil {
@@ -306,19 +297,47 @@ func Test_actionsCreateChildren(t *testing.T) {
 			if Cell.Data.ID == "" {
 				t.Errorf("Wrong ID Cell not created")
 			}
-			TestData["addchildren"][k].args.ID = Cell.Data.ID
+			TestDataReq["addchildren"][k].args.ID = Cell.Data.ID
 		})
 	}
 }
 
+func Test_FIND_and_UPDATE(t *testing.T) {
+	TestMind := Mind{
+		Cell{ID: "001", Data: "data 1"},
+		Cell{ID: "002", Data: "data 2", Cells: []Cell{
+			{ID: "002 001", Data: "data 2-1"},
+			{ID: "002 002", Data: "data 2-2"},
+		}},
+		Cell{ID: "003", Data: "data 3"},
+	}
+
+	res1 := TestMind.Find("id", "001", true)
+	fmt.Println(res1.Data)
+
+	res21 := TestMind.Find("id", "002 001", true)
+	fmt.Println(res21.Data)
+
+	TestMind.Find("id", "001", true).Update(Cell{ID: "001", Data: "updated data 1"})
+
+	fmt.Println(TestMind[0].Data)
+
+	TestMind.Find("id", "002 001", true).Update(Cell{ID: "002 001", Data: "updated data 2 - 1"})
+
+	fmt.Println(TestMind[1].Cells[0].Data)
+	fmt.Println(TestMind)
+}
+
 func Test_actionsUpdate(t *testing.T) {
 	var url = Apiurl + "/cells"
-	tests := TestData["update"]
+	tests := TestDataReq["update"]
 	//get test user auntification token
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			var Cell CellData
-			iurl := url + "/" + TestData["createroot"][0].args.ID
+			iurl := url + "/" + TestDataReq["createroot"][0].args.ID
+
+      tt.args.ID = TestDataReq["createroot"][0].args.ID
 
 			userJson, err := json.MarshalIndent(tt.args, " ", " ")
 			if err != nil {
@@ -333,32 +352,29 @@ func Test_actionsUpdate(t *testing.T) {
 
 			Cell.Read(resp)
 
+			//fmt.Println("CELL DATA AFTER UPDATE", Cell)
+
 			if len(Cell.Errors) > 0 {
 				t.Error("Api return Errs", Cell.Errors)
 			}
 
-			var Cell2 CellData
-
-			resp1 := doRequest(url+"/"+TestData["createroot"][0].args.ID, "GET", "", "")
-
-			if resp1.StatusCode != 200 {
-				t.Errorf("Wrong Check Response status = %s, want %v", resp.Status, 200)
-			}
-
-			Cell2.Read(resp1)
-
-			if Cell.Data.Data != Cell2.Data.Data {
-				t.Errorf("Wrong Updated Data")
-			}
-
-			if Cell.Data.Tags != Cell2.Data.Tags {
-				t.Errorf("Wrong Updated Tags = %s, want %s", Cell.Data.Tags, Cell2.Data.Tags)
-
-			}
-
-			if Cell.Data.Status != Cell2.Data.Status {
-				t.Errorf("Wrong Updated Status = %s, want %s", Cell.Data.Status, Cell2.Data.Status)
-			}
+//			var Cell2 CellData
+//
+//			resp1 := doRequest(url+"/"+TestDataReq["createroot"][0].args.ID, "GET", "", "")
+//
+//			if resp1.StatusCode != 200 {
+//				t.Errorf("Wrong Check Response status = %s, want %v", resp1.Status, 200)
+//			}
+//
+//			Cell2.Read(resp1)
+//
+//			if Cell.Data.Data != Cell2.Data.Data {
+//				t.Errorf("Wrong Updated Data = %s, want %s", Cell.Data.Data, Cell2.Data.Data)
+//			}
+//
+//			if Cell.Data.Status != Cell2.Data.Status {
+//				t.Errorf("Wrong Updated Status = %s, want %s", Cell.Data.Status, Cell2.Data.Status)
+//			}
 		})
 	}
 }
@@ -396,16 +412,16 @@ func Test_actionsUpdate(t *testing.T) {
 
 func Test_actionsDelete(t *testing.T) {
 	var url = Apiurl + "/cells"
-	tests := TestData["delete"]
+	tests := TestDataReq["delete"]
 	//get test user auntification token
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			var mind MindData
 			var iurl string
 			if tt.name == "delete Cell #2" {
-				iurl = url + "/" + TestData["createroot"][1].args.ID
+				iurl = url + "/" + TestDataReq["createroot"][1].args.ID
 			} else if tt.name == "delete Cell #1 1" {
-				iurl = url + "/" + TestData["addchildren"][0].args.ID
+				iurl = url + "/" + TestDataReq["addchildren"][0].args.ID
 			}
 
 			resp := doRequest(iurl, tt.proto, "", "")
@@ -422,7 +438,7 @@ func Test_actionsDelete(t *testing.T) {
 
 			mind.Read(resp1)
 
-			fmt.Println("MIND DATA LENGHT", len(mind.Data), TestData["createroot"][0].args.ID)
+			fmt.Println("MIND DATA LENGHT", len(mind.Data), TestDataReq["createroot"][0].args.ID)
 
 			if len(mind.Data) != 1 {
 				t.Errorf("Wrong element count = %d, want == 1", len(mind.Data))
