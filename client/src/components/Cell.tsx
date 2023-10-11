@@ -60,10 +60,10 @@ export default function Cell(
 
     const handleLinks = (data: string): string => {
 
-        const youtubetmpl = `<iframe width="350" height="200" src="https://www.youtube.com/embed/$2" title="YouTube video player" ></iframe>`;
+      const youtubetmpl = `<iframe width="100%" style="aspect-ratio: 16 / 9" src="https://www.youtube.com/embed/$2" title="YouTube video player" ></iframe>`;
         //data = data.replace(/(https:\/\/www\.youtube\.com\/embed\/(\S+))/, youtubetmpl);
         data = data.replace(/(https:\/\/www\.youtube\.com\/watch\?v=(\S{11}))/g, youtubetmpl);
-        data = data.replace(/((http(s?):)([/|.|\w|\s|-])*\.(?:jpg|gif|png))/g, '<img width="300" src="$1"/>');
+        data = data.replace(/((http(s?):)([/|.|\w|\s|-])*\.(?:jpg|gif|png))/g, '<img width="100%" src="$1"/>');
         data = data.replace(/(#\S+)/g, '<b style="color: lightblue">$1</b>');
 
         return data
@@ -101,11 +101,11 @@ export default function Cell(
                     });
                 } else {
                     console.log(response);
-                    alert("ERROR: " + response.status + " - " + response.statusText);
+                    console.log("ERROR: " + response.status + " - " + response.statusText);
                 }
             },
             function(error) {
-                alert(error.message);
+                console.log(error.message);
             }
         );
     }

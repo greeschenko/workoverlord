@@ -21,6 +21,8 @@ export default function FormDialog(
     const [cW, setCW] = React.useState(0);
     const [cH, setCH] = React.useState(0);
 
+    const [cursorposition, setCursorposition] = React.useState(0);
+
     const initialState = {
         id: "0",
         data: "",
@@ -30,7 +32,10 @@ export default function FormDialog(
     }
 
     const [formdata, setFormdata] = React.useState<CellModel>(initialState);
-    const [content, setContent] = React.useState("write something here...");
+    const [textcontent, setContent] = React.useState("write something here...");
+
+    const textareaEl = React.useRef<HTMLDivElement>(null)
+
 
     React.useEffect(() => {
         if (startdata.status == "new") {
@@ -38,6 +43,10 @@ export default function FormDialog(
             console.log("start here!!!");
         }
     }, [startdata]);
+
+    React.useEffect(() => {
+        console.log("CURSOR", cursorposition);
+    }, [cursorposition]);
 
     React.useEffect(() => {
         console.log("FORMDATA", formdata);
@@ -62,10 +71,11 @@ export default function FormDialog(
                         if (res.errors != null) {
                             console.log(res.errors);
                         } else {
-                            setOpen(false);
-                            setDataChange(Date.now());
                             setFormdata(initialState);
                             setStartdata(initialState);
+                            setDataChange(Date.now());
+                            clearform();
+                            setOpen(false);
                         }
                     });
                 } else {
@@ -84,6 +94,11 @@ export default function FormDialog(
         setFormdata(initialState);
         setStartdata(initialState);
     };
+
+    const clearform = () => {
+        var el = document.getElementById('forminput');
+        el!.innerText = textcontent;
+    }
 
     return (
         <g fill="white" stroke="green" stroke-width="5">
@@ -180,15 +195,24 @@ export default function FormDialog(
                 //          setIsMoved(false)
                 //        }}
                 >
+
                     <div
-                        contentEditable="true"
+                        id="forminput"
+                        ref={textareaEl}
+                        contentEditable={true}
+                        suppressContentEditableWarning={true}
                         style={{
                             color: "pink",
                             whiteSpace: "pre-wrap",
                         }}
-                        dangerouslySetInnerHTML={{ __html: content }}
-                        onInput={e => setFormdata({ ...formdata, ["data"]: e.currentTarget.innerText || "" })}
+                        dangerouslySetInnerHTML={{ __html: textcontent }}
+                        onInput={e => {
+                            setFormdata({ ...formdata, ["data"]: e.currentTarget.innerText || "" });
+                            console.log(window.getSelection());
+                            setCursorposition(window.getSelection()!.anchorOffset);
+                        }}
                     />
+
                 </foreignObject>
                 <text
                     className="svgbtn"

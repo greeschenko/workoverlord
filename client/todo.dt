@@ -1,10 +1,8 @@
 TODO
 
-clean form data after create
 edit cell content
 add child cell
   connections auto generation
-img and videos not resize during cell resize
 add close btn functions
   three btns in dialog
     done
@@ -17,8 +15,10 @@ add config and state section to the structure
 +scale index change by mouse scroll
 +fix elements rattling during zooming
 +clear create form after element create
++img and videos not resize during cell resize
 +move tags to main content with postprocessing
 +save all state of cell to the server
++clean form data after create
 +fix cell create position selection
   +fix wrong position
   +add scale suport
