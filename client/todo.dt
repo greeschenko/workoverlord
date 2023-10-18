@@ -1,6 +1,5 @@
 TODO
 
-edit cell content
 add child cell
   connections auto generation
 add close btn functions
@@ -11,6 +10,7 @@ add close btn functions
   color indication for diferent statuses
   status display when element active
 add config and state section to the structure
++edit cell content
 +fix btn size after create element with scale index != 1
 +scale index change by mouse scroll
 +fix elements rattling during zooming
