@@ -240,7 +240,13 @@ export default function Cell(
   }
 
   return (
-    <g display={formopenid != data.id ? "inherit" : "none"} style={{ userSelect: selected ? "auto" : "none" }} fill="white" stroke="green" stroke-width="5">
+    <g
+      display={formopenid != data.id && data.status != "archive" ? "inherit" : "none"}
+      style={{ userSelect: selected ? "auto" : "none" }}
+      fill="white"
+      stroke="green"
+      stroke-width="5"
+    >
       <Dialog fullWidth={false} open={archiveopen} onClose={handleDeleteClose}>
         <DialogContent>
           Delete permanently. You are shure?
@@ -257,7 +263,7 @@ export default function Cell(
         x={cX}
         y={cY}
         fill="none"
-        stroke={selected ? "tomato" : "cadetblue"}
+        stroke={selected ? "tomato" : data.status == "done" ? "gray" : "cadetblue"}
         stroke-width={2}
       />
       <foreignObject
@@ -285,12 +291,12 @@ export default function Cell(
         }}
       >
         <div
-          style={{ color: "pink", whiteSpace: "pre-wrap" }}
+          style={
+            data.status == "done"
+              ? { color: "gray", whiteSpace: "pre-wrap", textDecoration: "line-through" }
+              : { color: "pink", whiteSpace: "pre-wrap" }
+          }
           dangerouslySetInnerHTML={{ __html: handleLinks(data.data) }}
-        />
-        <div
-          style={{ color: "pink", whiteSpace: "pre-wrap" }}
-          dangerouslySetInnerHTML={{ __html: handleLinks(data.status || "") }}
         />
       </foreignObject>
       <g display={selected ? "inherit" : "none"}>

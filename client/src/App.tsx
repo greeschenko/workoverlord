@@ -259,6 +259,20 @@ function App() {
           formopenid={formopenid}
           setFormopenId={setFormopenId}
         />
+        <text
+          className="svgbtn"
+          fill="tomato"
+          stroke="none"
+          font-size="14"
+          font-family="monospace"
+          x={20}
+          y={20}
+          onClick={()=>{
+            console.log("show archive");
+          }}
+        >
+          ARCHIVED
+        </text>
       </svg>
     </div>
   );

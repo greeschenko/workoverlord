@@ -1,15 +1,17 @@
 TODO
 
+add close btn functions
+  change new status to active
+  for not active elements add btn for return to active
+  +three btns in dialog
+  +color indication for diferent statuses
+  +status display when element active
+add menu with btns
+  add btn archived
+add config and state section to the structure
+add basic user interface
 add child cell
   connections auto generation
-add close btn functions
-  three btns in dialog
-    done
-    archive
-    permanent delete
-  color indication for diferent statuses
-  status display when element active
-add config and state section to the structure
 +edit cell content
 +fix btn size after create element with scale index != 1
 +scale index change by mouse scroll
