@@ -49,7 +49,7 @@ export default function FormDialog(
 
 
   React.useEffect(() => {
-    if (startdata.status == "new") {
+    if (startdata.status == "active") {
       setPendingPosition(true);
       console.log("start here!!!");
     } else if (startdata.status == "updated") {
@@ -79,7 +79,7 @@ export default function FormDialog(
     if (formdata.status == "updated") {
       method = "PATCH";
       id = formdata.id
-      formdata.status = "new";
+      formdata.status = "active";
     }
 
     const url = "http://localhost:2222/cells/" + id;

@@ -18,6 +18,7 @@ export default function Cell(
     setStartdata,
     formopenid,
     setFormopenId,
+    layout,
   }:
     {
       data: CellModel,
@@ -30,6 +31,7 @@ export default function Cell(
       setStartdata: React.Dispatch<React.SetStateAction<CellModel>>,
       formopenid: string,
       setFormopenId: React.Dispatch<React.SetStateAction<string>>,
+      layout: string
     }) {
 
   const [archiveopen, setArchiveopen] = React.useState(false);
@@ -161,6 +163,42 @@ export default function Cell(
     );
   }
 
+  const handleActive = (event: any) => {
+    event.stopPropagation();
+    var tmpdata = data
+    tmpdata.status = "active"
+    const url = "http://localhost:2222/cells/" + data.id;
+    fetch(url, {
+      method: "PATCH",
+      //mode: "no-cors",
+      body: JSON.stringify(tmpdata),
+      headers: {
+        //"Content-Type": "application/json",
+        //Authorization: "Bearer " + "sdflsdjfl",
+      },
+      //credentials: "same-origin",
+    }).then(
+      function(response) {
+        if (response.status === 200) {
+          response.json().then(function(res) {
+            console.log(res);
+            if (res.errors != null) {
+              console.log(res.errors);
+            } else {
+              setDataChange(Date.now());
+            }
+          });
+        } else {
+          console.log(response);
+          alert("ERROR: " + response.status + " - " + response.statusText);
+        }
+      },
+      function(error) {
+        alert(error.message);
+      }
+    );
+  }
+
   const handleArchive = (event: any) => {
     event.stopPropagation();
     var tmpdata = data
@@ -239,9 +277,19 @@ export default function Cell(
     );
   }
 
+  const isVisible = ()=>{
+    if (formopenid == data.id) {
+      return false;
+    }
+    if (data.status == "archive" && layout != "archive") {
+      return false;
+    }
+    return true;
+  }
+
   return (
     <g
-      display={formopenid != data.id && data.status != "archive" ? "inherit" : "none"}
+      display={isVisible() ? "inherit" : "none"}
       style={{ userSelect: selected ? "auto" : "none" }}
       fill="white"
       stroke="green"
@@ -312,30 +360,62 @@ export default function Cell(
         >
           ADD SUBCELL
         </text>
-        <text
-          className="svgbtn"
-          fill="tomato"
-          stroke="none"
-          font-size="14"
-          font-family="monospace"
-          x={cX + cW + 4 + 5}
-          y={cY + 8 + 16}
-          onClick={handleDone}
-        >
-          DONE
-        </text>
-        <text
-          className="svgbtn"
-          fill="tomato"
-          stroke="none"
-          font-size="14"
-          font-family="monospace"
-          x={cX + cW + 4 + 5}
-          y={cY + 8 + 16 * 2}
-          onClick={handleArchive}
-        >
-          ARCHIVE
-        </text>
+        {
+          data.status != "done" ?
+            <text
+              className="svgbtn"
+              fill="tomato"
+              stroke="none"
+              font-size="14"
+              font-family="monospace"
+              x={cX + cW + 4 + 5}
+              y={cY + 8 + 16}
+              onClick={handleDone}
+            >
+              DONE
+            </text>
+            :
+            <text
+              className="svgbtn"
+              fill="tomato"
+              stroke="none"
+              font-size="14"
+              font-family="monospace"
+              x={cX + cW + 4 + 5}
+              y={cY + 8 + 16}
+              onClick={handleActive}
+            >
+              ACTIVE
+            </text>
+        }
+        {
+          data.status != "archive" ?
+            <text
+              className="svgbtn"
+              fill="tomato"
+              stroke="none"
+              font-size="14"
+              font-family="monospace"
+              x={cX + cW + 4 + 5}
+              y={cY + 8 + 16 * 2}
+              onClick={handleArchive}
+            >
+              ARCHIVE
+            </text>
+            :
+            <text
+              className="svgbtn"
+              fill="tomato"
+              stroke="none"
+              font-size="14"
+              font-family="monospace"
+              x={cX + cW + 4 + 5}
+              y={cY + 8 + 16 * 2}
+              onClick={handleArchive}
+            >
+              ACTIVE
+            </text>
+        }
         <text
           className="svgbtn"
           fill="tomato"

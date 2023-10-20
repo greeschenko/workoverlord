@@ -26,7 +26,7 @@ var (
 				"0",
 				Cell{
 					Data:     fake.WordsN(30),
-					Status:   "new",
+					Status:   "active",
 					Size:     [2]int{300, 300},
 					Position: [3]int{50, 50, 0},
 				},
@@ -37,7 +37,7 @@ var (
 				"ff00",
 				Cell{
 					Data:     fake.WordsN(30),
-					Status:   "new",
+					Status:   "active",
 					Size:     [2]int{300, 400},
 					Position: [3]int{500, 300, 0},
 				},
@@ -51,7 +51,7 @@ var (
 				"POST",
 				Cell{
 					Data:     fake.WordsN(30),
-					Status:   "new",
+					Status:   "active",
 					Size:     [2]int{300, 300},
 					Position: [3]int{50, 50, 0},
 				},
@@ -62,7 +62,7 @@ var (
 				"POST",
 				Cell{
 					Data:     fake.WordsN(100),
-					Status:   "new",
+					Status:   "active",
 					Size:     [2]int{300, 400},
 					Position: [3]int{750, 300, 0},
 				},
@@ -75,7 +75,7 @@ var (
 				"POST",
 				Cell{
 					Data:     fake.Words() + " https://www.youtube.com/watch?v=T4z-32mXLSY&ab_channel=Nikattica",
-					Status:   "new",
+					Status:   "active",
 					Size:     [2]int{300, 300},
 					Position: [3]int{360, 30, 1},
 				},
@@ -86,7 +86,7 @@ var (
 				"POST",
 				Cell{
 					Data:     fake.Words() + " https://cdna.artstation.com/p/assets/images/images/053/956/262/medium/sentron-edgerunner-copy.jpg",
-					Status:   "new",
+					Status:   "active",
 					Size:     [2]int{300, 250},
 					Position: [3]int{160, 450, 1},
 				},
@@ -99,7 +99,7 @@ var (
 				"PATCH",
 				Cell{
 					Data:     "******************",
-					Status:   "new",
+					Status:   "active",
 					Size:     [2]int{111, 111},
 					Position: [3]int{111, 111, 0},
 				},

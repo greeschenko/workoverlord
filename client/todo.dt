@@ -1,18 +1,13 @@
 TODO
 
-add close btn functions
-  change new status to active
-  for not active elements add btn for return to active
-  +three btns in dialog
-  +color indication for diferent statuses
-  +status display when element active
-add menu with btns
-  add btn archived
-add config and state section to the structure
-add basic user interface
 add child cell
   connections auto generation
+add config and state section to the structure
+add basic user interface
 +edit cell content
++add basic layers system with three basic layers: main, archived, completed
++add menu with btns
+  +add btn archived
 +fix btn size after create element with scale index != 1
 +scale index change by mouse scroll
 +fix elements rattling during zooming
@@ -24,6 +19,12 @@ add child cell
 +fix cell create position selection
   +fix wrong position
   +add scale suport
++add close btn functions
+  +for not active elements add btn for return to active
+  +change new status to active
+  +three btns in dialog
+  +color indication for diferent statuses
+  +status display when element active
 
 ---- second stage ----
 

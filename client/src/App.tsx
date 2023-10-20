@@ -8,6 +8,7 @@ import Slider from './components/Slider'
 import CellForm from './components/CellForm'
 import Fab from '@mui/material/Fab';
 import AddIcon from '@mui/icons-material/Add';
+import MoveToInboxIcon from '@mui/icons-material/MoveToInbox';
 
 const Cells = ({
   data,
@@ -20,6 +21,7 @@ const Cells = ({
   setStartdata,
   formopenid,
   setFormopenId,
+  layout,
 }: {
   data: CellModel[],
   selected: string,
@@ -31,6 +33,7 @@ const Cells = ({
   setStartdata: React.Dispatch<React.SetStateAction<CellModel>>,
   formopenid: string,
   setFormopenId: React.Dispatch<React.SetStateAction<string>>,
+  layout: string,
 }) => {
   return (
     <g>
@@ -48,6 +51,7 @@ const Cells = ({
               setStartdata={setStartdata}
               formopenid={formopenid}
               setFormopenId={setFormopenId}
+              layout={layout}
             />
             <Cells
               data={cell.cells || []}
@@ -59,6 +63,7 @@ const Cells = ({
               setStartdata={setStartdata}
               formopenid={formopenid}
               setFormopenId={setFormopenId}
+              layout={layout}
             />
           </g>
         );
@@ -82,6 +87,8 @@ function App() {
   const [viewY, setViewY] = React.useState(0);
 
   const [formopenid, setFormopenId] = React.useState("");
+
+  const [layout, setLayout] = React.useState("main");
 
   const [startdata, setStartdata] = React.useState<CellModel>({
     id: "0",
@@ -204,9 +211,20 @@ function App() {
         size="large"
         color={"primary"}
         aria-label="add"
-        onClick={() => setStartdata({ ...startdata, ["status"]: "new" })}
+        onClick={() => setStartdata({ ...startdata, ["status"]: "active" })}
       >
         <AddIcon />
+      </Fab>
+      <Fab
+        style={{ position: "absolute", bottom: "2em", right: "8em" }}
+        variant="extended"
+        size="medium"
+        color={layout != "archive" ? "default" : "primary"}
+        aria-label="archived"
+        onClick={() => layout != "archive" ? setLayout("archive") : setLayout("main")}
+      >
+        <MoveToInboxIcon sx={{ mr: 1 }} />
+        ARCHIVED
       </Fab>
       <div style={{ color: "white", position: "fixed", top: "10px", right: "10px" }}>
         <p>
@@ -258,21 +276,8 @@ function App() {
           setStartdata={setStartdata}
           formopenid={formopenid}
           setFormopenId={setFormopenId}
+          layout={layout}
         />
-        <text
-          className="svgbtn"
-          fill="tomato"
-          stroke="none"
-          font-size="14"
-          font-family="monospace"
-          x={20}
-          y={20}
-          onClick={()=>{
-            console.log("show archive");
-          }}
-        >
-          ARCHIVED
-        </text>
       </svg>
     </div>
   );
