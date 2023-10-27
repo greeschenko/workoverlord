@@ -52,6 +52,9 @@ export default function FormDialog(
     if (startdata.status == "active") {
       setPendingPosition(true);
       console.log("start here!!!");
+    } else if (startdata.status == "new") {
+      setPendingPosition(true);
+      setFormdata({ ...formdata, ["status"]: "new" });
     } else if (startdata.status == "updated") {
       console.log("need to update the form");
       setFormdata(startdata);
@@ -79,6 +82,11 @@ export default function FormDialog(
     if (formdata.status == "updated") {
       method = "PATCH";
       id = formdata.id
+      formdata.status = "active";
+    }
+
+    if (formdata.status == "new") {
+      id = startdata.id
       formdata.status = "active";
     }
 

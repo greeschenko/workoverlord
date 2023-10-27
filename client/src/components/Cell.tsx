@@ -77,7 +77,7 @@ export default function Cell(
 
   const handleLinks = (data: string): string => {
 
-    const youtubetmpl = `<iframe width="100%" style="aspect-ratio: 16 / 9" src="https://www.youtube.com/embed/$2" title="YouTube video player" ></iframe>`;
+    const youtubetmpl = `<iframe width="100%" style="aspect-ratio: 16 / 9" src="https://www.youtube.com/embed/$2" title="YouTube video player"></iframe>`;
     //data = data.replace(/(https:\/\/www\.youtube\.com\/embed\/(\S+))/, youtubetmpl);
     data = data.replace(/(https:\/\/www\.youtube\.com\/watch\?v=(\S{11}))/g, youtubetmpl);
     data = data.replace(/((http(s?):)([/|.|\w|\s|-])*\.(?:jpg|gif|png))/g, '<img width="100%" src="$1"/>');
@@ -88,7 +88,15 @@ export default function Cell(
 
   const handleAdd = (event: any) => {
     event.stopPropagation();
-    console.log("add add add");
+    const initialState = {
+      id: data.id,
+      data: "",
+      position: [0, 0, 0],
+      size: [0, 0],
+      status: "new",
+    }
+    console.log("TTTTTTTTT", initialState);
+    setStartdata(initialState);
   }
 
   const saveGeometry = () => {
@@ -277,7 +285,7 @@ export default function Cell(
     );
   }
 
-  const isVisible = ()=>{
+  const isVisible = () => {
     if (formopenid == data.id) {
       return false;
     }
