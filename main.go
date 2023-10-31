@@ -232,10 +232,7 @@ func actionCellsUpdate(w http.ResponseWriter, r *http.Request) {
 
 	enableCors(&w)
 
-	fmt.Println("TEST UPDATE 1", model)
-
 	if rsp.IsJsonParseDone(r.Body) && rsp.IsValidate() {
-		fmt.Println("TEST UPDATE", model)
 		USERMIND.Find("id", vars["id"], true).Update(model)
 	}
 

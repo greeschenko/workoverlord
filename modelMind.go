@@ -132,25 +132,25 @@ func (m *Mind) Extend(newcell Cell, parentid string) Cell {
             newcelltop[0] = newcell.Position[0] + newcell.Size[0] / 2
             newcelltop[1] = newcell.Position[1]
 
-            if parentcellright[0] < newcellleft[0] {
-                //element on right
-                newpoints = append(newpoints, [3]int{newcellleft[0], newcellleft[1]}, [3]int{parentcellright[0], parentcellright[1]})
+            if parentcelltop[1] > newcellbottom[1] {
+                //element on top
+                newpoints = append(newpoints, [3]int{newcellbottom[0], newcellbottom[1]}, [3]int{parentcelltop[0], parentcelltop[1]})
             }else if parentcellbottom[1] < newcelltop[1] {
                 //element on bottom
                 newpoints = append(newpoints, [3]int{newcelltop[0], newcelltop[1]}, [3]int{parentcellbottom[0], parentcellbottom[1]})
             }else if parentcellleft[0] > newcellright[0] {
                 //element on left
                 newpoints = append(newpoints, [3]int{newcellright[0], newcellright[1]}, [3]int{parentcellleft[0], parentcellleft[1]})
-            }else if parentcelltop[1] > newcellbottom[1] {
-                //element on top
-                newpoints = append(newpoints, [3]int{newcellbottom[0], newcellbottom[1]}, [3]int{parentcelltop[0], parentcelltop[1]})
+            }else if parentcellright[0] < newcellleft[0] {
+                //element on right
+                newpoints = append(newpoints, [3]int{newcellleft[0], newcellleft[1]}, [3]int{parentcellright[0], parentcellright[1]})
             }
 
             if len(newpoints) > 0 {
                 newcell.Synapses = []Synapse{{
                     Points: newpoints,
-                    Size: 1,
-                    Color: "red",
+                    Size: 2,
+                    Color: "cadetblue",
                 }}
             }
 

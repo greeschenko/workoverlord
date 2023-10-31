@@ -19,6 +19,7 @@ export default function Cell(
         formopenid,
         setFormopenId,
         layout,
+        handleSynapses,
     }:
         {
             data: CellModel,
@@ -31,7 +32,8 @@ export default function Cell(
             setStartdata: React.Dispatch<React.SetStateAction<CellModel>>,
             formopenid: string,
             setFormopenId: React.Dispatch<React.SetStateAction<string>>,
-            layout: string
+            layout: string,
+            handleSynapses: (id: string) => void,
         }) {
 
     const [archiveopen, setArchiveopen] = React.useState(false);
@@ -48,13 +50,6 @@ export default function Cell(
     const [btnW, setBtnW] = React.useState(btnWstart);
     const [btnH, setBtnH] = React.useState(btnHstart);
 
-    {/*
-      *React.useEffect(() => {
-      *    setBtnW(btnWstart * scaleIndex);
-      *    setBtnH(btnHstart * scaleIndex);
-      *}, [scaleIndex]);
-      */}
-
     React.useEffect(() => {
         if (isMoved) {
             setCX(cX + mousePosition.movX * scaleIndex);
@@ -63,6 +58,9 @@ export default function Cell(
         if (isResized) {
             setCW(cW + mousePosition.movX * scaleIndex);
             setCH(cH + mousePosition.movY * scaleIndex);
+        }
+        if (isMoved) {
+            handleSynapses(data.id);
         }
     }, [mousePosition]);
 
@@ -361,8 +359,8 @@ export default function Cell(
                 <div
                     style={
                         data.status == "done"
-                            ? { color: "gray", whiteSpace: "pre-wrap", textDecoration: "line-through" }
-                            : { color: "pink", whiteSpace: "pre-wrap" }
+                            ? { color: "gray", whiteSpace: "pre-wrap", textDecoration: "line-through", fontFamily: "monospace" }
+                            : { color: "pink", whiteSpace: "pre-wrap", fontFamily: "monospace" }
                     }
                     dangerouslySetInnerHTML={{ __html: handleLinks(data.data) }}
                 />

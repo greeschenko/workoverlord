@@ -246,6 +246,7 @@ export default function FormDialog(
             style={{
               color: "pink",
               whiteSpace: "pre-wrap",
+              fontFamily: "monospace",
             }}
             dangerouslySetInnerHTML={{ __html: textcontent }}
             onInput={e => {

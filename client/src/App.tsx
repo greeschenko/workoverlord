@@ -22,6 +22,7 @@ const Cells = ({
   formopenid,
   setFormopenId,
   layout,
+  handleSynapses,
 }: {
   data: CellModel[],
   selected: string,
@@ -34,6 +35,7 @@ const Cells = ({
   formopenid: string,
   setFormopenId: React.Dispatch<React.SetStateAction<string>>,
   layout: string,
+  handleSynapses: (id: string) => void,
 }) => {
   return (
     <g>
@@ -52,6 +54,7 @@ const Cells = ({
               formopenid={formopenid}
               setFormopenId={setFormopenId}
               layout={layout}
+              handleSynapses={handleSynapses}
             />
             <Cells
               data={cell.cells || []}
@@ -64,6 +67,7 @@ const Cells = ({
               formopenid={formopenid}
               setFormopenId={setFormopenId}
               layout={layout}
+              handleSynapses={handleSynapses}
             />
           </g>
         );
@@ -108,6 +112,42 @@ function App() {
   const updateDimensions = () => {
     setWidth(window.innerWidth);
     setHeight(window.innerHeight - 10);
+  }
+
+  const handleSynapses = (id: string) => {
+    console.log("RRRRRRRR", id, coords.movX * scaleIndex, coords.movY * scaleIndex);
+    let tmpdata = data;
+    let element: CellModel;
+    for (let i in id.split(" ")) {
+      let chain = id.split(" ")[i];
+      if (i == "0") {
+        for (let j in tmpdata) {
+          if (tmpdata[j].id == chain) {
+            element = tmpdata[j];
+          }
+        }
+      } else {
+        for (let j in element!.cells) {
+          if (element!.cells[Number(j)].id.slice(-4) == chain) {
+            element = element!.cells[Number(j)];
+          }
+        }
+      }
+    }
+
+    if (id.split(" ").length > 1) {
+      element!.synapses![0].points![0][0] += coords.movX * scaleIndex;
+      element!.synapses![0].points![0][1] += coords.movY * scaleIndex
+    }
+
+    for (let i in element!.cells!) {
+      let child = element!.cells![i];
+      child.synapses![0].points![1][0] += coords.movX * scaleIndex;
+      child.synapses![0].points![1][1] += coords.movY * scaleIndex;
+    }
+
+    setData(tmpdata);
+
   }
 
   React.useEffect(() => {
@@ -277,6 +317,7 @@ function App() {
           formopenid={formopenid}
           setFormopenId={setFormopenId}
           layout={layout}
+          handleSynapses={handleSynapses}
         />
       </svg>
     </div>
