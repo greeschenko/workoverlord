@@ -1,13 +1,14 @@
 TODO
 
+add preview for links
+add preview for google maps links and coordinates
 add child cell
   +create child cell
   +synapses auto generation
   synapses auto update while elements is moving
-add config and state section to the structure
-add basic user interface
-add preview for links
-add preview for google maps links and coordinates
+    +update when moved
+    update on resize
+    change connection side when it need
 +edit cell content
 +add basic layers system with three basic layers: main, archived, completed
 +add menu with btns

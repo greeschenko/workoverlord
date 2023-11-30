@@ -1,11 +1,14 @@
 package main
 
 import (
+	"bufio"
 	"crypto/sha256"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
 	"net/http"
+	"net/mail"
 	"os"
 	"strings"
 	"syscall"
@@ -28,16 +31,28 @@ var (
 	USERMIND  Mind
 	SECRETKEY [32]byte
 	App       core.App
+	UserEmail string
 	UserPass  string
 
-	Dbpath = os.Getenv("HOME") + "/prodev2/"
-	Dbfile = Dbpath + "MIND"
-
+	Dbpath   = os.Getenv("HOME") + "/prodev2/"
+	Dbfile   = Dbpath + "MIND"
 	frontend []byte
 )
 
-func askPass() (string, error) {
-	fmt.Print("Enter Password: ")
+type Config struct {
+	UserEmail     string `json:"useremail"`
+	Usersecretkey string `json:"usersecretkey"`
+}
+
+func askString(prompt string) (string, error) {
+	reader := bufio.NewReader(os.Stdin)
+	fmt.Print(prompt)
+	text, err := reader.ReadString('\n')
+	return strings.TrimSpace(text), err
+}
+
+func askPass(prompt string) (string, error) {
+	fmt.Print(prompt)
 	bytePassword, err := term.ReadPassword(int(syscall.Stdin))
 	if err != nil {
 		return "", err
@@ -45,6 +60,11 @@ func askPass() (string, error) {
 
 	password := string(bytePassword)
 	return strings.TrimSpace(password), nil
+}
+
+func isEmailValid(email string) bool {
+	_, err := mail.ParseAddress(email)
+	return err == nil
 }
 
 func init() {
@@ -55,58 +75,104 @@ func init() {
 	}
 
 	if _, err := os.Stat(Dbfile); errors.Is(err, os.ErrNotExist) {
-		file, err := os.Create(Dbfile)
+
+		for !isEmailValid(UserEmail) {
+			if UserEmail != "" {
+				fmt.Println("[ERR] Email has incorect format, try again please")
+			}
+			UserEmail, _ = askString("Enter email: ")
+		}
+
+		tmpuserpass := ""
+		tmpuserpassre := " "
+
+		for tmpuserpass != tmpuserpassre {
+			tmpuserpass, _ = askPass("\n Enter new password: ")
+			tmpuserpassre, _ = askPass("\n Enter new password re: ")
+		}
+
+		SECRETKEY = sha256.Sum256([]byte(tmpuserpass))
+
+		config := Config{
+			UserEmail:     UserEmail,
+			Usersecretkey: fmt.Sprintf("%x", SECRETKEY),
+		}
+
+		configString, _ := json.Marshal(config)
+
+		configCell := Cell{
+			Data:   string(configString),
+			Status: "config",
+		}
+
+		USERMIND = append(USERMIND, configCell)
+
+		saveData()
+
+		fmt.Println("===============================")
+		fmt.Println("New MAIND created")
+		fmt.Println("Run app againe to continue")
+		os.Exit(1)
+	} else {
+
+		UserPass, _ = askPass("Enter Password: ")
+		//fmt.Printf("Password: %s\n", UserPass)
+		//fmt.Print(string(dat))
+
+		SECRETKEY = sha256.Sum256([]byte(UserPass))
+
+		fmt.Println("SECRETKEY: ", SECRETKEY, len(SECRETKEY))
+
+		tmpdata, err := os.ReadFile(Dbfile)
 		if err != nil {
 			log.Fatal(err)
 		}
-		defer file.Close()
-		fmt.Println("- db file created")
+
+		json.Unmarshal(DataDescript(tmpdata), &USERMIND)
+
+		//compile frontend
+		index, _ := os.ReadFile("./client/build/index.html")
+		precss := []byte("<style type='text/css'>")
+		css, _ := os.ReadFile("./client/build/static/css/main.css")
+		postcss := []byte("</style>")
+		prejs1 := []byte("<script>")
+		js1, _ := os.ReadFile("./client/build/static/js/chunk.js")
+		postjs1 := []byte("</script>")
+		prejs2 := []byte("<script>")
+		js2, _ := os.ReadFile("./client/build/static/js/main.js")
+		postjs2 := []byte("</script>")
+
+		frontend = append(frontend, index...)
+		frontend = append(frontend, precss...)
+		frontend = append(frontend, css...)
+		frontend = append(frontend, postcss...)
+		frontend = append(frontend, prejs1...)
+		frontend = append(frontend, js1...)
+		frontend = append(frontend, postjs1...)
+		frontend = append(frontend, prejs2...)
+		frontend = append(frontend, js2...)
+		frontend = append(frontend, postjs2...)
 	}
-
-	UserPass, _ = askPass()
-	fmt.Printf("Password: %s\n", UserPass)
-	//fmt.Print(string(dat))
-
-	SECRETKEY = sha256.Sum256([]byte(UserPass))
-
-	fmt.Println("SECRETKEY: ", SECRETKEY, len(SECRETKEY))
-
-	tmpdata, err := os.ReadFile(Dbfile)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	fmt.Println("DATA: ", tmpdata, len(tmpdata))
-
-	if len(tmpdata) == 0 {
-		USERMIND = Mind{}
-	}
-
-	//compile frontend
-	index, _ := os.ReadFile("./client/build/index.html")
-	precss := []byte("<style type='text/css'>")
-	css, _ := os.ReadFile("./client/build/static/css/main.css")
-	postcss := []byte("</style>")
-	prejs1 := []byte("<script>")
-	js1, _ := os.ReadFile("./client/build/static/js/chunk.js")
-	postjs1 := []byte("</script>")
-	prejs2 := []byte("<script>")
-	js2, _ := os.ReadFile("./client/build/static/js/main.js")
-	postjs2 := []byte("</script>")
-
-	frontend = append(frontend, index...)
-	frontend = append(frontend, precss...)
-	frontend = append(frontend, css...)
-	frontend = append(frontend, postcss...)
-	frontend = append(frontend, prejs1...)
-	frontend = append(frontend, js1...)
-	frontend = append(frontend, postjs1...)
-	frontend = append(frontend, prejs2...)
-	frontend = append(frontend, js2...)
-	frontend = append(frontend, postjs2...)
 }
 
 func saveData() {
+	file, fileerr := os.Create(Dbfile)
+	if fileerr != nil {
+		log.Fatal(fileerr)
+	}
+	defer file.Close()
+
+	USERMINDjson, _ := json.MarshalIndent(USERMIND, " ", " ")
+
+	USERMINDjsonSecret := DataEnctypt(USERMINDjson)
+
+	w := bufio.NewWriter(file)
+	n4, _ := w.Write(USERMINDjsonSecret)
+	fmt.Printf("wrote %d bytes\n", n4)
+	w.Flush()
+}
+
+func logData() {
 	n := 0
 	tick := time.Tick(15000 * time.Millisecond)
 	//boom := time.After(12000 * time.Millisecond)
@@ -148,7 +214,7 @@ func main() {
 	App.R.HandleFunc("/cells/{id}", actionCellsUpdate).Methods("PATCH")
 	App.R.HandleFunc("/cells/{id}", actionCellsDelete).Methods("DELETE")
 
-	go saveData()
+	go logData()
 
 	log.Printf("%s", logo)
 	App.Run(":2222")
@@ -220,6 +286,8 @@ func actionCellsCreate(w http.ResponseWriter, r *http.Request) {
 		model = USERMIND.Extend(model, vars["id"])
 	}
 
+	saveData()
+
 	w.Write(rsp.Make())
 }
 
@@ -236,6 +304,8 @@ func actionCellsUpdate(w http.ResponseWriter, r *http.Request) {
 		USERMIND.Find("id", vars["id"], true).Update(model)
 	}
 
+	saveData()
+
 	w.Write(rsp.Make())
 }
 
@@ -251,6 +321,8 @@ func actionCellsDelete(w http.ResponseWriter, r *http.Request) {
 	if rsp.IsValidate() {
 		USERMIND.DeleteCell(vars["id"])
 	}
+
+	saveData()
 
 	w.Write(rsp.Make())
 }

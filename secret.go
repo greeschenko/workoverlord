@@ -4,14 +4,12 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/rand"
-	"encoding/hex"
+	//"encoding/hex"
 	"fmt"
 	"io"
 )
 
-type Secret string
-
-func (s *Secret) Enctypt() {
+func DataEnctypt(data []byte) []byte {
 
 	// generate a new aes cipher using our 32 byte long key
 	c, err := aes.NewCipher(SECRETKEY[:])
@@ -45,12 +43,14 @@ func (s *Secret) Enctypt() {
 	// slice. The nonce must be NonceSize() bytes long and unique for all
 	// time, for a given key.
 
-	*s = Secret(hex.EncodeToString(gcm.Seal(nonce, nonce, []byte(*s), nil)))
+    res := gcm.Seal(nonce, nonce, data, nil)
+
+    return res
 }
 
-func (s *Secret) Descript() {
+func DataDescript(data []byte) []byte {
 
-	ciphertext, _ := hex.DecodeString(string(*s))
+	ciphertext := data
 
 	c, err := aes.NewCipher(SECRETKEY[:])
 	if err != nil {
@@ -73,5 +73,6 @@ func (s *Secret) Descript() {
 		fmt.Println(err)
 	}
 
-	*s = Secret(plaintext)
+    res := plaintext
+    return res
 }

@@ -115,20 +115,26 @@ function App() {
   }
 
   const handleSynapses = (id: string) => {
-    console.log("RRRRRRRR", id, coords.movX * scaleIndex, coords.movY * scaleIndex);
     let tmpdata = data;
     let element: CellModel;
+    let parent: CellModel;
     for (let i in id.split(" ")) {
       let chain = id.split(" ")[i];
       if (i == "0") {
         for (let j in tmpdata) {
           if (tmpdata[j].id == chain) {
+            if (Number(i) != id.split(" ").length - 1) {
+              parent = tmpdata[j];
+            }
             element = tmpdata[j];
           }
         }
       } else {
         for (let j in element!.cells) {
           if (element!.cells[Number(j)].id.slice(-4) == chain) {
+            if (Number(i) != id.split(" ").length - 1) {
+              parent = element!.cells[Number(j)];
+            }
             element = element!.cells[Number(j)];
           }
         }
@@ -145,6 +151,8 @@ function App() {
       child.synapses![0].points![1][0] += coords.movX * scaleIndex;
       child.synapses![0].points![1][1] += coords.movY * scaleIndex;
     }
+
+    console.log("PPPPPPP", parent!, element!);
 
     setData(tmpdata);
 
