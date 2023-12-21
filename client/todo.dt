@@ -1,7 +1,8 @@
 TODO
 
-add preview for links
-add preview for google maps links and coordinates
+add preview for google maps links
+add img from local disc and convert to base64
+add the ability to add simple drawing
 add child cell
   +create child cell
   +synapses auto generation
@@ -34,6 +35,7 @@ add child cell
 ---- second stage ----
 
 add full vim like keyboard controls
+add preview for links
 add multiselect for cells
   add move for all selected elements
   add btns for all selected element

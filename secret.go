@@ -5,7 +5,7 @@ import (
 	"crypto/cipher"
 	"crypto/rand"
 	//"encoding/hex"
-	"fmt"
+    "log"
 	"io"
 )
 
@@ -15,7 +15,7 @@ func DataEnctypt(data []byte) []byte {
 	c, err := aes.NewCipher(SECRETKEY[:])
 	// if there are any errors, handle them
 	if err != nil {
-		fmt.Println(err)
+		log.Fatalln(err)
 	}
 
 	// gcm or Galois/Counter Mode, is a mode of operation
@@ -25,7 +25,7 @@ func DataEnctypt(data []byte) []byte {
 	// if any error generating new GCM
 	// handle them
 	if err != nil {
-		fmt.Println(err)
+		log.Fatalln(err)
 	}
 
 	// creates a new byte array the size of the nonce
@@ -34,7 +34,7 @@ func DataEnctypt(data []byte) []byte {
 	// populates our nonce with a cryptographically secure
 	// random sequence
 	if _, err = io.ReadFull(rand.Reader, nonce); err != nil {
-		fmt.Println(err)
+		log.Fatalln(err)
 	}
 
 	// here we encrypt our text using the Seal function
@@ -54,23 +54,23 @@ func DataDescript(data []byte) []byte {
 
 	c, err := aes.NewCipher(SECRETKEY[:])
 	if err != nil {
-		fmt.Println(err)
+		log.Fatalln(err)
 	}
 
 	gcm, err := cipher.NewGCM(c)
 	if err != nil {
-		fmt.Println(err)
+		log.Fatalln(err)
 	}
 
 	nonceSize := gcm.NonceSize()
 	if len(ciphertext) < nonceSize {
-		fmt.Println(err)
+		log.Fatalln(err)
 	}
 
 	nonce, ciphertext := ciphertext[:nonceSize], ciphertext[nonceSize:]
 	plaintext, err := gcm.Open(nil, nonce, ciphertext, nil)
 	if err != nil {
-		fmt.Println(err)
+		log.Fatalln(err)
 	}
 
     res := plaintext

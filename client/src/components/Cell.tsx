@@ -75,11 +75,21 @@ export default function Cell(
 
     const handleLinks = (data: string): string => {
 
+      //altitude index = 4.3546
+
+      //https://www.google.com/maps/embed?pb=!1m10!1m8!1m3!1d24338.25750225145!2d30.503572899999973!3d50.51767350000001!3m2!1i1024!2i768!4f13.1!5e1!3m2!1suk!2sua!4v1702584679328!5m2!1suk!2sua
+      //https://www.google.com/maps/embed?pb=!1m10!1m8!1m3!1d5000.09420383183!2d27.5035729!3d49.5176735!3m2!1i1024!2i768!4f13.1!5e0!3m2!1suk!2sua!4v1702582143755!5m2!1suk!2sua
+
+      //https://www.google.com/maps/@50.5176735,30.5035729,14z?authuser=0&entry=ttu
+
+      const gmaptmpl = `<iframe src="https://www.google.com/maps/embed?pb=!1m10!1m8!1m3!1d5000.09420383183!2d27.5035729!3d49.5176735!3m2!1i1024!2i768!4f13.1!5e1!3m2!1suk!2sua!4v1702582143755!5m2!1suk!2sua" width="600" height="450" style="border:0;margin:1em;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>`;
+
         const youtubetmpl = `<iframe width="100%" style="aspect-ratio: 16 / 9" src="https://www.youtube.com/embed/$2" title="YouTube video player"></iframe>`;
         //data = data.replace(/(https:\/\/www\.youtube\.com\/embed\/(\S+))/, youtubetmpl);
         data = data.replace(/(https:\/\/www\.youtube\.com\/watch\?v=(\S{11}))/g, youtubetmpl);
         data = data.replace(/((http(s?):)([/|.|\w|\s|-])*\.(?:jpg|gif|png))/g, '<img width="100%" src="$1"/>');
         data = data.replace(/(#\S+)/g, '<b style="color: lightblue">$1</b>');
+        data = data.replace(/(gggg)/g, gmaptmpl);
 
         return data
     };
