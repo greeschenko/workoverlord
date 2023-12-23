@@ -1,13 +1,12 @@
 import * as React from 'react';
 
-import { CellModel } from '../models/Mind'
-import { XY } from '../models/XY'
+import { CellModel } from '../models/Mind';
+import { XY } from '../models/XY';
 
 export default function FormDialog(
     {
         coords,
         scaleIndex,
-        setDataChange,
         viewX,
         viewY,
         startdata,
@@ -17,7 +16,6 @@ export default function FormDialog(
     }: {
         coords: XY,
         scaleIndex: number,
-        setDataChange: React.Dispatch<React.SetStateAction<number>>
         viewX: number,
         viewY: number,
         startdata: CellModel,
@@ -32,28 +30,53 @@ export default function FormDialog(
     const [cW, setCW] = React.useState(0);
     const [cH, setCH] = React.useState(0);
 
-    //    const inputRef = React.useRef(null);
-    //
-    //    const handleClick = () => {
-    //        // 👇️ open file input box on click of another element
-    //        inputRef.current.click();
-    //    };
+    const inputRef = React.useRef<HTMLInputElement | null>(null);
+
+    const handleClickFile = () => {
+        inputRef.current?.click();
+    };
+
+    const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const fileObj = event.target.files && event.target.files[0];
+        if (!fileObj) {
+            return;
+        }
+
+        console.log('fileObj is', fileObj);
+
+        // 👇️ reset file input
+        if (inputRef.current) {
+            inputRef.current.value = '';
+        }
+
+        // 👇️ is now empty
+        console.log(event.target.files);
+
+        // 👇️ can still access file object here
+        console.log(fileObj);
+        console.log(fileObj.name);
+
+        const base64Content = await readFileAsBase64(fileObj);
+        console.log('File content in base64:', base64Content);
+    };
+
+    // Function to read file content as base64
+    const readFileAsBase64 = (file: File): Promise<string> => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => {
+                if (reader.result) {
+                    resolve(reader.result.toString());
+                } else {
+                    reject(new Error('Failed to read file as base64.'));
+                }
+            };
+            reader.onerror = (error) => reject(error);
+            reader.readAsDataURL(file);
+        });
+    };
 
     const [cursorposition, setCursorposition] = React.useState(0);
-
-    const initialState = {
-        id: "0",
-        data: "",
-        position: [0, 0, 0],
-        size: [0, 0],
-        status: "",
-    }
-
-    const [formdata, setFormdata] = React.useState<CellModel>(initialState);
-    const [textcontent, setContent] = React.useState("write something here...");
-
-    const textareaEl = React.useRef<HTMLDivElement>(null)
-
 
     React.useEffect(() => {
         if (startdata.status == "active") {
@@ -61,15 +84,15 @@ export default function FormDialog(
             console.log("start here!!!");
         } else if (startdata.status == "new") {
             setPendingPosition(true);
-            setFormdata({ ...formdata, ["status"]: "new" });
+            setStartdata({ ...startdata, ["status"]: "new" });
         } else if (startdata.status == "updated") {
             console.log("need to update the form");
-            setFormdata(startdata);
+            setStartdata(startdata);
             setCX(viewX + startdata.position[0] * scaleIndex);
             setCY(viewY + startdata.position[1] * scaleIndex);
             setCW(startdata.size[0] * scaleIndex);
             setCH(startdata.size[1] * scaleIndex);
-            setformtext(startdata.data);
+            //setformtext(startdata.data);
             setFormopenId(startdata.id);
         }
     }, [startdata]);
@@ -77,77 +100,6 @@ export default function FormDialog(
     React.useEffect(() => {
         console.log("CURSOR", cursorposition);
     }, [cursorposition]);
-
-    React.useEffect(() => {
-        console.log("FORMDATA", formdata);
-    }, [formdata]);
-
-    const handleSubmit = () => {
-        let method = "POST";
-        let id = "0";
-
-        if (formdata.status == "updated") {
-            method = "PATCH";
-            id = formdata.id
-            formdata.status = "active";
-        }
-
-        if (formdata.status == "new") {
-            id = startdata.id
-            formdata.status = "active";
-        }
-
-        const url = "http://localhost:2222/cells/" + id;
-        fetch(url, {
-            method: method,
-            //mode: "no-cors",
-            body: JSON.stringify(formdata),
-            headers: {
-                //"Content-Type": "application/json",
-                //Authorization: "Bearer " + "sdflsdjfl",
-            },
-            //credentials: "same-origin",
-        }).then(
-            function(response) {
-                if (response.status === 200) {
-                    response.json().then(function(res) {
-                        console.log(res);
-                        if (res.errors != null) {
-                            console.log(res.errors);
-                        } else {
-                            setFormdata(initialState);
-                            setStartdata(initialState);
-                            setDataChange(Date.now());
-                            clearform();
-                            setFormopenId("");
-                        }
-                    });
-                } else {
-                    console.log(response);
-                    alert("ERROR: " + response.status + " - " + response.statusText);
-                }
-            },
-            function(error) {
-                alert(error.message);
-            }
-        );
-    }
-
-    const handleClose = () => {
-        setFormopenId("");
-        setFormdata(initialState);
-        setStartdata(initialState);
-    };
-
-    const clearform = () => {
-        var el = document.getElementById('forminput');
-        el!.innerText = textcontent;
-    }
-
-    const setformtext = (text: string) => {
-        var el = document.getElementById('forminput');
-        el!.innerText = text;
-    }
 
     return (
         <g fill="white" stroke="green" stroke-width="5">
@@ -174,8 +126,8 @@ export default function FormDialog(
                         if (pendingPosition) {
                             setPendingPosition(false);
                             setPendingSize(true);
-                            setFormdata({
-                                ...formdata,
+                            setStartdata({
+                                ...startdata,
                                 ['position']:
                                     [
                                         Math.ceil(viewX + coords.x * scaleIndex),
@@ -188,15 +140,15 @@ export default function FormDialog(
                         } else if (pendingSize) {
                             setPendingPosition(false);
                             setPendingSize(false);
-                            setFormdata({
-                                ...formdata,
+                            setStartdata({
+                                ...startdata,
                                 ['size']: [
-                                    Math.ceil((viewX + coords.x * scaleIndex) - formdata.position[0]),
-                                    Math.ceil((viewY + coords.y * scaleIndex) - formdata.position[1]),
+                                    Math.ceil((viewX + coords.x * scaleIndex) - startdata.position[0]),
+                                    Math.ceil((viewY + coords.y * scaleIndex) - startdata.position[1]),
                                 ]
                             });
-                            setCW((viewX + coords.x * scaleIndex) - formdata.position[0]);
-                            setCH((viewY + coords.y * scaleIndex) - formdata.position[1]);
+                            setCW((viewX + coords.x * scaleIndex) - startdata.position[0]);
+                            setCH((viewY + coords.y * scaleIndex) - startdata.position[1]);
                             setFormopenId("0");
                         }
                     }}
@@ -205,8 +157,8 @@ export default function FormDialog(
             <rect
                 display={pendingSize ? "inherit" : "none"}
                 rx="6"
-                width={(viewX + coords.x * scaleIndex) - formdata.position[0]}
-                height={(viewY + coords.y * scaleIndex) - formdata.position[1]}
+                width={(viewX + coords.x * scaleIndex) - startdata.position[0]}
+                height={(viewY + coords.y * scaleIndex) - startdata.position[1]}
                 x={cX}
                 y={cY}
                 fill="none"
@@ -245,6 +197,7 @@ export default function FormDialog(
                 //        }}
                 >
 
+                    {/*
                     <div
                         id="forminput"
                         ref={textareaEl}
@@ -262,7 +215,13 @@ export default function FormDialog(
                             setCursorposition(window.getSelection()!.anchorOffset);
                         }}
                     />
-                    <input type="file" style={{ display: "none" }} onChange={(e) => { console.log(e); }} />
+                        */}
+                    <input
+                        type="file"
+                        ref={inputRef}
+                        style={{ display: "none" }}
+                        onChange={handleFileChange}
+                    />
                 </foreignObject>
                 <text
                     className="svgbtn"
@@ -272,33 +231,9 @@ export default function FormDialog(
                     font-family="monospace"
                     x={cX + cW + 4 + 5}
                     y={cY + 8}
-                //onClick={handleSubmit}
+                    onClick={handleClickFile}
                 >
                     ADD IMG
-                </text>
-                <text
-                    className="svgbtn"
-                    fill="tomato"
-                    stroke="none"
-                    font-size="14"
-                    font-family="monospace"
-                    x={cX + cW + 4 + 5}
-                    y={cY + 8 + 16}
-                    onClick={handleSubmit}
-                >
-                    SAVE
-                </text>
-                <text
-                    className="svgbtn"
-                    fill="tomato"
-                    stroke="none"
-                    font-size="14"
-                    font-family="monospace"
-                    x={cX + cW + 4 + 5}
-                    y={cY + 8 + 16 + 16}
-                    onClick={handleClose}
-                >
-                    CANCEL
                 </text>
             </g>
         </g>
