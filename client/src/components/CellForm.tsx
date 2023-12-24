@@ -30,51 +30,6 @@ export default function FormDialog(
     const [cW, setCW] = React.useState(0);
     const [cH, setCH] = React.useState(0);
 
-    const inputRef = React.useRef<HTMLInputElement | null>(null);
-
-    const handleClickFile = () => {
-        inputRef.current?.click();
-    };
-
-    const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-        const fileObj = event.target.files && event.target.files[0];
-        if (!fileObj) {
-            return;
-        }
-
-        console.log('fileObj is', fileObj);
-
-        // 👇️ reset file input
-        if (inputRef.current) {
-            inputRef.current.value = '';
-        }
-
-        // 👇️ is now empty
-        console.log(event.target.files);
-
-        // 👇️ can still access file object here
-        console.log(fileObj);
-        console.log(fileObj.name);
-
-        const base64Content = await readFileAsBase64(fileObj);
-        console.log('File content in base64:', base64Content);
-    };
-
-    // Function to read file content as base64
-    const readFileAsBase64 = (file: File): Promise<string> => {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = () => {
-                if (reader.result) {
-                    resolve(reader.result.toString());
-                } else {
-                    reject(new Error('Failed to read file as base64.'));
-                }
-            };
-            reader.onerror = (error) => reject(error);
-            reader.readAsDataURL(file);
-        });
-    };
 
     const [cursorposition, setCursorposition] = React.useState(0);
 
@@ -216,25 +171,7 @@ export default function FormDialog(
                         }}
                     />
                         */}
-                    <input
-                        type="file"
-                        ref={inputRef}
-                        style={{ display: "none" }}
-                        onChange={handleFileChange}
-                    />
                 </foreignObject>
-                <text
-                    className="svgbtn"
-                    fill="tomato"
-                    stroke="none"
-                    font-size="14"
-                    font-family="monospace"
-                    x={cX + cW + 4 + 5}
-                    y={cY + 8}
-                    onClick={handleClickFile}
-                >
-                    ADD IMG
-                </text>
             </g>
         </g>
     );

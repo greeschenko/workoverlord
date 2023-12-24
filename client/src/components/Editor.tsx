@@ -20,6 +20,55 @@ const EditableText: React.FC<EditableTextProps> = ({
     setFormopenId,
     initialState,
 }) => {
+
+    const inputRef = React.useRef<HTMLInputElement | null>(null);
+
+    const handleClickFile = () => {
+        inputRef.current?.click();
+    };
+
+    const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const fileObj = event.target.files && event.target.files[0];
+        if (!fileObj) {
+            return;
+        }
+
+        console.log('fileObj is', fileObj);
+
+        // 👇️ reset file input
+        if (inputRef.current) {
+            inputRef.current.value = '';
+        }
+
+        // 👇️ is now empty
+        console.log(event.target.files);
+
+        // 👇️ can still access file object here
+        console.log(fileObj);
+        console.log(fileObj.name);
+
+        const base64Content = await readFileAsBase64(fileObj);
+        console.log('File content in base64:', base64Content);
+
+        setStartdata({ ...startdata, ["data"]: startdata.data + '\n<img width="100%" src="' + base64Content + '"/>' || "" })
+    };
+
+    // Function to read file content as base64
+    const readFileAsBase64 = (file: File): Promise<string> => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => {
+                if (reader.result) {
+                    resolve(reader.result.toString());
+                } else {
+                    reject(new Error('Failed to read file as base64.'));
+                }
+            };
+            reader.onerror = (error) => reject(error);
+            reader.readAsDataURL(file);
+        });
+    };
+
     const handleAddToEnd = () => {
         // Додає "The End" в кінець тексту
         setStartdata({ ...startdata, ["data"]: startdata.data + ' The End' || "" })
@@ -86,6 +135,12 @@ const EditableText: React.FC<EditableTextProps> = ({
 
     return (
         <>
+            <input
+                type="file"
+                ref={inputRef}
+                style={{ display: "none" }}
+                onChange={handleFileChange}
+            />
             <AceEditor
                 mode="text"
                 theme="monokai"
@@ -106,10 +161,9 @@ const EditableText: React.FC<EditableTextProps> = ({
                 style={{ border: '1px solid #ccc', padding: '8px', position: 'relative' }}
             />
             <div style={{ position: 'absolute', bottom: '8px', right: '8px' }}>
+                <button onClick={handleClickFile}>ADD IMG</button>
                 <button onClick={handleSubmit}>SAVE</button>
                 <button onClick={handleClose}>CLOSE</button>
-                <button onClick={handleAddToStart}>Додати "Start here"</button>
-                <button onClick={handleAddToEnd}>Додати "The End"</button>
             </div>
         </>
     );
