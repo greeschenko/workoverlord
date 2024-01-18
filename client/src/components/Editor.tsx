@@ -89,9 +89,8 @@ const EditableText: React.FC<EditableTextProps> = ({
             startdata.status = "active";
         }
 
-        if (startdata.status == "new") {
+        if (startdata.status == "active") {
             id = startdata.id
-            startdata.status = "active";
         }
 
         const url = "http://localhost:2222/cells/" + id;

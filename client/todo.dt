@@ -1,8 +1,5 @@
 TODO
 
-add preview for google maps links
-add img from local disc and convert to base64
-add the ability to add simple drawing
 add child cell
   +create child cell
   +synapses auto generation
@@ -10,6 +7,7 @@ add child cell
     +update when moved
     update on resize
     change connection side when it need
++add img from local disc and convert to base64
 +edit cell content
 +add basic layers system with three basic layers: main, archived, completed
 +add menu with btns
@@ -34,6 +32,8 @@ add child cell
 
 ---- second stage ----
 
+add the ability to add simple drawing
+add preview for google maps links
 add full vim like keyboard controls
 add preview for links
 add multiselect for cells
