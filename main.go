@@ -35,7 +35,7 @@ var (
 	UserEmail string
 	UserPass  string
 
-	Dbpath   = os.Getenv("HOME") + "/prodev2/"
+	Dbpath   = os.Getenv("HOME") + "/prodev/"
 	Dbfile   = Dbpath + "MIND"
 	frontend []byte
 )

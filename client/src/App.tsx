@@ -266,6 +266,7 @@ function App() {
                 <MoveToInboxIcon sx={{ mr: 1 }} />
                 ARCHIVED
             </Fab>
+            {/*
             <div style={{ color: "white", position: "fixed", top: "10px", right: "10px" }}>
                 <p>
                     Mouse positioned at:{' '}
@@ -286,6 +287,7 @@ function App() {
                     </b>
                 </p>
             </div>
+            */}
             <CellForm
                 coords={coords}
                 scaleIndex={scaleIndex}
