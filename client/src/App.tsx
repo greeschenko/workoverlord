@@ -64,7 +64,7 @@ const Cells = ({
             {data != null && data.map(cell => {
                 return (
                     <g>
-                        <Connections data={cell} />
+                        {/*<Connections data={cell} />*/}
                         <Cell
                             data={cell}
                             selected={selected == cell.id}

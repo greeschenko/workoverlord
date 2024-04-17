@@ -122,7 +122,7 @@ func init() {
 
 		SECRETKEY = sha256.Sum256([]byte(UserPass))
 
-		fmt.Println("SECRETKEY: ", SECRETKEY, len(SECRETKEY))
+		//fmt.Println("SECRETKEY: ", SECRETKEY, len(SECRETKEY))
 
 		tmpdata, err := os.ReadFile(Dbfile)
 		if err != nil {
@@ -180,7 +180,7 @@ func logData() {
 	for {
 		select {
 		case <-tick:
-			fmt.Println(USERMIND)
+			fmt.Println(">")
 		//case <-boom:
 		//fmt.Println("BOOM!")
 		//return
@@ -250,7 +250,9 @@ func actionCellsGetAll(w http.ResponseWriter, r *http.Request) {
 
 	enableCors(&w)
 
-	fmt.Println("USERMIND", USERMIND)
+	//fmt.Println("USERMIND", USERMIND)
+
+    USERMIND.RecalculateSynapses()
 
 	data = USERMIND
 
@@ -266,7 +268,7 @@ func actionCellsOne(w http.ResponseWriter, r *http.Request) {
 
 	enableCors(&w)
 
-	fmt.Println("USERMIND", USERMIND)
+	//fmt.Println("USERMIND", USERMIND)
 
 	res := USERMIND.Find("id", vars["id"], true)
 	data = *res
