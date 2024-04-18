@@ -146,7 +146,7 @@ const EditableText: React.FC<EditableTextProps> = ({
                 name="editableText"
                 //onBlur={() => handleBlur(text)}
                 onChange={(value) => setStartdata({ ...startdata, ["data"]: value || "" })}
-                fontSize={10}
+                fontSize={14}
                 showPrintMargin={true}
                 showGutter={true}
                 highlightActiveLine={true}
@@ -157,7 +157,7 @@ const EditableText: React.FC<EditableTextProps> = ({
                     tabSize: 2,
                     keyboardHandler: "ace/keyboard/vim", // Додаємо підтримку Vim
                 }}
-                style={{ border: '1px solid #ccc', padding: '8px', position: 'relative' }}
+                style={{ border: '1px solid #ccc', padding: '8px', position: 'relative', width: "80vw" }}
             />
             <div style={{ position: 'absolute', bottom: '8px', right: '8px' }}>
                 <button onClick={handleClickFile}>ADD IMG</button>

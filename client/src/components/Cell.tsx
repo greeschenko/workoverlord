@@ -334,6 +334,14 @@ export default function Cell(
                             stroke={synapse.color}
                             stroke-width={synapse.size}
                         />}
+                        {synapse.points != undefined && synapse.points![3] != undefined && <line
+                            x1={synapse.points![2][0]}
+                            y1={synapse.points![2][1]}
+                            x2={synapse.points![3][0]}
+                            y2={synapse.points![3][1]}
+                            stroke={synapse.color}
+                            stroke-width={synapse.size}
+                        />}
                     </g>
                 );
             })}

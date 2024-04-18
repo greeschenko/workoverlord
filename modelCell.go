@@ -90,9 +90,9 @@ func generateSynapses(first, second Cell) [][3]int {
 		}
 	case "topcenter":
 		points = [][3]int{
-			{first.Position[0] + first.Size[0]/2, first.Position[1], 0},
-			{first.Position[0] + first.Size[0]/2, (first.Position[1] - second.Position[1] + second.Size[1]) / 2, 0},
-			{second.GetCenter()[0], (first.Position[1] - second.Position[1] + second.Size[1]) / 2, 0},
+			{first.GetCenter()[0], first.Position[1], 0},
+			{first.GetCenter()[0], first.Position[1] - (first.Position[1] - second.Position[1] - second.Size[1]) / 2, 0},
+			{second.GetCenter()[0], first.Position[1] - (first.Position[1] - second.Position[1] - second.Size[1]) / 2, 0},
 			{second.Position[0] + second.Size[0]/2, second.Position[1] + second.Size[1], 0},
 		}
 	case "topright":
@@ -104,15 +104,15 @@ func generateSynapses(first, second Cell) [][3]int {
 	case "midleft":
 		points = [][3]int{
 			{first.Position[0], first.GetCenter()[1], 0},
-			{(first.Position[0] - second.Position[0] + second.Size[0]) / 2, first.GetCenter()[1], 0},
-			{(first.Position[0] - second.Position[0] + second.Size[0]) / 2, second.GetCenter()[1], 0},
+			{first.Position[0] - (first.Position[0]-second.Position[0]-second.Size[0])/2, first.GetCenter()[1], 0},
+			{first.Position[0] - (first.Position[0]-second.Position[0]-second.Size[0])/2, second.GetCenter()[1], 0},
 			{second.Position[0] + second.Size[0], second.GetCenter()[1], 0},
 		}
 	case "midright":
 		points = [][3]int{
 			{first.Position[0] + first.Size[0], first.GetCenter()[1], 0},
-			{(second.Position[0] - first.Position[0] + first.Size[0]) / 2, first.GetCenter()[1], 0},
-			{(second.Position[0] - first.Position[0] + first.Size[0]) / 2, second.GetCenter()[1], 0},
+			{second.Position[0] - (second.Position[0]-first.Position[0]-first.Size[0])/2, first.GetCenter()[1], 0},
+			{second.Position[0] - (second.Position[0]-first.Position[0]-first.Size[0])/2, second.GetCenter()[1], 0},
 			{second.Position[0], second.GetCenter()[1], 0},
 		}
 	case "bottomleft":
@@ -124,8 +124,8 @@ func generateSynapses(first, second Cell) [][3]int {
 	case "bottomcenter":
 		points = [][3]int{
 			{first.GetCenter()[0], first.Position[1] + first.Size[1], 0},
-			{first.GetCenter()[0], (second.Position[1] - first.Position[1] + first.Size[1]) / 2, 0},
-			{second.GetCenter()[0], (second.Position[1] - first.Position[1] + first.Size[1]) / 2, 0},
+			{first.GetCenter()[0], second.Position[1] - (second.Position[1] - first.Position[1] - first.Size[1]) / 2, 0},
+			{second.GetCenter()[0], second.Position[1] - (second.Position[1] - first.Position[1] - first.Size[1]) / 2, 0},
 			{second.GetCenter()[0], second.Position[1], 0},
 		}
 	case "bottomright":
@@ -142,7 +142,7 @@ func (s *Cell) RecalculateSynapses() {
 	var synapses = []Synapse{}
 	for e := range s.Cells {
 		points := generateSynapses(*s, s.Cells[e])
-		synapses = append(synapses, Synapse{Points: points, Size: 2, Color: randomColor()})
+		synapses = append(synapses, Synapse{Points: points, Size: 2, Color: "#fa4372"})
 		s.Cells[e].RecalculateSynapses()
 	}
 	s.Synapses = synapses
