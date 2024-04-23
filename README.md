@@ -2,6 +2,8 @@
 
 [DEV] Next-generation personal productivity app powered by mindmaps, secondbrain and AI
 
+![20240418-160914_1920x1080](https://github.com/greeschenko/workoverlord/assets/2754533/3ff2268d-79b9-4de1-8c2f-f852466d6791)
+
 # HOW it work
 
 - User run app by first time and set up the SECRETKEY for data enscription 
