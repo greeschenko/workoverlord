@@ -62,6 +62,17 @@ func (s *Cell) genID(parentid string) {
 	fmt.Println("GENERATED ID", s.ID)
 }
 
+func (s *Cell) RecalculateIds(parentid string) {
+    s.genID(parentid)
+    for e := range s.Cells {
+        s.Cells[e].RecalculateIds(s.ID)
+    }
+}
+
+func (s *Cell) AppendCell(newdata Cell) {
+	(*s).Cells = append((*s).Cells, newdata)
+}
+
 func (s *Cell) Update(newdata Cell) {
 	(*s) = newdata
 }

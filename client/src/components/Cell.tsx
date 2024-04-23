@@ -19,6 +19,8 @@ export default function Cell(
         formopenid,
         setFormopenId,
         layout,
+        moveToStart,
+        setMoveToStart,
     }:
         {
             data: CellModel,
@@ -32,6 +34,8 @@ export default function Cell(
             formopenid: string,
             setFormopenId: React.Dispatch<React.SetStateAction<string>>,
             layout: string,
+            moveToStart: string,
+            setMoveToStart: React.Dispatch<React.SetStateAction<string>>,
         }) {
 
     const [archiveopen, setArchiveopen] = React.useState(false);
@@ -251,6 +255,11 @@ export default function Cell(
         setArchiveopen(true);
     }
 
+    const handleMoveStart = (event: any) => {
+        event.stopPropagation();
+        setMoveToStart(data.id);
+    }
+
     const handleDeleteClose = () => {
         setArchiveopen(false);
     }
@@ -259,6 +268,39 @@ export default function Cell(
         const url = "http://localhost:2222/cells/" + data.id;
         fetch(url, {
             method: "DELETE",
+            //mode: "no-cors",
+            //body: JSON.stringify(formdata),
+            headers: {
+                //"Content-Type": "application/json",
+                //Authorization: "Bearer " + "sdflsdjfl",
+            },
+            //credentials: "same-origin",
+        }).then(
+            function(response) {
+                if (response.status === 200) {
+                    response.json().then(function(res) {
+                        console.log(res);
+                        if (res.errors != null) {
+                            console.log(res.errors);
+                        } else {
+                            setDataChange(Date.now());
+                        }
+                    });
+                } else {
+                    console.log(response);
+                    alert("ERROR: " + response.status + " - " + response.statusText);
+                }
+            },
+            function(error) {
+                alert(error.message);
+            }
+        );
+    }
+
+    const handleMoveTo = () => {
+        const url = "http://localhost:2222/cells/" + moveToStart + "/" + data.id;
+        fetch(url, {
+            method: "PUT",
             //mode: "no-cors",
             //body: JSON.stringify(formdata),
             headers: {
@@ -362,6 +404,10 @@ export default function Cell(
                 height={cH - 20}
                 onClick={(event) => {
                     event.stopPropagation();
+                    if (moveToStart != "" && moveToStart != data.id) {
+                        console.log("move " + moveToStart + " to " + data.id);
+                        handleMoveTo();
+                    }
                     setSelected(data.id);
                 }}
                 onDoubleClick={() => {
@@ -465,6 +511,18 @@ export default function Cell(
                     font-family="monospace"
                     x={cX + cW + 4 + 5}
                     y={cY + 8 + 16 * 3}
+                    onClick={handleMoveStart}
+                >
+                    MOVE TO
+                </text>
+                <text
+                    className="svgbtn"
+                    fill="tomato"
+                    stroke="none"
+                    font-size="14"
+                    font-family="monospace"
+                    x={cX + cW + 4 + 5}
+                    y={cY + 8 + 16 * 4}
                     onClick={handleDeleteStart}
                 >
                     DELETE

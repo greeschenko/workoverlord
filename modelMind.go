@@ -47,6 +47,17 @@ func (m Mind) Find(name, mach string, fool bool) *Cell {
 	return res
 }
 
+func (m *Mind) MoveCell(id, toid string) {
+
+	var tmpcell = m.Find("id", id, true)
+
+    m.DeleteCell(id)
+
+	tmpcell.RecalculateIds(toid)
+
+	m.Find("id", toid, true).AppendCell(*tmpcell)
+}
+
 func (m *Mind) DeleteCell(id string) {
 
 	idlist := strings.Split(id, " ")
@@ -110,8 +121,8 @@ func (m *Mind) Extend(newcell Cell, parentid string) Cell {
 }
 
 func (m *Mind) RecalculateSynapses() {
-    tmpm := *m
-    for e := range tmpm {
-        tmpm[e].RecalculateSynapses()
-    }
+	tmpm := *m
+	for e := range tmpm {
+		tmpm[e].RecalculateSynapses()
+	}
 }

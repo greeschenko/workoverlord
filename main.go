@@ -19,7 +19,6 @@ import (
 	"golang.org/x/term"
 )
 
-
 const logo = `
  __        __    _          ___                 _               _
  \ \      / /__ | | ___ __ / _ \__   _____ _ __| | ___  _ __ __| |
@@ -213,7 +212,9 @@ func main() {
 	App.R.HandleFunc("/cells/{id}", actionCellsOne).Methods("GET")
 	App.R.HandleFunc("/cells/{id}", actionCellsCreate).Methods("POST")
 	App.R.HandleFunc("/cells/{id}", actionCellsUpdate).Methods("PATCH")
+	App.R.HandleFunc("/cells/{id}/{toid}", actionCellsMove).Methods("PUT")
 	App.R.HandleFunc("/cells/{id}", actionCellsDelete).Methods("DELETE")
+	App.R.HandleFunc("/cellstest", actionCellsTest).Methods("GET")
 
 	go logData()
 
@@ -252,7 +253,7 @@ func actionCellsGetAll(w http.ResponseWriter, r *http.Request) {
 
 	//fmt.Println("USERMIND", USERMIND)
 
-    USERMIND.RecalculateSynapses()
+	USERMIND.RecalculateSynapses()
 
 	data = USERMIND
 
@@ -312,6 +313,22 @@ func actionCellsUpdate(w http.ResponseWriter, r *http.Request) {
 	w.Write(rsp.Make())
 }
 
+func actionCellsMove(w http.ResponseWriter, r *http.Request) {
+	var (
+		model Cell
+		rsp   = core.Response{Data: &model, Req: r}
+		vars  = mux.Vars(r)
+	)
+
+	enableCors(&w)
+
+    USERMIND.MoveCell(vars["id"], vars["toid"])
+
+	saveData()
+
+	w.Write(rsp.Make())
+}
+
 func actionCellsDelete(w http.ResponseWriter, r *http.Request) {
 	var (
 		model Cell
@@ -324,6 +341,21 @@ func actionCellsDelete(w http.ResponseWriter, r *http.Request) {
 	if rsp.IsValidate() {
 		USERMIND.DeleteCell(vars["id"])
 	}
+
+	saveData()
+
+	w.Write(rsp.Make())
+}
+
+func actionCellsTest(w http.ResponseWriter, r *http.Request) {
+	var (
+		model Cell
+		rsp   = core.Response{Data: &model, Req: r}
+	)
+
+	enableCors(&w)
+
+    USERMIND.Find("id", "b2ac 71a2", true).genID("0")
 
 	saveData()
 

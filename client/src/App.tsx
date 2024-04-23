@@ -46,6 +46,8 @@ const Cells = ({
     formopenid,
     setFormopenId,
     layout,
+    moveToStart,
+    setMoveToStart,
 }: {
     data: CellModel[],
     selected: string,
@@ -58,6 +60,8 @@ const Cells = ({
     formopenid: string,
     setFormopenId: React.Dispatch<React.SetStateAction<string>>,
     layout: string,
+    moveToStart: string,
+    setMoveToStart: React.Dispatch<React.SetStateAction<string>>,
 }) => {
     return (
         <g>
@@ -77,6 +81,8 @@ const Cells = ({
                             formopenid={formopenid}
                             setFormopenId={setFormopenId}
                             layout={layout}
+                            moveToStart={moveToStart}
+                            setMoveToStart={setMoveToStart}
                         />
                         <Cells
                             data={cell.cells || []}
@@ -89,6 +95,8 @@ const Cells = ({
                             formopenid={formopenid}
                             setFormopenId={setFormopenId}
                             layout={layout}
+                            moveToStart={moveToStart}
+                            setMoveToStart={setMoveToStart}
                         />
                     </g>
                 );
@@ -107,6 +115,7 @@ function App() {
     const [width, setWidth] = React.useState(window.innerWidth);
     const [height, setHeight] = React.useState(window.innerHeight);
 
+    const [moveToStart, setMoveToStart] = React.useState("");
     const [isViewMoved, setIsViewMoved] = React.useState(false);
     const [viewX, setViewX] = React.useState(0);
     const [viewY, setViewY] = React.useState(0);
@@ -124,6 +133,10 @@ function App() {
     };
 
     const [startdata, setStartdata] = React.useState<CellModel>(initialState);
+
+    React.useEffect(() => {
+        console.log("MOVE TO START ID = ", moveToStart);
+    }, [moveToStart]);
 
     React.useEffect(() => {
         console.log("START DATA", startdata);
@@ -318,6 +331,8 @@ function App() {
                     formopenid={formopenid}
                     setFormopenId={setFormopenId}
                     layout={layout}
+                    moveToStart={moveToStart}
+                    setMoveToStart={setMoveToStart}
                 />
             </svg>
         </div>
