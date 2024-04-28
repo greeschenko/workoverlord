@@ -7,9 +7,11 @@ import { MindModel, CellModel } from './models/Mind'
 import Slider from './components/Slider'
 import CellForm from './components/CellForm'
 import Editor from './components/Editor';
+import TreeView from './components/TreeView';
 import Fab from '@mui/material/Fab';
 import AddIcon from '@mui/icons-material/Add';
 import MoveToInboxIcon from '@mui/icons-material/MoveToInbox';
+import AccountTreeIcon from '@mui/icons-material/AccountTree';
 
 const Connections = ({
     data,
@@ -123,6 +125,8 @@ function App() {
     const [formopenid, setFormopenId] = React.useState("");
 
     const [layout, setLayout] = React.useState("main");
+
+    const [treeview, setTreeview] = React.useState(false);
 
     const initialState = {
         id: "0",
@@ -279,6 +283,23 @@ function App() {
                 <MoveToInboxIcon sx={{ mr: 1 }} />
                 ARCHIVED
             </Fab>
+            <Fab
+                style={{ position: "absolute", bottom: "2em", right: "20em" }}
+                variant="extended"
+                size="medium"
+                color={"default"}
+                aria-label="archived"
+                onClick={() => setTreeview(true)}
+            >
+                <AccountTreeIcon sx={{ mr: 1 }} />
+                TREE VIEW
+            </Fab>
+            <TreeView
+                data={data}
+                treeview={treeview}
+                setTreeview={setTreeview}
+                setDataChange={setDataChange}
+            />
             {/*
             <div style={{ color: "white", position: "fixed", top: "10px", right: "10px" }}>
                 <p>

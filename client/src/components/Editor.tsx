@@ -22,6 +22,11 @@ const EditableText: React.FC<EditableTextProps> = ({
 }) => {
 
     const inputRef = React.useRef<HTMLInputElement | null>(null);
+    const saveRef = React.useRef<HTMLButtonElement | null>(null);
+
+    const handleSave = () => {
+        saveRef.current?.click();
+    };
 
     const handleClickFile = () => {
         inputRef.current?.click();
@@ -94,6 +99,7 @@ const EditableText: React.FC<EditableTextProps> = ({
         }
 
         const url = "http://localhost:2222/cells/" + id;
+
         fetch(url, {
             method: method,
             //mode: "no-cors",
@@ -111,9 +117,9 @@ const EditableText: React.FC<EditableTextProps> = ({
                         if (res.errors != null) {
                             console.log(res.errors);
                         } else {
-                            setStartdata(initialState);
-                            setDataChange(Date.now());
-                            setFormopenId("");
+                            console.log("element saved");
+                            //setStartdata(initialState);
+                            //setFormopenId("");
                         }
                     });
                 } else {
@@ -130,6 +136,7 @@ const EditableText: React.FC<EditableTextProps> = ({
     const handleClose = () => {
         setFormopenId("");
         setStartdata(initialState);
+        setDataChange(Date.now());
     };
 
     return (
@@ -144,8 +151,17 @@ const EditableText: React.FC<EditableTextProps> = ({
                 mode="text"
                 theme="monokai"
                 name="editableText"
-                //onBlur={() => handleBlur(text)}
-                onChange={(value) => setStartdata({ ...startdata, ["data"]: value || "" })}
+                //onBlur={() => console.log("exit")}
+                onChange={(value) => {
+                    setStartdata({ ...startdata, ["data"]: value || "" })
+                }}
+                commands={[
+                    {
+                        name: 'save',
+                        bindKey: { win: 'Ctrl-s', mac: 'Cmd-s' },
+                        exec: handleSave,
+                    },
+                ]}
                 fontSize={14}
                 showPrintMargin={true}
                 showGutter={true}
@@ -161,7 +177,10 @@ const EditableText: React.FC<EditableTextProps> = ({
             />
             <div style={{ position: 'absolute', bottom: '8px', right: '8px' }}>
                 <button onClick={handleClickFile}>ADD IMG</button>
-                <button onClick={handleSubmit}>SAVE</button>
+                <button ref={saveRef} onClick={() => {
+                    handleSubmit();
+                    handleClose();
+                }}>SAVE</button>
                 <button onClick={handleClose}>CLOSE</button>
             </div>
         </>
