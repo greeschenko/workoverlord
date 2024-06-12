@@ -13,10 +13,6 @@ import AddIcon from '@mui/icons-material/Add';
 import MoveToInboxIcon from '@mui/icons-material/MoveToInbox';
 import AccountTreeIcon from '@mui/icons-material/AccountTree';
 
-import Konva from 'konva';
-import { createRoot } from 'react-dom/client';
-import { Stage, Layer, Circle } from 'react-konva';
-
 const Connections = ({
     data,
 }: {
@@ -292,34 +288,6 @@ function App() {
 
     return (
         <div className="App">
-            <div style={{ position: 'absolute', top: '8px', left: '8px', display: formopenid == "" ? "inherit" : "none" }}>
-                <Stage width={300} height={300}>
-                    <Layer>
-                        <Circle
-                            key="circle1"
-                            name="circle1"
-                            draggable
-                            x={50}
-                            y={50}
-                            fill="#fff"
-                            radius={50}
-                            onDragStart={handleDragStart}
-                            onDragEnd={handleDragEnd}
-                        />
-                        <Circle
-                            key="circle2"
-                            name="circle2"
-                            draggable
-                            x={150}
-                            y={150}
-                            fill="#ccc"
-                            radius={50}
-                            onDragStart={handleDragStart}
-                            onDragEnd={handleDragEnd}
-                        />
-                    </Layer>
-                </Stage>
-            </div>
             <div style={{ position: 'absolute', top: '8px', left: '8px', display: formopenid != "" ? "inherit" : "none" }}>
                 <Editor
                     startdata={startdata}
