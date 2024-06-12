@@ -21,6 +21,7 @@ export default function Cell(
         layout,
         moveToStart,
         setMoveToStart,
+        isViewMoved,
     }:
         {
             data: CellModel,
@@ -36,6 +37,7 @@ export default function Cell(
             layout: string,
             moveToStart: string,
             setMoveToStart: React.Dispatch<React.SetStateAction<string>>,
+            isViewMoved: boolean,
         }) {
 
     const [archiveopen, setArchiveopen] = React.useState(false);
@@ -425,14 +427,14 @@ export default function Cell(
                     saveGeometry();
                 }}
             >
-                <div
+                {!isViewMoved && <div
                     style={
                         data.status == "done"
                             ? { color: "gray", whiteSpace: "pre-wrap", textDecoration: "line-through", fontFamily: "monospace" }
                             : { color: "pink", whiteSpace: "pre-wrap", fontFamily: "monospace" }
                     }
                     dangerouslySetInnerHTML={{ __html: handleLinks(data.data) }}
-                />
+                />}
             </foreignObject>
             <g display={selected ? "inherit" : "none"}>
                 <text

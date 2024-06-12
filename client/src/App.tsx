@@ -13,6 +13,10 @@ import AddIcon from '@mui/icons-material/Add';
 import MoveToInboxIcon from '@mui/icons-material/MoveToInbox';
 import AccountTreeIcon from '@mui/icons-material/AccountTree';
 
+import Konva from 'konva';
+import { createRoot } from 'react-dom/client';
+import { Stage, Layer, Circle } from 'react-konva';
+
 const Connections = ({
     data,
 }: {
@@ -50,6 +54,7 @@ const Cells = ({
     layout,
     moveToStart,
     setMoveToStart,
+    isViewMoved,
 }: {
     data: CellModel[],
     selected: string,
@@ -64,6 +69,7 @@ const Cells = ({
     layout: string,
     moveToStart: string,
     setMoveToStart: React.Dispatch<React.SetStateAction<string>>,
+    isViewMoved: boolean,
 }) => {
     return (
         <g>
@@ -85,6 +91,7 @@ const Cells = ({
                             layout={layout}
                             moveToStart={moveToStart}
                             setMoveToStart={setMoveToStart}
+                            isViewMoved={isViewMoved}
                         />
                         <Cells
                             data={cell.cells || []}
@@ -99,6 +106,7 @@ const Cells = ({
                             layout={layout}
                             moveToStart={moveToStart}
                             setMoveToStart={setMoveToStart}
+                            isViewMoved={isViewMoved}
                         />
                     </g>
                 );
@@ -148,8 +156,13 @@ function App() {
 
     React.useEffect(() => {
         if (isViewMoved) {
-            setViewX(viewX - coords.movX * scaleIndex);
-            setViewY(viewY - coords.movY * scaleIndex)
+            const acceleration = 0;
+            setViewX(coords.movX >= 0
+                ? viewX - coords.movX * scaleIndex - acceleration
+                : viewX - coords.movX * scaleIndex + acceleration);
+            setViewY(coords.movY >= 0
+                ? viewY - coords.movY * scaleIndex - acceleration
+                : viewY - coords.movY * scaleIndex + acceleration)
         }
     }, [coords]);
 
@@ -162,6 +175,24 @@ function App() {
         window.addEventListener("resize", updateDimensions);
         return () => window.removeEventListener("resize", updateDimensions);
     }, []);
+
+    React.useEffect(() => {
+        window.addEventListener("keydown", keydownHandler);
+        return () => window.removeEventListener("keydown", keydownHandler);
+    }, [viewX, viewY]);
+
+    const keydownHandler = (e: any) => {
+        console.log(">>>>>", e.key);
+        if (e.key == "h") {
+            setViewX(viewX - 50);
+        } else if (e.key == "j") {
+            setViewY(viewY + 50);
+        } else if (e.key == "k") {
+            setViewY(viewY - 50);
+        } else if (e.key == "l") {
+            setViewX(viewX + 50);
+        }
+    }
 
     React.useEffect(() => {
         const updateWheel = (event: any) => {
@@ -251,8 +282,44 @@ function App() {
         };
     }, []);
 
+    const handleDragStart = (e: any) => {
+        console.log("drag start", e);
+    };
+
+    const handleDragEnd = (e: any) => {
+        console.log("drag end", e);
+    };
+
     return (
         <div className="App">
+            <div style={{ position: 'absolute', top: '8px', left: '8px', display: formopenid == "" ? "inherit" : "none" }}>
+                <Stage width={300} height={300}>
+                    <Layer>
+                        <Circle
+                            key="circle1"
+                            name="circle1"
+                            draggable
+                            x={50}
+                            y={50}
+                            fill="#fff"
+                            radius={50}
+                            onDragStart={handleDragStart}
+                            onDragEnd={handleDragEnd}
+                        />
+                        <Circle
+                            key="circle2"
+                            name="circle2"
+                            draggable
+                            x={150}
+                            y={150}
+                            fill="#ccc"
+                            radius={50}
+                            onDragStart={handleDragStart}
+                            onDragEnd={handleDragEnd}
+                        />
+                    </Layer>
+                </Stage>
+            </div>
             <div style={{ position: 'absolute', top: '8px', left: '8px', display: formopenid != "" ? "inherit" : "none" }}>
                 <Editor
                     startdata={startdata}
@@ -293,6 +360,46 @@ function App() {
             >
                 <AccountTreeIcon sx={{ mr: 1 }} />
                 TREE VIEW
+            </Fab>
+            <Fab
+                style={{ position: "absolute", bottom: "3em", left: "1em" }}
+                variant="extended"
+                size="medium"
+                color={"default"}
+                aria-label="archived"
+                onClick={() => setViewX(viewX - 50)}
+            >
+                LEFT
+            </Fab>
+            <Fab
+                style={{ position: "absolute", bottom: "6em", left: "3em" }}
+                variant="extended"
+                size="medium"
+                color={"default"}
+                aria-label="archived"
+                onClick={() => setViewY(viewY - 50)}
+            >
+                UP
+            </Fab>
+            <Fab
+                style={{ position: "absolute", bottom: "3em", left: "6em" }}
+                variant="extended"
+                size="medium"
+                color={"default"}
+                aria-label="archived"
+                onClick={() => setViewX(viewX + 50)}
+            >
+                RIGHT
+            </Fab>
+            <Fab
+                style={{ position: "absolute", bottom: "1em", left: "3em" }}
+                variant="extended"
+                size="medium"
+                color={"default"}
+                aria-label="archived"
+                onClick={() => setViewY(viewY + 50)}
+            >
+                DOWN
             </Fab>
             <TreeView
                 data={data}
@@ -354,6 +461,7 @@ function App() {
                     layout={layout}
                     moveToStart={moveToStart}
                     setMoveToStart={setMoveToStart}
+                    isViewMoved={isViewMoved}
                 />
             </svg>
         </div>
