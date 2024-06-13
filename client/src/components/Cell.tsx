@@ -22,6 +22,7 @@ export default function Cell(
         moveToStart,
         setMoveToStart,
         isViewMoved,
+        isInVisibleView,
     }:
         {
             data: CellModel,
@@ -38,6 +39,7 @@ export default function Cell(
             moveToStart: string,
             setMoveToStart: React.Dispatch<React.SetStateAction<string>>,
             isViewMoved: boolean,
+            isInVisibleView: any,
         }) {
 
     const [archiveopen, setArchiveopen] = React.useState(false);
@@ -344,7 +346,7 @@ export default function Cell(
 
     return (
         <g
-            display={isVisible() ? "inherit" : "none"}
+            display={isVisible() && isInVisibleView(data) ? "inherit" : "none"}
             style={{ userSelect: selected ? "auto" : "none" }}
             fill="white"
             stroke="green"
@@ -427,7 +429,7 @@ export default function Cell(
                     saveGeometry();
                 }}
             >
-                {!isViewMoved && <div
+                {/*!isViewMoved &&*/ <div
                     style={
                         data.status == "done"
                             ? { color: "gray", whiteSpace: "pre-wrap", textDecoration: "line-through", fontFamily: "monospace" }
@@ -551,6 +553,20 @@ export default function Cell(
                 />
                 <line x1={cX + cW + 4 + 5} y1={cY + cH + 4 + btnW - 5} x2={cX + cW + 4 + btnW - 5} y2={cY + cH + 4 + btnW - 5} stroke="pink" stroke-width="1" />
                 <line x1={cX + cW + 4 + btnW - 5} y1={cY + cH + 4 + btnW - 5} x2={cX + cW + 4 + btnW - 5} y2={cY + cH + 4 + 5} stroke="pink" stroke-width="1" />
+            </g>
+            <g display={selected ? "inherit" : "none"}>
+                <text
+                    className="svgbtn"
+                    fill="tomato"
+                    stroke="none"
+                    font-size="14"
+                    font-family="monospace"
+                    x={cX}
+                    y={cY + cH + 16}
+                    onClick={handleAdd}
+                >
+                    {data.position[0] + ", " + data.position[1]}
+                </text>
             </g>
         </g>
     );

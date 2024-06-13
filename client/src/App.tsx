@@ -51,6 +51,7 @@ const Cells = ({
     moveToStart,
     setMoveToStart,
     isViewMoved,
+    isInVisibleView,
 }: {
     data: CellModel[],
     selected: string,
@@ -66,6 +67,7 @@ const Cells = ({
     moveToStart: string,
     setMoveToStart: React.Dispatch<React.SetStateAction<string>>,
     isViewMoved: boolean,
+    isInVisibleView: any,
 }) => {
     return (
         <g>
@@ -88,6 +90,7 @@ const Cells = ({
                             moveToStart={moveToStart}
                             setMoveToStart={setMoveToStart}
                             isViewMoved={isViewMoved}
+                            isInVisibleView={isInVisibleView}
                         />
                         <Cells
                             data={cell.cells || []}
@@ -103,6 +106,7 @@ const Cells = ({
                             moveToStart={moveToStart}
                             setMoveToStart={setMoveToStart}
                             isViewMoved={isViewMoved}
+                            isInVisibleView={isInVisibleView}
                         />
                     </g>
                 );
@@ -252,6 +256,7 @@ function App() {
 
     React.useEffect(() => {
         console.log("ViewXY", viewX, viewY);
+        console.log("View zone", viewX, viewY, viewX + width, viewY + height);
     }, [viewX]);
 
     React.useEffect(() => {
@@ -285,6 +290,27 @@ function App() {
     const handleDragEnd = (e: any) => {
         console.log("drag end", e);
     };
+
+    const isInVisibleView = (cell: CellModel) => {
+        //calculate center coordinats of cell
+        const cellCenterX = cell.position[0] + cell.size[0];
+        const cellCenterY = cell.position[1] + cell.size[1];
+        //calculate coordinats of visible view rectangle
+        const vvrectLeftTopX = viewX - width / 2;
+        const vvrectLeftTopY = viewY - height / 2;
+        const vvrectRightBottomX = viewX + width * 1.5;
+        const vvrectRightBottomY = viewY + height * 1.5;
+
+        if (cellCenterX >= vvrectLeftTopX
+            && cellCenterX <= vvrectRightBottomX
+            && cellCenterY >= vvrectLeftTopY
+            && cellCenterY <= vvrectRightBottomY
+        ) {
+            return true;
+        }
+
+        return false;
+    }
 
     return (
         <div className="App">
@@ -375,28 +401,34 @@ function App() {
                 setTreeview={setTreeview}
                 setDataChange={setDataChange}
             />
-            {/*
-            <div style={{ color: "white", position: "fixed", top: "10px", right: "10px" }}>
-                <p>
-                    Mouse positioned at:{' '}
-                    <b>
-                        ({coords.x}, {coords.y}, {coords.movX}, {coords.movY})
-                    </b>
-                </p>
-                <p>
-                    window size:{' '}
-                    <b>
-                        ({width}, {height})
-                    </b>
-                </p>
-                <p>
-                    scale index:{' '}
-                    <b>
-                        ({scaleIndex})
-                    </b>
-                </p>
-            </div>
-            */}
+            {
+                <div style={{ color: "white", position: "fixed", top: "10px", right: "10px" }}>
+                    <p>
+                        Mouse positioned at:{' '}
+                        <b>
+                            ({coords.x}, {coords.y}, {coords.movX}, {coords.movY})
+                        </b>
+                    </p>
+                    <p>
+                        window size:{' '}
+                        <b>
+                            ({width}, {height})
+                        </b>
+                    </p>
+                    <p>
+                        scale index:{' '}
+                        <b>
+                            ({scaleIndex})
+                        </b>
+                    </p>
+                    <p>
+                        visible view:{' '}
+                        <b>
+                            ({viewX}, {viewY}, {viewX + width}, {viewY + height})
+                        </b>
+                    </p>
+                </div>
+            }
             <CellForm
                 coords={coords}
                 scaleIndex={scaleIndex}
@@ -430,6 +462,7 @@ function App() {
                     moveToStart={moveToStart}
                     setMoveToStart={setMoveToStart}
                     isViewMoved={isViewMoved}
+                    isInVisibleView={isInVisibleView}
                 />
             </svg>
         </div>
