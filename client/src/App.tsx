@@ -156,7 +156,7 @@ function App() {
 
     React.useEffect(() => {
         if (isViewMoved) {
-            const acceleration = 0;
+            const acceleration = 5;
             setViewX(coords.movX >= 0
                 ? viewX - coords.movX * scaleIndex - acceleration
                 : viewX - coords.movX * scaleIndex + acceleration);
@@ -183,14 +183,15 @@ function App() {
 
     const keydownHandler = (e: any) => {
         console.log(">>>>>", e.key);
+        const movSpeed = 200;
         if (e.key == "h") {
-            setViewX(viewX - 50);
+            setViewX(viewX - movSpeed);
         } else if (e.key == "j") {
-            setViewY(viewY + 50);
+            setViewY(viewY + movSpeed);
         } else if (e.key == "k") {
-            setViewY(viewY - 50);
+            setViewY(viewY - movSpeed);
         } else if (e.key == "l") {
-            setViewX(viewX + 50);
+            setViewX(viewX + movSpeed);
         }
     }
 
@@ -296,10 +297,10 @@ function App() {
         const cellCenterX = cell.position[0] + cell.size[0];
         const cellCenterY = cell.position[1] + cell.size[1];
         //calculate coordinats of visible view rectangle
-        const vvrectLeftTopX = viewX - width / 2;
-        const vvrectLeftTopY = viewY - height / 2;
-        const vvrectRightBottomX = viewX + width * 1.5;
-        const vvrectRightBottomY = viewY + height * 1.5;
+        const vvrectLeftTopX = viewX - (width / 4) * scaleIndex;
+        const vvrectLeftTopY = viewY - (height / 4) * scaleIndex;
+        const vvrectRightBottomX = viewX + (width * 1.25) * scaleIndex;
+        const vvrectRightBottomY = viewY + (height * 1.25) * scaleIndex;
 
         if (cellCenterX >= vvrectLeftTopX
             && cellCenterX <= vvrectRightBottomX
@@ -355,53 +356,13 @@ function App() {
                 <AccountTreeIcon sx={{ mr: 1 }} />
                 TREE VIEW
             </Fab>
-            <Fab
-                style={{ position: "absolute", bottom: "3em", left: "1em" }}
-                variant="extended"
-                size="medium"
-                color={"default"}
-                aria-label="archived"
-                onClick={() => setViewX(viewX - 50)}
-            >
-                LEFT
-            </Fab>
-            <Fab
-                style={{ position: "absolute", bottom: "6em", left: "3em" }}
-                variant="extended"
-                size="medium"
-                color={"default"}
-                aria-label="archived"
-                onClick={() => setViewY(viewY - 50)}
-            >
-                UP
-            </Fab>
-            <Fab
-                style={{ position: "absolute", bottom: "3em", left: "6em" }}
-                variant="extended"
-                size="medium"
-                color={"default"}
-                aria-label="archived"
-                onClick={() => setViewX(viewX + 50)}
-            >
-                RIGHT
-            </Fab>
-            <Fab
-                style={{ position: "absolute", bottom: "1em", left: "3em" }}
-                variant="extended"
-                size="medium"
-                color={"default"}
-                aria-label="archived"
-                onClick={() => setViewY(viewY + 50)}
-            >
-                DOWN
-            </Fab>
             <TreeView
                 data={data}
                 treeview={treeview}
                 setTreeview={setTreeview}
                 setDataChange={setDataChange}
             />
-            {
+            {/*
                 <div style={{ color: "white", position: "fixed", top: "10px", right: "10px" }}>
                     <p>
                         Mouse positioned at:{' '}
@@ -428,7 +389,7 @@ function App() {
                         </b>
                     </p>
                 </div>
-            }
+            */}
             <CellForm
                 coords={coords}
                 scaleIndex={scaleIndex}
