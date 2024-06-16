@@ -182,16 +182,17 @@ function App() {
     }, [viewX, viewY]);
 
     const keydownHandler = (e: any) => {
-        console.log(">>>>>", e.key);
         const movSpeed = 200;
-        if (e.key == "h") {
-            setViewX(viewX - movSpeed);
-        } else if (e.key == "j") {
-            setViewY(viewY + movSpeed);
-        } else if (e.key == "k") {
-            setViewY(viewY - movSpeed);
-        } else if (e.key == "l") {
-            setViewX(viewX + movSpeed);
+        if (formopenid == "") {
+            if (e.key == "h") {
+                setViewX(viewX - movSpeed);
+            } else if (e.key == "j") {
+                setViewY(viewY + movSpeed);
+            } else if (e.key == "k") {
+                setViewY(viewY - movSpeed);
+            } else if (e.key == "l") {
+                setViewX(viewX + movSpeed);
+            }
         }
     }
 
