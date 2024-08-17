@@ -217,9 +217,10 @@ func main() {
 	App.R.HandleFunc("/cellstest", actionCellsTest).Methods("GET")
 
 	go logData()
+	go log.Printf("%s", logo)
+	go App.Run(":2222")
 
-	log.Printf("%s", logo)
-	App.Run(":2222")
+    RunGui()
 }
 
 func doRequest(url, proto, userJson, token string) *http.Response {
