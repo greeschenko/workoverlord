@@ -1,128 +1,99 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
-	"io"
-	"log"
-	"net/http"
+	"os"
+	"os/exec"
 	"strings"
-
-	"github.com/go-rest-framework/core"
+	"time"
 )
 
-type Mind []Cell
-
-type MindData struct {
-	Errors []core.ErrorMsg `json:"errors"`
-	Data   Mind            `json:"data"`
+type MIND struct {
+	Cells map[string]*Cell `json:"cells"`
 }
 
-func (u *MindData) Read(r *http.Response) {
-	body, err := io.ReadAll(r.Body)
+// Initialize a new MIND
+func NewMIND() *MIND {
+	return &MIND{
+		Cells: make(map[string]*Cell),
+	}
+}
+
+func (m *MIND) AddCell() error {
+	return m.editContent(time.Now().Format(time.RFC3339), "")
+}
+
+func (m *MIND) UpdateCell(key string) error {
+	if text, exists := m.Cells[key]; exists {
+		return m.editContent(key, text.Content)
+	}
+	return fmt.Errorf("text with key '%s' not found", key)
+}
+
+// editText handles the editing of a text by key
+func (m *MIND) editContent(key string, existingContent string) error {
+	// Create a temporary file to store the input text
+	tmpfile, err := os.CreateTemp("", "temp*.txt")
 	if err != nil {
-		log.Fatal(err)
+		return fmt.Errorf("failed to create temporary file: %v", err)
 	}
-	json.Unmarshal([]byte(body), &u)
-	defer r.Body.Close()
-}
+	defer os.Remove(tmpfile.Name()) // Clean up after use
 
-func handleListInRecursiveChanels(data []Cell, name, mach string, fool bool, c chan *Cell) {
-	for k, s := range data {
-		if s.getValue(name) == mach {
-			c <- &data[k]
-			return
-		}
-		go handleListInRecursiveChanels(s.Cells, name, mach, fool, c)
-	}
-}
-
-func (m Mind) Find(name, mach string, fool bool) *Cell {
-	c := make(chan *Cell)
-
-	go handleListInRecursiveChanels(m, name, mach, fool, c)
-
-	res := <-c
-
-	return res
-}
-
-func (m *Mind) MoveCell(id, toid string) {
-
-	var tmpcell = m.Find("id", id, true)
-
-    m.DeleteCell(id)
-
-	tmpcell.RecalculateIds(toid)
-
-	m.Find("id", toid, true).AppendCell(*tmpcell)
-}
-
-func (m *Mind) DeleteCell(id string) {
-
-	idlist := strings.Split(id, " ")
-	idlistres := []string{}
-	tmpid := ""
-
-	tmp := *m
-
-	for k := range idlist {
-		if k == 0 {
-			tmpid = idlist[k]
-		} else {
-			tmpid = tmpid + " " + idlist[k]
-		}
-		idlistres = append(idlistres, tmpid)
-	}
-
-	fmt.Println("IDDDDDD", id)
-
-	tmp = deleteCellListHandle(tmp, id, idlistres, 0)
-
-	*m = tmp
-}
-
-func deleteCellListHandle(cc []Cell, id string, idlistres []string, idindex int) []Cell {
-	for j := range cc {
-		if cc[j].ID == idlistres[idindex] {
-			if cc[j].ID == id {
-				var tmpres []Cell
-
-				for i := range cc {
-					if cc[i].ID != id {
-						tmpres = append(tmpres, cc[i])
-					}
-				}
-
-				cc = tmpres
-			} else {
-				cc[j].Cells = deleteCellListHandle(cc[j].Cells, id, idlistres, idindex+1)
-			}
-			break
+	// Write existing content to the temporary file if available
+	if existingContent != "" {
+		if err := os.WriteFile(tmpfile.Name(), []byte(existingContent), 0644); err != nil {
+			return fmt.Errorf("failed to write existing content to temporary file: %v", err)
 		}
 	}
-	return cc
-}
 
-func (m *Mind) Extend(newcell Cell, parentid string) Cell {
-	newcell.genID(parentid)
-	if parentid == "0" {
-		*m = append(*m, newcell)
+	// Detect the terminal type using $TERM
+	term := os.Getenv("TERM")
+	cmd := prepareEditorCommand(term, tmpfile.Name())
+
+	// Start the editor process
+	if err := cmd.Start(); err != nil {
+		return fmt.Errorf("failed to open editor in new terminal: %v", err)
+	}
+
+	// Wait for the Vim process to finish
+	if err := cmd.Wait(); err != nil {
+		return fmt.Errorf("editor did not close properly: %v", err)
+	}
+
+	// Read the content from the temporary file after editing
+	content, err := os.ReadFile(tmpfile.Name())
+	if err != nil {
+		return fmt.Errorf("failed to read from temporary file: %v", err)
+	}
+
+	// Update or add the text in the Textes map
+	m.Cells[key] = &Cell{
+		Content: strings.TrimSpace(string(content)),
+		//TODO add function for generation new position and size
+        //TODO or implement selection the position and size
+		Position: [2]int{100, 100},
+		Size:     [2]int{200, 100},
+		Status:   CellStatusActive,
+	}
+	if existingContent == "" {
+		fmt.Println("Text added successfully!")
 	} else {
-		parentcell := m.Find("id", parentid, true)
-		if parentcell != nil {
-			parentcell.Cells = append(parentcell.Cells, newcell)
-		} else {
-			log.Println("not found " + parentid)
-		}
+		fmt.Println("Text updated successfully!")
 	}
-
-	return newcell
+    saveData()
+	return nil
 }
 
-func (m *Mind) RecalculateSynapses() {
-	tmpm := *m
-	for e := range tmpm {
-		tmpm[e].RecalculateSynapses()
+// prepareEditorCommand prepares the command to open the editor based on $TERM
+func prepareEditorCommand(term string, filePath string) *exec.Cmd {
+	var cmd *exec.Cmd
+	switch term {
+	case "xterm", "xterm-256color", "screen", "st", "konsole":
+		cmd = exec.Command(term, "-e", "vim", filePath)
+	case "gnome-terminal":
+		cmd = exec.Command("gnome-terminal", "--", "vim", filePath)
+	default:
+		cmd = exec.Command("xterm", "-e", "vim", filePath)
 	}
+	return cmd
 }
