@@ -19,19 +19,19 @@ func NewMIND() *MIND {
 	}
 }
 
-func (m *MIND) AddCell() error {
-	return m.editContent(time.Now().Format(time.RFC3339), "")
+func (m *MIND) AddCell(point [2]int) error {
+	return m.editContent(time.Now().Format(time.RFC3339), "", &point)
 }
 
 func (m *MIND) UpdateCell(key string) error {
 	if text, exists := m.Cells[key]; exists {
-		return m.editContent(key, text.Content)
+		return m.editContent(key, text.Content, nil)
 	}
 	return fmt.Errorf("text with key '%s' not found", key)
 }
 
 // editText handles the editing of a text by key
-func (m *MIND) editContent(key string, existingContent string) error {
+func (m *MIND) editContent(key string, existingContent string, point *[2]int) error {
 	// Create a temporary file to store the input text
 	tmpfile, err := os.CreateTemp("", "temp*.txt")
 	if err != nil {
@@ -66,21 +66,18 @@ func (m *MIND) editContent(key string, existingContent string) error {
 		return fmt.Errorf("failed to read from temporary file: %v", err)
 	}
 
-	// Update or add the text in the Textes map
-	m.Cells[key] = &Cell{
-		Content: strings.TrimSpace(string(content)),
-		//TODO add function for generation new position and size
-        //TODO or implement selection the position and size
-		Position: [2]int{100, 100},
-		Size:     [2]int{200, 100},
-		Status:   CellStatusActive,
-	}
 	if existingContent == "" {
+		m.Cells[key] = &Cell{
+			Content:  strings.TrimSpace(string(content)),
+			Position: *point,
+			Status:   CellStatusActive,
+		}
 		fmt.Println("Text added successfully!")
 	} else {
+        m.Cells[key].Content = strings.TrimSpace(string(content))
 		fmt.Println("Text updated successfully!")
 	}
-    saveData()
+	saveData()
 	return nil
 }
 
