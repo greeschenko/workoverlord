@@ -19,8 +19,9 @@ func NewMIND() *MIND {
 	}
 }
 
-func (m *MIND) AddCell(point [2]int) error {
-	return m.editContent(time.Now().Format(time.RFC3339), "", &point)
+func (m *MIND) AddCell(point [2]int) (string, error) {
+	newkey := time.Now().Format(time.RFC3339)
+	return newkey, m.editContent(newkey, "", &point)
 }
 
 func (m *MIND) UpdateCell(key string) error {
@@ -74,7 +75,7 @@ func (m *MIND) editContent(key string, existingContent string, point *[2]int) er
 		}
 		fmt.Println("Text added successfully!")
 	} else {
-        m.Cells[key].Content = strings.TrimSpace(string(content))
+		m.Cells[key].Content = strings.TrimSpace(string(content))
 		fmt.Println("Text updated successfully!")
 	}
 	saveData()

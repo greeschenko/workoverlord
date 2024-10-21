@@ -26,7 +26,8 @@ var IsCreateSelect = false
 
 // var COLORBG = color.NRGBA{R: 0x28, G: 0x2c, B: 0x34, A: 0xff}
 var COLORBG = color.NRGBA{R: 40, G: 44, B: 52, A: 0xff}
-//var COLORTXT = color.NRGBA{R: 0xff, G: 0xb7, B: 0xce, A: 0xff}
+
+// var COLORTXT = color.NRGBA{R: 0xff, G: 0xb7, B: 0xce, A: 0xff}
 var COLORTXT = color.NRGBA{R: 0xff, G: 0xff, B: 0xff, A: 0xff}
 var COLORLINES = color.NRGBA{R: 250, G: 67, B: 114, A: 0xff}
 var COLORBRD = color.NRGBA{R: 40, G: 44, B: 52, A: 0xff}
@@ -35,14 +36,26 @@ var COLORSTR = color.NRGBA{R: 0x5f, G: 0x9e, B: 0xa0, A: 0xff}
 // cell widget container
 type CellWidgetContainer struct {
 	widget.BaseWidget
-	Content   []fyne.CanvasObject
-	Container fyne.CanvasObject
+	Container fyne.Container
+}
+
+func NewCellWidgetContainer(content []fyne.CanvasObject) *CellWidgetContainer {
+	item := &CellWidgetContainer{
+		Container: *container.NewWithoutLayout(),
+	}
+	item.Container.Objects = content
+	item.ExtendBaseWidget(item)
+	return item
 }
 
 func (item *CellWidgetContainer) CreateRenderer() fyne.WidgetRenderer {
-	obj := canvas.NewRectangle(COLORBG)
-	c := container.NewStack(obj, item.Container)
-	return widget.NewSimpleRenderer(c)
+	return widget.NewSimpleRenderer(&item.Container)
+}
+
+func ZoomRefresh() {
+	zoom, _ := GUIZOOM.Get()
+    GUIZOOM.Set(zoom - 0.1)
+    GUIZOOM.Set(zoom + 0.1)
 }
 
 func (item *CellWidgetContainer) Scrolled(d *fyne.ScrollEvent) {
@@ -69,8 +82,12 @@ func (item *CellWidgetContainer) Tapped(e *fyne.PointEvent) {
 	u, _ := GUIDATAUPDATER.Get()
 	GUIDATAUPDATER.Set(u + 1)
 	if IsCreateSelect {
-		err := USERMIND.AddCell([2]int{int(e.Position.X), int(e.Position.Y)})
+		key, err := USERMIND.AddCell([2]int{int(e.Position.X), int(e.Position.Y)})
 		checkErr(err)
+		myw := NewCellWidget(key, USERMIND.Cells[key])
+		item.Container.Objects = append(item.Container.Objects, myw)
+		item.Refresh()
+        ZoomRefresh()
 		IsCreateSelect = false
 	}
 }
@@ -82,16 +99,6 @@ func (item *CellWidgetContainer) Dragged(d *fyne.DragEvent) {
 
 func (item *CellWidgetContainer) DragEnd() {
 	fmt.Println("Background drag end")
-}
-
-func NewCellWidgetContainer(content []fyne.CanvasObject) *CellWidgetContainer {
-	cont := container.NewWithoutLayout(content...)
-	item := &CellWidgetContainer{
-		Content:   content,
-		Container: cont,
-	}
-	item.ExtendBaseWidget(item)
-	return item
 }
 
 // move icon widget
@@ -120,11 +127,12 @@ func (icon *CellWidgetMoveIcon) DragEnd() {
 // cell widget
 type CellWidget struct {
 	widget.BaseWidget
-	Id         string
-	Cell       *Cell
-	Movebtn    *CellWidgetMoveIcon
-	Background *canvas.Rectangle
-	Zoom       float32
+	Id            string
+	Cell          *Cell
+	Movebtn       *CellWidgetMoveIcon
+	Background    *canvas.Rectangle
+	Textcontainer *fyne.Container
+	Zoom          float32
 }
 
 func NewCellWidget(key string, cell *Cell) *CellWidget {
@@ -136,38 +144,38 @@ func NewCellWidget(key string, cell *Cell) *CellWidget {
 	obj.StrokeWidth = 1
 
 	item := &CellWidget{
-		Id:         key,
-		Cell:       cell,
-		Movebtn:    movebnt,
-		Background: obj,
-		Zoom:       1,
+		Id:            key,
+		Cell:          cell,
+		Movebtn:       movebnt,
+		Background:    obj,
+		Zoom:          1,
+		Textcontainer: container.NewVBox(),
 	}
 	item.ExtendBaseWidget(item)
+
+	list := binding.NewDataListener(func() {
+		zoom, _ := GUIZOOM.Get()
+		item.Resize(fyne.NewSize(float32(cell.Size[0])*float32(zoom), float32(cell.Size[1])*float32(zoom)))
+		item.Move(fyne.NewPos(float32(cell.Position[0])*float32(zoom), float32(cell.Position[1])*float32(zoom)))
+		item.Movebtn.Resize(fyne.NewSize(20, 20))
+		item.Movebtn.Move(fyne.NewPos(-20, -20))
+		item.Refresh()
+	})
+
+	GUIZOOM.AddListener(list)
+
+	list2 := binding.NewDataListener(func() {
+		item.Movebtn.Hide()
+		item.Background.StrokeColor = COLORSTR
+		item.Refresh()
+	})
+
+	GUIDATAUPDATER.AddListener(list2)
 
 	return item
 }
 
-func (item *CellWidget) Tapped(_ *fyne.PointEvent) {
-	item.Movebtn.Show()
-	item.Background.StrokeColor = COLORLINES
-	item.Refresh()
-	log.Println("I have been tapped")
-}
-
-func (item *CellWidget) DoubleTapped(_ *fyne.PointEvent) {
-	err := USERMIND.UpdateCell(item.Id)
-	checkErr(err)
-}
-
-func (item *CellWidget) CreateRenderer() fyne.WidgetRenderer {
-	item.Movebtn.OnDragStart = func(d *fyne.DragEvent) {
-		item.Move(fyne.NewPos(item.Position().X+d.Dragged.DX, item.Position().Y+d.Dragged.DY))
-	}
-	item.Movebtn.OnDragEnd = func() {
-        USERMIND.Cells[item.Id].Position = [2]int{int(item.Position().X), int(item.Position().Y)}
-        saveData()
-	}
-
+func (item *CellWidget) genText() {
 	lineslist := strings.Split(item.Cell.Content, "\n")
 	var lines []fyne.CanvasObject
 	maxlinelengh := 0
@@ -188,11 +196,41 @@ func (item *CellWidget) CreateRenderer() fyne.WidgetRenderer {
 		lines = append(lines, text)
 	}
 
-	item.Cell.Size = [2]int{maxlinelengh * FONTSIZE * 2 / 3, len(lineslist) * FONTSIZE * 4 / 3}
+	item.Cell.Size = [2]int{maxlinelengh * FONTSIZE * 2 / 3, len(lineslist) * FONTSIZE * 6 / 4}
 
-	text := container.NewVBox(lines...)
-	//c := container.NewStack(item.Background, text, container.NewWithoutLayout(item.Movebtn))
-	c := container.NewStack(text, container.NewWithoutLayout(item.Movebtn))
+	item.Textcontainer.Objects = lines
+}
+
+func (item *CellWidget) Tapped(_ *fyne.PointEvent) {
+	item.Movebtn.Show()
+	item.Background.StrokeColor = COLORLINES
+	item.Refresh()
+}
+
+func (item *CellWidget) DoubleTapped(_ *fyne.PointEvent) {
+	err := USERMIND.UpdateCell(item.Id)
+	if err != nil {
+		panic(err)
+	} else {
+		item.genText()
+		item.Refresh()
+        ZoomRefresh()
+	}
+}
+
+func (item *CellWidget) CreateRenderer() fyne.WidgetRenderer {
+	item.Movebtn.OnDragStart = func(d *fyne.DragEvent) {
+		item.Move(fyne.NewPos(item.Position().X+d.Dragged.DX, item.Position().Y+d.Dragged.DY))
+	}
+	item.Movebtn.OnDragEnd = func() {
+		USERMIND.Cells[item.Id].Position = [2]int{int(item.Position().X), int(item.Position().Y)}
+		saveData()
+	}
+
+	item.genText()
+
+	//c := container.NewStack(item.Background, item.Textcontainer, container.NewWithoutLayout(item.Movebtn))
+	c := container.NewStack(item.Textcontainer, container.NewWithoutLayout(item.Movebtn))
 	return widget.NewSimpleRenderer(c)
 }
 
@@ -203,24 +241,6 @@ func RecurceAddGuiCells(mind *MIND, celllist []fyne.CanvasObject) []fyne.CanvasO
 			continue
 		}
 		myw := NewCellWidget(i, e)
-		list := binding.NewDataListener(func() {
-			zoom, _ := GUIZOOM.Get()
-			myw.Resize(fyne.NewSize(float32(e.Size[0])*float32(zoom), float32(e.Size[1])*float32(zoom)))
-			myw.Move(fyne.NewPos(float32(e.Position[0])*float32(zoom), float32(e.Position[1])*float32(zoom)))
-			myw.Movebtn.Resize(fyne.NewSize(20, 20))
-			myw.Movebtn.Move(fyne.NewPos(-20, -20))
-			myw.Refresh()
-		})
-
-		GUIZOOM.AddListener(list)
-
-		list2 := binding.NewDataListener(func() {
-			myw.Movebtn.Hide()
-			myw.Background.StrokeColor = COLORSTR
-			myw.Refresh()
-		})
-
-		GUIDATAUPDATER.AddListener(list2)
 
 		celllist = append(celllist, myw)
 	}
@@ -239,10 +259,9 @@ func initGui() {
 	celllist = RecurceAddGuiCells(USERMIND, celllist)
 
 	cont := NewCellWidgetContainer(celllist)
+
 	addbtn := widget.NewButton("add new", func() {
 		IsCreateSelect = true
-		//err := USERMIND.AddCell()
-		//checkErr(err)
 	})
 	closebtn := widget.NewButton("close", func() {
 		w.Close()
