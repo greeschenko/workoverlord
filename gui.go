@@ -24,6 +24,8 @@ var FONTSIZE = 14
 
 var IsCreateSelect = false
 
+var SELECTED = []string{}
+
 // var COLORBG = color.NRGBA{R: 0x28, G: 0x2c, B: 0x34, A: 0xff}
 var COLORBG = color.NRGBA{R: 40, G: 44, B: 52, A: 0xff}
 
@@ -54,8 +56,8 @@ func (item *CellWidgetContainer) CreateRenderer() fyne.WidgetRenderer {
 
 func ZoomRefresh() {
 	zoom, _ := GUIZOOM.Get()
-    GUIZOOM.Set(zoom - 0.1)
-    GUIZOOM.Set(zoom + 0.1)
+	GUIZOOM.Set(zoom - 0.1)
+	GUIZOOM.Set(zoom + 0.1)
 }
 
 func (item *CellWidgetContainer) Scrolled(d *fyne.ScrollEvent) {
@@ -81,13 +83,14 @@ func (item *CellWidgetContainer) Tapped(e *fyne.PointEvent) {
 	fmt.Println("typed", e.Position)
 	u, _ := GUIDATAUPDATER.Get()
 	GUIDATAUPDATER.Set(u + 1)
+	SELECTED = []string{}
 	if IsCreateSelect {
 		key, err := USERMIND.AddCell([2]int{int(e.Position.X), int(e.Position.Y)})
 		checkErr(err)
 		myw := NewCellWidget(key, USERMIND.Cells[key])
 		item.Container.Objects = append(item.Container.Objects, myw)
 		item.Refresh()
-        ZoomRefresh()
+		ZoomRefresh()
 		IsCreateSelect = false
 	}
 }
@@ -205,6 +208,7 @@ func (item *CellWidget) Tapped(_ *fyne.PointEvent) {
 	item.Movebtn.Show()
 	item.Background.StrokeColor = COLORLINES
 	item.Refresh()
+	SELECTED = append(SELECTED, item.Id)
 }
 
 func (item *CellWidget) DoubleTapped(_ *fyne.PointEvent) {
@@ -214,7 +218,7 @@ func (item *CellWidget) DoubleTapped(_ *fyne.PointEvent) {
 	} else {
 		item.genText()
 		item.Refresh()
-        ZoomRefresh()
+		ZoomRefresh()
 	}
 }
 
@@ -234,9 +238,10 @@ func (item *CellWidget) CreateRenderer() fyne.WidgetRenderer {
 	return widget.NewSimpleRenderer(c)
 }
 
-func RecurceAddGuiCells(mind *MIND, celllist []fyne.CanvasObject) []fyne.CanvasObject {
-	for i := range mind.Cells {
-		e := mind.Cells[i]
+func RecurceAddGuiCells() []fyne.CanvasObject {
+	var celllist []fyne.CanvasObject
+	for i := range USERMIND.Cells {
+		e := USERMIND.Cells[i]
 		if e.Status == CellStatusConfig {
 			continue
 		}
@@ -250,23 +255,32 @@ func RecurceAddGuiCells(mind *MIND, celllist []fyne.CanvasObject) []fyne.CanvasO
 
 func initGui() {
 
-	var celllist []fyne.CanvasObject
 	GUIZOOM.Set(1)
 
 	myApp := app.New()
 	w := myApp.NewWindow("WorkOverlord")
 
-	celllist = RecurceAddGuiCells(USERMIND, celllist)
+	cont := NewCellWidgetContainer(RecurceAddGuiCells())
 
-	cont := NewCellWidgetContainer(celllist)
-
-	addbtn := widget.NewButton("add new", func() {
+	addbtn := widget.NewButton("ADD", func() {
 		IsCreateSelect = true
 	})
-	closebtn := widget.NewButton("close", func() {
+	deletebtn := widget.NewButton("DELETE", func() {
+		if len(SELECTED) == 0 {
+			fmt.Println("no cells selected")
+		} else {
+			for _, v := range SELECTED {
+				delete(USERMIND.Cells, v)
+			}
+            saveData()
+			cont.Container.Objects = RecurceAddGuiCells()
+			cont.Refresh()
+		}
+	})
+	closebtn := widget.NewButton("CLOSE", func() {
 		w.Close()
 	})
-	mainmenu := container.NewHBox(addbtn, closebtn)
+	mainmenu := container.NewHBox(addbtn, deletebtn, closebtn)
 
 	content := container.NewBorder(mainmenu, nil, nil, nil, cont)
 	w.SetContent(content)
