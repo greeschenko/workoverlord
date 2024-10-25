@@ -19,6 +19,7 @@ import (
 
 var GUIZOOM = binding.NewFloat()
 var GUIDATAUPDATER = binding.NewInt()
+var GUICONTAINER *CellWidgetContainer
 
 var FONTSIZE = 14
 
@@ -79,13 +80,22 @@ func (item *CellWidgetContainer) Scrolled(d *fyne.ScrollEvent) {
 	}
 }
 
+func realCoordinates(pos, contpos fyne.Position) (int, int) {
+	zoom, _ := GUIZOOM.Get()
+	realX := (pos.X - contpos.X) / float32(zoom)
+	realY := (pos.Y - contpos.Y) / float32(zoom)
+
+	return int(realX), int(realY)
+}
+
 func (item *CellWidgetContainer) Tapped(e *fyne.PointEvent) {
-	fmt.Println("typed", e.Position)
+	fmt.Println(e.Position, item.Container.Position())
 	u, _ := GUIDATAUPDATER.Get()
 	GUIDATAUPDATER.Set(u + 1)
 	SELECTED = []string{}
 	if IsCreateSelect {
-		key, err := USERMIND.AddCell([2]int{int(e.Position.X), int(e.Position.Y)})
+		realX, realY := realCoordinates(e.Position, item.Container.Position())
+		key, err := USERMIND.AddCell([2]int{realX, realY})
 		checkErr(err)
 		myw := NewCellWidget(key, USERMIND.Cells[key])
 		item.Container.Objects = append(item.Container.Objects, myw)
@@ -227,7 +237,9 @@ func (item *CellWidget) CreateRenderer() fyne.WidgetRenderer {
 		item.Move(fyne.NewPos(item.Position().X+d.Dragged.DX, item.Position().Y+d.Dragged.DY))
 	}
 	item.Movebtn.OnDragEnd = func() {
-		USERMIND.Cells[item.Id].Position = [2]int{int(item.Position().X), int(item.Position().Y)}
+		zoom, _ := GUIZOOM.Get()
+		//realX, realY := realCoordinates(item.Position(), GUICONTAINER.Container.Position())
+		USERMIND.Cells[item.Id].Position = [2]int{int(item.Position().X / float32(zoom)), int(item.Position().Y / float32(zoom))}
 		saveData()
 	}
 
@@ -260,7 +272,7 @@ func initGui() {
 	myApp := app.New()
 	w := myApp.NewWindow("WorkOverlord")
 
-	cont := NewCellWidgetContainer(RecurceAddGuiCells())
+	GUICONTAINER = NewCellWidgetContainer(RecurceAddGuiCells())
 
 	addbtn := widget.NewButton("ADD", func() {
 		IsCreateSelect = true
@@ -272,9 +284,9 @@ func initGui() {
 			for _, v := range SELECTED {
 				delete(USERMIND.Cells, v)
 			}
-            saveData()
-			cont.Container.Objects = RecurceAddGuiCells()
-			cont.Refresh()
+			saveData()
+			GUICONTAINER.Container.Objects = RecurceAddGuiCells()
+			GUICONTAINER.Refresh()
 		}
 	})
 	closebtn := widget.NewButton("CLOSE", func() {
@@ -282,7 +294,7 @@ func initGui() {
 	})
 	mainmenu := container.NewHBox(addbtn, deletebtn, closebtn)
 
-	content := container.NewBorder(mainmenu, nil, nil, nil, cont)
+	content := container.NewBorder(mainmenu, nil, nil, nil, GUICONTAINER)
 	w.SetContent(content)
 
 	ctrlTab := &desktop.CustomShortcut{KeyName: fyne.KeyTab, Modifier: fyne.KeyModifierControl}
