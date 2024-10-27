@@ -63,21 +63,26 @@ func ZoomRefresh() {
 
 func (item *CellWidgetContainer) Scrolled(d *fyne.ScrollEvent) {
 	zoom, _ := GUIZOOM.Get()
+    newZoom := zoom
 	fmt.Println("container position on zoom", item.Container.Position())
-	//item.Container.Move(fyne.NewPos(1000, 1000))
 	if d.Scrolled.DY > 0 {
 		if zoom < 1 {
-			GUIZOOM.Set(zoom + 0.1)
+            newZoom = zoom + 0.1
+			GUIZOOM.Set(newZoom)
 		} else {
 			GUIZOOM.Set(1)
 		}
 	} else {
 		if zoom > 0.1 {
-			GUIZOOM.Set(zoom - 0.1)
+            newZoom = zoom - 0.1
+			GUIZOOM.Set(newZoom)
 		} else {
 			GUIZOOM.Set(0.1)
 		}
 	}
+    newOffsetX := d.Position.X - (d.Position.X - item.Container.Position().X) * float32(newZoom / zoom)
+    newOffsetY := d.Position.Y - (d.Position.Y - item.Container.Position().Y) * float32(newZoom / zoom)
+	item.Container.Move(fyne.NewPos(newOffsetX, newOffsetY))
 }
 
 func realCoordinates(pos, contpos fyne.Position) (int, int) {
@@ -162,7 +167,7 @@ func NewCellWidget(key string, cell *Cell) *CellWidget {
 		Movebtn:       movebnt,
 		Background:    obj,
 		Zoom:          1,
-		Textcontainer: container.NewVBox(),
+		Textcontainer: container.NewWithoutLayout(),
 	}
 	item.ExtendBaseWidget(item)
 
@@ -192,21 +197,20 @@ func (item *CellWidget) genText() {
 	lineslist := strings.Split(item.Cell.Content, "\n")
 	var lines []fyne.CanvasObject
 	maxlinelengh := 0
+	lineSpacing := FONTSIZE * 1 / 2
+	var y float32 = 0
 	for i := range lineslist {
+		zoom, _ := GUIZOOM.Get()
 		e := lineslist[i]
 		if maxlinelengh < len(e) {
 			maxlinelengh = len(e)
 		}
 		text := canvas.NewText(e, COLORTXT)
 		text.TextStyle.Monospace = true
-		list := binding.NewDataListener(func() {
-			zoom, _ := GUIZOOM.Get()
-			text.TextSize = float32(FONTSIZE) * float32(zoom)
-			text.Refresh()
-			fmt.Println("zoom changed ", zoom)
-		})
-		GUIZOOM.AddListener(list)
+		text.Move(fyne.NewPos(0, y))
+		text.TextSize = float32(FONTSIZE) * float32(zoom)
 		lines = append(lines, text)
+		y += float32(FONTSIZE + lineSpacing) * float32(zoom)
 	}
 
 	item.Cell.Size = [2]int{maxlinelengh * FONTSIZE * 2 / 3, len(lineslist) * FONTSIZE * 6 / 4}
@@ -243,7 +247,10 @@ func (item *CellWidget) CreateRenderer() fyne.WidgetRenderer {
 		saveData()
 	}
 
-	item.genText()
+	list := binding.NewDataListener(func() {
+		item.genText()
+	})
+	GUIZOOM.AddListener(list)
 
 	//c := container.NewStack(item.Background, item.Textcontainer, container.NewWithoutLayout(item.Movebtn))
 	c := container.NewStack(item.Textcontainer, container.NewWithoutLayout(item.Movebtn))
