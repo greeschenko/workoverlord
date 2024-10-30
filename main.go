@@ -17,7 +17,8 @@ var (
 )
 
 func main() {
-    initDb()
 	fmt.Println(logo)
-    initGui()
+    //initDb()
+    //initGui()
+    start()
 }

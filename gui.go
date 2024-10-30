@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/sha256"
 	"fmt"
 	"image/color"
 	"log"
@@ -13,6 +14,7 @@ import (
 	"fyne.io/fyne/v2/data/binding"
 	"fyne.io/fyne/v2/driver/desktop"
 	//"fyne.io/fyne/v2/layout"
+	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 )
@@ -63,25 +65,25 @@ func ZoomRefresh() {
 
 func (item *CellWidgetContainer) Scrolled(d *fyne.ScrollEvent) {
 	zoom, _ := GUIZOOM.Get()
-    newZoom := zoom
+	newZoom := zoom
 	fmt.Println("container position on zoom", item.Container.Position())
 	if d.Scrolled.DY > 0 {
 		if zoom < 1 {
-            newZoom = zoom + 0.1
+			newZoom = zoom + 0.1
 			GUIZOOM.Set(newZoom)
 		} else {
 			GUIZOOM.Set(1)
 		}
 	} else {
 		if zoom > 0.1 {
-            newZoom = zoom - 0.1
+			newZoom = zoom - 0.1
 			GUIZOOM.Set(newZoom)
 		} else {
 			GUIZOOM.Set(0.1)
 		}
 	}
-    newOffsetX := d.Position.X - (d.Position.X - item.Container.Position().X) * float32(newZoom / zoom)
-    newOffsetY := d.Position.Y - (d.Position.Y - item.Container.Position().Y) * float32(newZoom / zoom)
+	newOffsetX := d.Position.X - (d.Position.X-item.Container.Position().X)*float32(newZoom/zoom)
+	newOffsetY := d.Position.Y - (d.Position.Y-item.Container.Position().Y)*float32(newZoom/zoom)
 	item.Container.Move(fyne.NewPos(newOffsetX, newOffsetY))
 }
 
@@ -210,7 +212,7 @@ func (item *CellWidget) genText() {
 		text.Move(fyne.NewPos(0, y))
 		text.TextSize = float32(FONTSIZE) * float32(zoom)
 		lines = append(lines, text)
-		y += float32(FONTSIZE + lineSpacing) * float32(zoom)
+		y += float32(FONTSIZE+lineSpacing) * float32(zoom)
 	}
 
 	item.Cell.Size = [2]int{maxlinelengh * FONTSIZE * 2 / 3, len(lineslist) * FONTSIZE * 6 / 4}
@@ -272,12 +274,48 @@ func RecurceAddGuiCells() []fyne.CanvasObject {
 	return celllist
 }
 
-func initGui() {
+func start() {
+	myApp := app.New()
+	myWindow := myApp.NewWindow("WorkOverlord")
+
+	passwordEntry := widget.NewPasswordEntry()
+	passwordEntry.SetPlaceHolder("Enter your password")
+
+	submitButton := widget.NewButton("Submit", func() {
+
+		SECRETKEY = sha256.Sum256([]byte(passwordEntry.Text))
+
+		fmt.Println("secret is ", SECRETKEY)
+
+		if initDb() != nil {
+			dialog.ShowInformation("Error", "Wrong password", myWindow)
+		} else {
+		    //myWindow.SetContent(widget.NewLabel("Hello World"))
+            initGui(myWindow)
+		}
+
+		//if passwordEntry.Text == correctPassword {
+		//initGui(myApp)
+		//} else {
+		//	dialog.ShowInformation("Error", "Wrong password", myWindow)
+		//}
+	})
+
+	content := container.NewVBox(
+		widget.NewLabel("Please enter your password:"),
+		passwordEntry,
+		submitButton,
+	)
+
+	myWindow.SetContent(content)
+
+	myWindow.Resize(fyne.NewSize(1200, 600))
+	myWindow.ShowAndRun()
+}
+
+func initGui(w fyne.Window) {
 
 	GUIZOOM.Set(1)
-
-	myApp := app.New()
-	w := myApp.NewWindow("WorkOverlord")
 
 	GUICONTAINER = NewCellWidgetContainer(RecurceAddGuiCells())
 
@@ -308,7 +346,4 @@ func initGui() {
 	w.Canvas().AddShortcut(ctrlTab, func(shortcut fyne.Shortcut) {
 		log.Println("We tapped Ctrl+Tab")
 	})
-
-	w.Resize(fyne.NewSize(1200, 600))
-	w.ShowAndRun()
 }
