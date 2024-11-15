@@ -6,6 +6,7 @@ import (
 	"image/color"
 	"log"
 	"strings"
+	"unicode/utf8"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
@@ -204,8 +205,9 @@ func (item *CellWidget) genText() {
 	for i := range lineslist {
 		zoom, _ := GUIZOOM.Get()
 		e := lineslist[i]
-		if maxlinelengh < len(e) {
-			maxlinelengh = len(e)
+        strlen := utf8.RuneCountInString(e)
+		if maxlinelengh < strlen {
+			maxlinelengh = strlen
 		}
 		text := canvas.NewText(e, COLORTXT)
 		text.TextStyle.Monospace = true
@@ -244,7 +246,6 @@ func (item *CellWidget) CreateRenderer() fyne.WidgetRenderer {
 	}
 	item.Movebtn.OnDragEnd = func() {
 		zoom, _ := GUIZOOM.Get()
-		//realX, realY := realCoordinates(item.Position(), GUICONTAINER.Container.Position())
 		USERMIND.Cells[item.Id].Position = [2]int{int(item.Position().X / float32(zoom)), int(item.Position().Y / float32(zoom))}
 		saveData()
 	}
@@ -290,8 +291,8 @@ func start() {
 		if initDb() != nil {
 			dialog.ShowInformation("Error", "Wrong password", myWindow)
 		} else {
-		    //myWindow.SetContent(widget.NewLabel("Hello World"))
-            initGui(myWindow)
+			//myWindow.SetContent(widget.NewLabel("Hello World"))
+			initGui(myWindow)
 		}
 
 		//if passwordEntry.Text == correctPassword {
@@ -308,6 +309,8 @@ func start() {
 	)
 
 	myWindow.SetContent(content)
+
+	myWindow.Canvas().Focus(passwordEntry)
 
 	myWindow.Resize(fyne.NewSize(1200, 600))
 	myWindow.ShowAndRun()
