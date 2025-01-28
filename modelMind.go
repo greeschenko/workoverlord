@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"strings"
 	"time"
 )
 
@@ -69,13 +68,13 @@ func (m *MIND) editContent(key string, existingContent string, point *[2]int) er
 
 	if existingContent == "" {
 		m.Cells[key] = &Cell{
-			Content:  strings.TrimSpace(string(content)),
+			Content:  string(content),
 			Position: *point,
 			Status:   CellStatusActive,
 		}
 		fmt.Println("Text added successfully!")
 	} else {
-		m.Cells[key].Content = strings.TrimSpace(string(content))
+		m.Cells[key].Content = string(content)
 		fmt.Println("Text updated successfully!")
 	}
 	saveData()

@@ -197,30 +197,41 @@ func NewCellWidget(key string, cell *Cell) *CellWidget {
 }
 
 func (item *CellWidget) genText() {
-	lineslist := strings.Split(item.Cell.Content, "\n")
-	var lines []fyne.CanvasObject
-	maxlinelengh := 0
-	lineSpacing := FONTSIZE * 1 / 2
-	var y float32 = 0
-	for i := range lineslist {
-		zoom, _ := GUIZOOM.Get()
-		e := lineslist[i]
-        strlen := utf8.RuneCountInString(e)
-		if maxlinelengh < strlen {
-			maxlinelengh = strlen
+	linesList := strings.Split(item.Cell.Content, "\n") // Use camelCase consistently
+	var maxLineLength int
+	var y float32
+	zoom, _ := GUIZOOM.Get()
+	fontSize := float32(FONTSIZE)                       // Convert FONTSIZE to float32
+	lineSpacing := fontSize / 2
+	textSize := fontSize * float32(zoom)
+	yIncrement := (fontSize + lineSpacing) * float32(zoom)      // Correct type handling
+	lines := make([]fyne.CanvasObject, 0, len(linesList)) // Preallocate slice
+
+	for _, line := range linesList {
+		lineLength := utf8.RuneCountInString(line)
+		if lineLength > maxLineLength {
+			maxLineLength = lineLength
 		}
-		text := canvas.NewText(e, COLORTXT)
+
+		text := canvas.NewText(line, COLORTXT)
 		text.TextStyle.Monospace = true
+		text.TextSize = textSize
 		text.Move(fyne.NewPos(0, y))
-		text.TextSize = float32(FONTSIZE) * float32(zoom)
 		lines = append(lines, text)
-		y += float32(FONTSIZE+lineSpacing) * float32(zoom)
+
+		y += yIncrement
 	}
 
-	item.Cell.Size = [2]int{maxlinelengh * FONTSIZE * 2 / 3, len(lineslist) * FONTSIZE * 6 / 4}
+	// Avoid recalculating the size multiple times
+	item.Cell.Size = [2]int{
+		maxLineLength * FONTSIZE * 2 / 3,
+		len(linesList) * FONTSIZE * 6 / 4,
+	}
 
+	// Update container
 	item.Textcontainer.Objects = lines
 }
+
 
 func (item *CellWidget) Tapped(_ *fyne.PointEvent) {
 	item.Movebtn.Show()
@@ -251,7 +262,7 @@ func (item *CellWidget) CreateRenderer() fyne.WidgetRenderer {
 	}
 
 	list := binding.NewDataListener(func() {
-		item.genText()
+		go item.genText()
 	})
 	GUIZOOM.AddListener(list)
 
@@ -282,8 +293,9 @@ func start() {
 	passwordEntry := widget.NewPasswordEntry()
 	passwordEntry.SetPlaceHolder("Enter your password")
 
-	submitButton := widget.NewButton("Submit", func() {
+	form := widget.NewForm(widget.NewFormItem("Password", passwordEntry))
 
+	form.OnSubmit = func() {
 		SECRETKEY = sha256.Sum256([]byte(passwordEntry.Text))
 
 		fmt.Println("secret is ", SECRETKEY)
@@ -291,21 +303,17 @@ func start() {
 		if initDb() != nil {
 			dialog.ShowInformation("Error", "Wrong password", myWindow)
 		} else {
-			//myWindow.SetContent(widget.NewLabel("Hello World"))
 			initGui(myWindow)
 		}
+	}
 
-		//if passwordEntry.Text == correctPassword {
-		//initGui(myApp)
-		//} else {
-		//	dialog.ShowInformation("Error", "Wrong password", myWindow)
-		//}
-	})
+	passwordEntry.OnSubmitted = func(_ string) {
+		form.OnSubmit()
+	}
 
 	content := container.NewVBox(
 		widget.NewLabel("Please enter your password:"),
-		passwordEntry,
-		submitButton,
+		form,
 	)
 
 	myWindow.SetContent(content)
