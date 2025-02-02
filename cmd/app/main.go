@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+
 )
 
 const logo = `
@@ -12,13 +13,10 @@ const logo = `
     \_/\_/ \___/|_|\_\_|   \___/  \_/ \___|_|  |_|\___/|_|  \__,_|
 `
 
-var (
-	USERMIND = NewMIND()
-)
+//var (
+//	USERMIND = NewMIND()
+//)
 
 func main() {
-	fmt.Println(logo)
-    //initDb()
-    //initGui()
-    start()
+	fmt.Print(logo)
 }
