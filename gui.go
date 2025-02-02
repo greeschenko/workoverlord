@@ -316,6 +316,11 @@ func start() {
 		form,
 	)
 
+	ctrlTab := &desktop.CustomShortcut{KeyName: fyne.KeyTab, Modifier: fyne.KeyModifierControl}
+	myWindow.Canvas().AddShortcut(ctrlTab, func(shortcut fyne.Shortcut) {
+		log.Println("We tapped Ctrl+Tab")
+	})
+
 	myWindow.SetContent(content)
 
 	myWindow.Canvas().Focus(passwordEntry)
@@ -352,9 +357,4 @@ func initGui(w fyne.Window) {
 
 	content := container.NewBorder(mainmenu, nil, nil, nil, GUICONTAINER)
 	w.SetContent(content)
-
-	ctrlTab := &desktop.CustomShortcut{KeyName: fyne.KeyTab, Modifier: fyne.KeyModifierControl}
-	w.Canvas().AddShortcut(ctrlTab, func(shortcut fyne.Shortcut) {
-		log.Println("We tapped Ctrl+Tab")
-	})
 }
