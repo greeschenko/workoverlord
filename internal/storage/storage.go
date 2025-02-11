@@ -1,6 +1,7 @@
 package storage
 
 import (
+	"greeschenko/workoverlord2/internal/encriptor"
 	"crypto/sha256"
 	"encoding/json"
 	"errors"
@@ -14,12 +15,18 @@ var (
 	Dbfile = Dbpath + "MIND2"
 )
 
+type EnkriptorInteraface interface {
+	Encrypt([]byte, [32]byte) []byte
+	Descrypt([]byte, [32]byte) ([]byte, error)
+}
+
 type Storage struct {
 	secretkey [32]byte
+	encriptor EnkriptorInteraface
 }
 
 func NewStorage() *Storage {
-	return &Storage{}
+	return &Storage{encriptor: encriptor.NewEncriptor()}
 }
 
 func (s *Storage) SetSecret(secret string) {
@@ -44,7 +51,7 @@ func (s *Storage) Load() error {
 		if err != nil {
 			return err
 		}
-		data, err := DataDescript(tmpdata)
+		data, err := s.encriptor.Descrypt(tmpdata, s.secretkey)
 		if err != nil {
 			return err
 		}

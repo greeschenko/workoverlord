@@ -1,4 +1,4 @@
-package main
+package encriptor
 
 import (
 	"crypto/aes"
@@ -9,9 +9,13 @@ import (
 	"log"
 )
 
-var SECRETKEY [32]byte
+type Encriptor struct {}
 
-func DataEnctypt(data []byte) []byte {
+func NewEncriptor() *Encriptor {
+	return &Encriptor{}
+}
+
+func (e Encriptor) Encrypt(data []byte, SECRETKEY [32]byte) []byte {
 
 	// generate a new aes cipher using our 32 byte long key
 	c, err := aes.NewCipher(SECRETKEY[:])
@@ -50,29 +54,29 @@ func DataEnctypt(data []byte) []byte {
 	return res
 }
 
-func DataDescript(data []byte) ([]byte, error) {
+func (e Encriptor) Descrypt(data []byte, SECRETKEY [32]byte) ([]byte, error) {
 
 	ciphertext := data
 
 	c, err := aes.NewCipher(SECRETKEY[:])
 	if err != nil {
-        return nil, err
+		return nil, err
 	}
 
 	gcm, err := cipher.NewGCM(c)
 	if err != nil {
-        return nil, err
+		return nil, err
 	}
 
 	nonceSize := gcm.NonceSize()
 	if len(ciphertext) < nonceSize {
-        return nil, err
+		return nil, err
 	}
 
 	nonce, ciphertext := ciphertext[:nonceSize], ciphertext[nonceSize:]
 	plaintext, err := gcm.Open(nil, nonce, ciphertext, nil)
 	if err != nil {
-        return nil, err
+		return nil, err
 	}
 
 	res := plaintext
