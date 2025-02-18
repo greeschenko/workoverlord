@@ -1,4 +1,4 @@
-package main
+package models 
 
 type Synapse struct {
 	Name  string  `json:"name"`

@@ -1,4 +1,4 @@
-package main
+package models
 
 import (
 	"fmt"
@@ -77,7 +77,8 @@ func (m *MIND) editContent(key string, existingContent string, point *[2]int) er
 		m.Cells[key].Content = string(content)
 		fmt.Println("Text updated successfully!")
 	}
-	saveData()
+    //TODO change to load
+	//saveData()
 	return nil
 }
 

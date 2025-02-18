@@ -1,11 +1,12 @@
 package storage
 
 import (
-	"greeschenko/workoverlord2/internal/encriptor"
 	"crypto/sha256"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"greeschenko/workoverlord2/internal/encriptor"
+	"greeschenko/workoverlord2/internal/models"
 	"log"
 	"os"
 )
@@ -23,6 +24,7 @@ type EnkriptorInteraface interface {
 type Storage struct {
 	secretkey [32]byte
 	encriptor EnkriptorInteraface
+    data models.MIND
 }
 
 func NewStorage() *Storage {
@@ -35,6 +37,16 @@ func (s *Storage) SetSecret(secret string) {
 
 func (s *Storage) GetSecret() [32]byte {
 	return s.secretkey
+}
+
+func (s *Storage) Descrypt(data []byte) error {
+	data, err := s.encriptor.Descrypt(data, s.secretkey)
+	if err != nil {
+		return err
+	}
+	json.Unmarshal(data, &s.data)
+    fmt.Println(s.data)
+	return nil
 }
 
 func (s *Storage) Load() error {
@@ -51,11 +63,10 @@ func (s *Storage) Load() error {
 		if err != nil {
 			return err
 		}
-		data, err := s.encriptor.Descrypt(tmpdata, s.secretkey)
+		err = s.Descrypt(tmpdata)
 		if err != nil {
 			return err
 		}
-		json.Unmarshal(data, &USERMIND)
 	}
 
 	return nil
@@ -63,4 +74,8 @@ func (s *Storage) Load() error {
 
 func (s *Storage) Save() {
 	log.Println("storage saved data")
+}
+
+func (s *Storage) GetData() models.MIND {
+    return s.data
 }

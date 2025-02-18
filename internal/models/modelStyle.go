@@ -1,4 +1,4 @@
-package main
+package models
 
 type Style struct {
 	Color    string `json:"color"`
