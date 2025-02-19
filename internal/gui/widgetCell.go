@@ -1,6 +1,7 @@
 package gui
 
 import (
+	"fmt"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
@@ -8,6 +9,8 @@ import (
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 	"greeschenko/workoverlord2/internal/models"
+	"strings"
+	"unicode/utf8"
 )
 
 // cell widget
@@ -18,27 +21,6 @@ type CellWidget struct {
 	Movebtn       *CellWidgetMoveIcon
 	Background    *canvas.Rectangle
 	Textcontainer *fyne.Container
-	Zoom          float32
-}
-
-func (item *CellWidget) CreateRenderer() fyne.WidgetRenderer {
-	item.Movebtn.OnDragStart = func(d *fyne.DragEvent) {
-		item.Move(fyne.NewPos(item.Position().X+d.Dragged.DX, item.Position().Y+d.Dragged.DY))
-	}
-	item.Movebtn.OnDragEnd = func() {
-		zoom, _ := GUIZOOM.Get()
-		USERMIND.Cells[item.Id].Position = [2]int{int(item.Position().X / float32(zoom)), int(item.Position().Y / float32(zoom))}
-		saveData()
-	}
-
-	list := binding.NewDataListener(func() {
-		go item.genText()
-	})
-	GUIZOOM.AddListener(list)
-
-	//c := container.NewStack(item.Background, item.Textcontainer, container.NewWithoutLayout(item.Movebtn))
-	c := container.NewStack(item.Textcontainer, container.NewWithoutLayout(item.Movebtn))
-	return widget.NewSimpleRenderer(c)
 }
 
 func NewCellWidget(key string, cell *models.Cell) *CellWidget {
@@ -53,7 +35,6 @@ func NewCellWidget(key string, cell *models.Cell) *CellWidget {
 		Cell:          cell,
 		Movebtn:       movebnt,
 		Background:    obj,
-		Zoom:          1,
 		Textcontainer: container.NewWithoutLayout(),
 	}
 	item.ExtendBaseWidget(item)
@@ -80,6 +61,27 @@ func NewCellWidget(key string, cell *models.Cell) *CellWidget {
 	return item
 }
 
+func (item *CellWidget) CreateRenderer() fyne.WidgetRenderer {
+	item.Movebtn.OnDragStart = func(d *fyne.DragEvent) {
+		item.Move(fyne.NewPos(item.Position().X+d.Dragged.DX, item.Position().Y+d.Dragged.DY))
+	}
+	item.Movebtn.OnDragEnd = func() {
+		fmt.Println("drag is end")
+		//		zoom, _ := GUIZOOM.Get()
+		//		USERMIND.Cells[item.Id].Position = [2]int{int(item.Position().X / float32(zoom)), int(item.Position().Y / float32(zoom))}
+		//		saveData()
+	}
+
+	list := binding.NewDataListener(func() {
+		go item.genText()
+	})
+	GUIZOOM.AddListener(list)
+
+	//c := container.NewStack(item.Background, item.Textcontainer, container.NewWithoutLayout(item.Movebtn))
+	c := container.NewStack(item.Textcontainer, container.NewWithoutLayout(item.Movebtn))
+	return widget.NewSimpleRenderer(c)
+}
+
 func newCellWidgetMoveIcon(res fyne.Resource) *CellWidgetMoveIcon {
 	icon := &CellWidgetMoveIcon{}
 	icon.ExtendBaseWidget(icon)
@@ -101,4 +103,40 @@ func (icon *CellWidgetMoveIcon) Dragged(d *fyne.DragEvent) {
 
 func (icon *CellWidgetMoveIcon) DragEnd() {
 	icon.OnDragEnd()
+}
+
+func (item *CellWidget) genText() {
+	linesList := strings.Split(item.Cell.Content, "\n") // Use camelCase consistently
+	var maxLineLength int
+	var y float32
+	zoom, _ := GUIZOOM.Get()
+	fontSize := float32(FONTSIZE) // Convert FONTSIZE to float32
+	lineSpacing := fontSize / 2
+	textSize := fontSize * float32(zoom)
+	yIncrement := (fontSize + lineSpacing) * float32(zoom) // Correct type handling
+	lines := make([]fyne.CanvasObject, 0, len(linesList))  // Preallocate slice
+
+	for _, line := range linesList {
+		lineLength := utf8.RuneCountInString(line)
+		if lineLength > maxLineLength {
+			maxLineLength = lineLength
+		}
+
+		text := canvas.NewText(line, COLORTXT)
+		text.TextStyle.Monospace = true
+		text.TextSize = textSize
+		text.Move(fyne.NewPos(0, y))
+		lines = append(lines, text)
+
+		y += yIncrement
+	}
+
+	// Avoid recalculating the size multiple times
+	item.Cell.Size = [2]int{
+		maxLineLength * FONTSIZE * 2 / 3,
+		len(linesList) * FONTSIZE * 6 / 4,
+	}
+
+	// Update container
+	item.Textcontainer.Objects = lines
 }

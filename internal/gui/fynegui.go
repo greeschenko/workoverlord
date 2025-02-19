@@ -5,13 +5,34 @@ import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/data/binding"
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/driver/desktop"
 	"fyne.io/fyne/v2/widget"
 	woapp "greeschenko/workoverlord2/internal/app"
 	"greeschenko/workoverlord2/internal/models"
+	"image/color"
 	"log"
 )
+
+var GUIZOOM = binding.NewFloat()
+var GUIDATAUPDATER = binding.NewInt()
+var GUICONTAINER *CellWidgetContainer
+
+var FONTSIZE = 14
+
+var IsCreateSelect = false
+
+var SELECTED = []string{}
+
+// var COLORBG = color.NRGBA{R: 0x28, G: 0x2c, B: 0x34, A: 0xff}
+var COLORBG = color.NRGBA{R: 40, G: 44, B: 52, A: 0xff}
+
+// var COLORTXT = color.NRGBA{R: 0xff, G: 0xb7, B: 0xce, A: 0xff}
+var COLORTXT = color.NRGBA{R: 0xff, G: 0xff, B: 0xff, A: 0xff}
+var COLORLINES = color.NRGBA{R: 250, G: 67, B: 114, A: 0xff}
+var COLORBRD = color.NRGBA{R: 40, G: 44, B: 52, A: 0xff}
+var COLORSTR = color.NRGBA{R: 0x5f, G: 0x9e, B: 0xa0, A: 0xff}
 
 // GUI — стандартна реалізація GUI
 type GUI struct {
@@ -100,7 +121,7 @@ func (g *GUI) showData(w fyne.Window) {
 func (g *GUI) RecurceAddGuiCells() []fyne.CanvasObject {
 	var celllist []fyne.CanvasObject
 	woapp := woapp.GetInstance()
-	for i,e := range woapp.Storage.GetData().Cells {
+	for i, e := range woapp.Storage.GetData().Cells {
 		if e.Status == models.CellStatusConfig {
 			continue
 		}

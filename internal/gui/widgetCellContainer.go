@@ -4,17 +4,13 @@ import (
 	"fmt"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/data/binding"
 	"fyne.io/fyne/v2/widget"
 )
 
 // cell widget container
 type CellWidgetContainer struct {
 	widget.BaseWidget
-	Container      fyne.Container
-	zoom           binding.Float
-	updater        binding.Int
-	guidataupdater binding.Int
+	Container fyne.Container
 }
 
 func NewCellWidgetContainer(content []fyne.CanvasObject) *CellWidgetContainer {
@@ -23,7 +19,7 @@ func NewCellWidgetContainer(content []fyne.CanvasObject) *CellWidgetContainer {
 	}
 	item.Container.Objects = content
 	item.ExtendBaseWidget(item)
-	item.zoom.Set(1)
+	GUIZOOM.Set(1)
 	return item
 }
 
@@ -32,22 +28,22 @@ func (item *CellWidgetContainer) CreateRenderer() fyne.WidgetRenderer {
 }
 
 func (item *CellWidgetContainer) Scrolled(d *fyne.ScrollEvent) {
-	zoom, _ := item.zoom.Get()
+	zoom, _ := GUIZOOM.Get()
 	newZoom := zoom
 	fmt.Println("container position on zoom", item.Container.Position())
 	if d.Scrolled.DY > 0 {
 		if zoom < 1 {
 			newZoom = zoom + 0.1
-			item.zoom.Set(newZoom)
+			GUIZOOM.Set(newZoom)
 		} else {
-			item.zoom.Set(1)
+			GUIZOOM.Set(1)
 		}
 	} else {
 		if zoom > 0.1 {
 			newZoom = zoom - 0.1
-			item.zoom.Set(newZoom)
+			GUIZOOM.Set(newZoom)
 		} else {
-			item.zoom.Set(0.1)
+			GUIZOOM.Set(0.1)
 		}
 	}
 	newOffsetX := d.Position.X - (d.Position.X-item.Container.Position().X)*float32(newZoom/zoom)
@@ -83,7 +79,7 @@ func (item *CellWidgetContainer) DragEnd() {
 }
 
 func (item *CellWidgetContainer) ZoomRefresh() {
-	zoom, _ := item.zoom.Get()
-	item.zoom.Set(zoom - 0.1)
-	item.zoom.Set(zoom + 0.1)
+	zoom, _ := GUIZOOM.Get()
+	GUIZOOM.Set(zoom - 0.1)
+	GUIZOOM.Set(zoom + 0.1)
 }

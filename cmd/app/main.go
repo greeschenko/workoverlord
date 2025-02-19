@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
-    "greeschenko/workoverlord2/internal/app"
-    "greeschenko/workoverlord2/internal/gui"
-    "greeschenko/workoverlord2/internal/storage"
+	"greeschenko/workoverlord2/internal/app"
+	"greeschenko/workoverlord2/internal/gui"
+	"greeschenko/workoverlord2/internal/storage"
 )
 
 const logo = `
@@ -15,14 +15,10 @@ const logo = `
     \_/\_/ \___/|_|\_\_|   \___/  \_/ \___|_|  |_|\___/|_|  \__,_|
 `
 
-//var (
-//	USERMIND = NewMIND()
-//)
-
 func main() {
 	fmt.Print(logo)
-    App := app.GetInstance()
-    App.GUI = gui.NewFyneGUI()
-    App.Storage = storage.NewStorage()
-    App.Run()
+	App := app.GetInstance()
+	App.GUI = gui.NewFyneGUI()
+	App.Storage = storage.NewStorage()
+	App.Run()
 }
