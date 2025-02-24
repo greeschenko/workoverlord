@@ -78,7 +78,7 @@ func (item *CellWidgetContainer) DragEnd() {
 	fmt.Println("Background drag end")
 }
 
-func (item *CellWidgetContainer) ZoomRefresh() {
+func ZoomRefresh() {
 	zoom, _ := GUIZOOM.Get()
 	GUIZOOM.Set(zoom - 0.1)
 	GUIZOOM.Set(zoom + 0.1)

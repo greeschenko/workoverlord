@@ -57,8 +57,6 @@ func (g *GUI) Start() {
 	form.OnSubmit = func() {
 		woapp.Storage.SetSecret(passwordEntry.Text)
 
-		fmt.Println("secret is ", woapp.Storage.GetSecret())
-
 		if woapp.Storage.Load() != nil {
 			dialog.ShowInformation("Error", "Wrong password", w)
 		} else {
@@ -89,25 +87,23 @@ func (g *GUI) Start() {
 }
 
 func (g *GUI) showData(w fyne.Window) {
+	woapp := woapp.GetInstance()
 	g.container = NewCellWidgetContainer(g.RecurceAddGuiCells())
 
 	addbtn := widget.NewButton("ADD", func() {
-		fmt.Println("add btn click")
-		//IsCreateSelect = true
+		IsCreateSelect = true
 	})
 	deletebtn := widget.NewButton("DELETE", func() {
 		fmt.Println("delete btn click")
-		//		if len(SELECTED) == 0 {
-		//			fmt.Println("no cells selected")
-		//		} else {
-		//			for _, v := range SELECTED {
-		//				delete(USERMIND.Cells, v)
-		//			}
-		//			saveData()
-		//            woapp.Storage.Save()
-		//			g.container.Container.Objects = RecurceAddGuiCells()
-		//			g.container.Refresh()
-		//		}
+		if len(SELECTED) == 0 {
+			fmt.Println("no cells selected")
+		} else {
+			for _, v := range SELECTED {
+                woapp.Storage.DeleteData(v)
+			}
+			g.container.Container.Objects = g.RecurceAddGuiCells()
+			g.container.Refresh()
+		}
 	})
 	closebtn := widget.NewButton("CLOSE", func() {
 		w.Close()

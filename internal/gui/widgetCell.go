@@ -61,6 +61,24 @@ func NewCellWidget(key string, cell *models.Cell) *CellWidget {
 	return item
 }
 
+func (item *CellWidget) Tapped(_ *fyne.PointEvent) {
+	item.Movebtn.Show()
+	item.Background.StrokeColor = COLORLINES
+	item.Refresh()
+	SELECTED = append(SELECTED, item.Id)
+}
+
+func (item *CellWidget) DoubleTapped(_ *fyne.PointEvent) {
+	err := USERMIND.UpdateCell(item.Id)
+	if err != nil {
+		panic(err)
+	} else {
+		item.genText()
+		item.Refresh()
+		ZoomRefresh()
+	}
+}
+
 func (item *CellWidget) CreateRenderer() fyne.WidgetRenderer {
 	item.Movebtn.OnDragStart = func(d *fyne.DragEvent) {
 		item.Move(fyne.NewPos(item.Position().X+d.Dragged.DX, item.Position().Y+d.Dragged.DY))

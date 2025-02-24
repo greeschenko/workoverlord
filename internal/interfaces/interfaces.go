@@ -12,8 +12,10 @@ type GUIInterface interface {
 // StorageInterface визначає поведінку сховища даних
 type StorageInterface interface {
 	SetSecret(string)
-	GetSecret() [32]byte
 	Load() error
 	Save()
 	GetData() models.MIND
+	AddData(models.Cell)
+	UpdateData(string, models.Cell)
+	DeleteData(string)
 }
