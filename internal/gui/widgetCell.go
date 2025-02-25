@@ -21,9 +21,10 @@ type CellWidget struct {
 	Movebtn       *CellWidgetMoveIcon
 	Background    *canvas.Rectangle
 	Textcontainer *fyne.Container
+	Gui           *GUI
 }
 
-func NewCellWidget(key string, cell *models.Cell) *CellWidget {
+func NewCellWidget(key string, cell *models.Cell, gui *GUI) *CellWidget {
 	movebnt := newCellWidgetMoveIcon(theme.Icon(theme.IconNameViewZoomFit))
 	movebnt.Hidden = true
 	obj := canvas.NewRectangle(COLORBRD)
@@ -36,6 +37,7 @@ func NewCellWidget(key string, cell *models.Cell) *CellWidget {
 		Movebtn:       movebnt,
 		Background:    obj,
 		Textcontainer: container.NewWithoutLayout(),
+		Gui:           gui,
 	}
 	item.ExtendBaseWidget(item)
 
@@ -69,7 +71,7 @@ func (item *CellWidget) Tapped(_ *fyne.PointEvent) {
 }
 
 func (item *CellWidget) DoubleTapped(_ *fyne.PointEvent) {
-	err := USERMIND.UpdateCell(item.Id)
+	err := item.Gui.UpdateCell(item.Id)
 	if err != nil {
 		panic(err)
 	} else {

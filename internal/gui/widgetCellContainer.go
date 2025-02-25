@@ -11,11 +11,13 @@ import (
 type CellWidgetContainer struct {
 	widget.BaseWidget
 	Container fyne.Container
+	Gui       *GUI
 }
 
-func NewCellWidgetContainer(content []fyne.CanvasObject) *CellWidgetContainer {
+func NewCellWidgetContainer(content []fyne.CanvasObject, gui *GUI) *CellWidgetContainer {
 	item := &CellWidgetContainer{
 		Container: *container.NewWithoutLayout(),
+		Gui:       gui,
 	}
 	item.Container.Objects = content
 	item.ExtendBaseWidget(item)
@@ -52,18 +54,18 @@ func (item *CellWidgetContainer) Scrolled(d *fyne.ScrollEvent) {
 }
 
 func (item *CellWidgetContainer) Tapped(e *fyne.PointEvent) {
-	u, _ := item.guidataupdater.Get()
-	item.guidataupdater.Set(u + 1)
+	u, _ := GUIDATAUPDATER.Get()
+	GUIDATAUPDATER.Set(u + 1)
 	SELECTED = []string{}
 
 	if IsCreateSelect {
 		realX, realY := realCoordinates(e.Position, item.Container.Position())
-		key, err := USERMIND.AddCell([2]int{realX, realY})
+		key, err := item.Gui.AddCell([2]int{realX, realY})
 		checkErr(err)
-		myw := NewCellWidget(key, USERMIND.Cells[key])
+		myw := NewCellWidget(key, USERMIND.Cells[key], item.Gui)
 		item.Container.Objects = append(item.Container.Objects, myw)
 		item.Refresh()
-		item.ZoomRefresh()
+		ZoomRefresh()
 		IsCreateSelect = false
 	}
 }
@@ -81,4 +83,12 @@ func ZoomRefresh() {
 	zoom, _ := GUIZOOM.Get()
 	GUIZOOM.Set(zoom - 0.1)
 	GUIZOOM.Set(zoom + 0.1)
+}
+
+func realCoordinates(pos, contpos fyne.Position) (int, int) {
+	zoom, _ := GUIZOOM.Get()
+	realX := (pos.X - contpos.X) / float32(zoom)
+	realY := (pos.Y - contpos.Y) / float32(zoom)
+
+	return int(realX), int(realY)
 }

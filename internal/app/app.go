@@ -7,7 +7,7 @@ import (
 )
 
 type App struct {
-	USERMIND models.MIND
+	USERMIND *models.MIND
 	GUI      interfaces.GUIInterface
 	Storage  interfaces.StorageInterface
 }

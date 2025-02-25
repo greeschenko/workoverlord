@@ -126,7 +126,7 @@ func (g *GUI) RecurceAddGuiCells() []fyne.CanvasObject {
 		if e.Status == models.CellStatusConfig {
 			continue
 		}
-		myw := NewCellWidget(i, e)
+		myw := NewCellWidget(i, e, g)
 
 		celllist = append(celllist, myw)
 	}
@@ -140,10 +140,11 @@ func (g *GUI) AddCell(point [2]int) (string, error) {
 }
 
 func (g *GUI) UpdateCell(key string) error {
-	if text, exists := g.Data.GetOne(key); exists {
-		return g.editContent(key, text.Content, nil)
+	text, err := g.Data.GetOne(key)
+	if err != nil {
+		return fmt.Errorf("text with key '%s' not found", key, err)
 	}
-	return fmt.Errorf("text with key '%s' not found", key)
+	return g.editContent(key, text.Content, nil)
 }
 
 // editText handles the editing of a text by key
@@ -183,15 +184,27 @@ func (g *GUI) editContent(key string, existingContent string, point *[2]int) err
 	}
 
 	if existingContent == "" {
-		m.Cells[key] = &Cell{
-			Content:  string(content),
-			Position: *point,
-			Status:   CellStatusActive,
+		_, err := g.Data.Add(
+			key,
+			models.Cell{
+				Content:  string(content),
+				Position: *point,
+				Status:   models.CellStatusActive,
+			},
+		)
+		if err != nil {
+			return fmt.Errorf("failed to add cell to data: %v", err)
 		}
-		fmt.Println("Text added successfully!")
 	} else {
-		m.Cells[key].Content = string(content)
-		fmt.Println("Text updated successfully!")
+		_, err := g.Data.Patch(
+			key,
+			models.Cell{
+				Content: string(content),
+			},
+		)
+		if err != nil {
+			return fmt.Errorf("failed to update cell to data: %v", err)
+		}
 	}
 	//TODO change to load
 	//saveData()
