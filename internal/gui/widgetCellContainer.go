@@ -52,21 +52,20 @@ func (item *CellWidgetContainer) Scrolled(d *fyne.ScrollEvent) {
 }
 
 func (item *CellWidgetContainer) Tapped(e *fyne.PointEvent) {
-	fmt.Println(e.Position, item.Container.Position())
-	//u, _ := item.guidataupdater.Get()
-	// item.guidataupdater.Set(u + 1)
-	// SELECTED = []string{}
-	//
-	//	if IsCreateSelect {
-	//		realX, realY := realCoordinates(e.Position, item.Container.Position())
-	//		key, err := USERMIND.AddCell([2]int{realX, realY})
-	//		checkErr(err)
-	//		myw := NewCellWidget(key, USERMIND.Cells[key])
-	//		item.Container.Objects = append(item.Container.Objects, myw)
-	//		item.Refresh()
-	//		item.ZoomRefresh()
-	//		IsCreateSelect = false
-	//	}
+	u, _ := item.guidataupdater.Get()
+	item.guidataupdater.Set(u + 1)
+	SELECTED = []string{}
+
+	if IsCreateSelect {
+		realX, realY := realCoordinates(e.Position, item.Container.Position())
+		key, err := USERMIND.AddCell([2]int{realX, realY})
+		checkErr(err)
+		myw := NewCellWidget(key, USERMIND.Cells[key])
+		item.Container.Objects = append(item.Container.Objects, myw)
+		item.Refresh()
+		item.ZoomRefresh()
+		IsCreateSelect = false
+	}
 }
 
 func (item *CellWidgetContainer) Dragged(d *fyne.DragEvent) {

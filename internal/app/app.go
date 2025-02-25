@@ -1,14 +1,15 @@
 package app
 
 import (
-	"fmt"
 	"greeschenko/workoverlord2/internal/interfaces"
+	"greeschenko/workoverlord2/internal/models"
 	"sync"
 )
 
 type App struct {
-	GUI     interfaces.GUIInterface
-	Storage interfaces.StorageInterface
+	USERMIND models.MIND
+	GUI      interfaces.GUIInterface
+	Storage  interfaces.StorageInterface
 }
 
 var instance *App
@@ -22,7 +23,5 @@ func GetInstance() *App {
 }
 
 func (a App) Run() {
-	fmt.Println("app component is running")
-	fmt.Println("gui component is running")
-    a.GUI.Start()
+	a.GUI.Start()
 }

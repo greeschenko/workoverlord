@@ -2,6 +2,14 @@ package gui
 
 import (
 	"fmt"
+	"greeschenko/workoverlord2/internal/interfaces"
+	"greeschenko/workoverlord2/internal/models"
+	"image/color"
+	"log"
+	"os"
+	"os/exec"
+	"time"
+
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/container"
@@ -9,10 +17,6 @@ import (
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/driver/desktop"
 	"fyne.io/fyne/v2/widget"
-	woapp "greeschenko/workoverlord2/internal/app"
-	"greeschenko/workoverlord2/internal/models"
-	"image/color"
-	"log"
 )
 
 var GUIZOOM = binding.NewFloat()
@@ -38,16 +42,19 @@ var COLORSTR = color.NRGBA{R: 0x5f, G: 0x9e, B: 0xa0, A: 0xff}
 type GUI struct {
 	App       fyne.App
 	container *CellWidgetContainer
+	Storage   interfaces.StorageInterface
+	Data      interfaces.DataInterface
 }
 
-func NewFyneGUI() *GUI {
+func NewFyneGUI(Storage interfaces.StorageInterface, Data interfaces.DataInterface) *GUI {
 	return &GUI{
-		App: app.New(),
+		App:     app.New(),
+		Storage: Storage,
+		Data:    Data,
 	}
 }
 
 func (g *GUI) Start() {
-	woapp := woapp.GetInstance()
 	w := g.App.NewWindow("WorkOverlord")
 	passwordEntry := widget.NewPasswordEntry()
 	passwordEntry.SetPlaceHolder("Enter your password")
@@ -55,9 +62,9 @@ func (g *GUI) Start() {
 	form := widget.NewForm(widget.NewFormItem("Password", passwordEntry))
 
 	form.OnSubmit = func() {
-		woapp.Storage.SetSecret(passwordEntry.Text)
+		g.Storage.SetSecret(passwordEntry.Text)
 
-		if woapp.Storage.Load() != nil {
+		if g.Storage.Load() != nil {
 			dialog.ShowInformation("Error", "Wrong password", w)
 		} else {
 			g.showData(w)
@@ -87,7 +94,6 @@ func (g *GUI) Start() {
 }
 
 func (g *GUI) showData(w fyne.Window) {
-	woapp := woapp.GetInstance()
 	g.container = NewCellWidgetContainer(g.RecurceAddGuiCells())
 
 	addbtn := widget.NewButton("ADD", func() {
@@ -99,7 +105,7 @@ func (g *GUI) showData(w fyne.Window) {
 			fmt.Println("no cells selected")
 		} else {
 			for _, v := range SELECTED {
-                woapp.Storage.DeleteData(v)
+				g.Data.Delete(v)
 			}
 			g.container.Container.Objects = g.RecurceAddGuiCells()
 			g.container.Refresh()
@@ -116,8 +122,7 @@ func (g *GUI) showData(w fyne.Window) {
 
 func (g *GUI) RecurceAddGuiCells() []fyne.CanvasObject {
 	var celllist []fyne.CanvasObject
-	woapp := woapp.GetInstance()
-	for i, e := range woapp.Storage.GetData().Cells {
+	for i, e := range g.Data.GetAll() {
 		if e.Status == models.CellStatusConfig {
 			continue
 		}
@@ -127,4 +132,82 @@ func (g *GUI) RecurceAddGuiCells() []fyne.CanvasObject {
 	}
 
 	return celllist
+}
+
+func (g *GUI) AddCell(point [2]int) (string, error) {
+	newkey := time.Now().Format(time.RFC3339)
+	return newkey, g.editContent(newkey, "", &point)
+}
+
+func (g *GUI) UpdateCell(key string) error {
+	if text, exists := g.Data.GetOne(key); exists {
+		return g.editContent(key, text.Content, nil)
+	}
+	return fmt.Errorf("text with key '%s' not found", key)
+}
+
+// editText handles the editing of a text by key
+func (g *GUI) editContent(key string, existingContent string, point *[2]int) error {
+	// Create a temporary file to store the input text
+	tmpfile, err := os.CreateTemp("", "temp*.txt")
+	if err != nil {
+		return fmt.Errorf("failed to create temporary file: %v", err)
+	}
+	defer os.Remove(tmpfile.Name()) // Clean up after use
+
+	// Write existing content to the temporary file if available
+	if existingContent != "" {
+		if err := os.WriteFile(tmpfile.Name(), []byte(existingContent), 0644); err != nil {
+			return fmt.Errorf("failed to write existing content to temporary file: %v", err)
+		}
+	}
+
+	// Detect the terminal type using $TERM
+	term := os.Getenv("TERM")
+	cmd := prepareEditorCommand(term, tmpfile.Name())
+
+	// Start the editor process
+	if err := cmd.Start(); err != nil {
+		return fmt.Errorf("failed to open editor in new terminal: %v", err)
+	}
+
+	// Wait for the Vim process to finish
+	if err := cmd.Wait(); err != nil {
+		return fmt.Errorf("editor did not close properly: %v", err)
+	}
+
+	// Read the content from the temporary file after editing
+	content, err := os.ReadFile(tmpfile.Name())
+	if err != nil {
+		return fmt.Errorf("failed to read from temporary file: %v", err)
+	}
+
+	if existingContent == "" {
+		m.Cells[key] = &Cell{
+			Content:  string(content),
+			Position: *point,
+			Status:   CellStatusActive,
+		}
+		fmt.Println("Text added successfully!")
+	} else {
+		m.Cells[key].Content = string(content)
+		fmt.Println("Text updated successfully!")
+	}
+	//TODO change to load
+	//saveData()
+	return nil
+}
+
+// prepareEditorCommand prepares the command to open the editor based on $TERM
+func prepareEditorCommand(term string, filePath string) *exec.Cmd {
+	var cmd *exec.Cmd
+	switch term {
+	case "xterm", "xterm-256color", "screen", "st", "konsole":
+		cmd = exec.Command(term, "-e", "vim", filePath)
+	case "gnome-terminal":
+		cmd = exec.Command("gnome-terminal", "--", "vim", filePath)
+	default:
+		cmd = exec.Command("xterm", "-e", "vim", filePath)
+	}
+	return cmd
 }

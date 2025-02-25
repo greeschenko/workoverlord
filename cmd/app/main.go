@@ -18,7 +18,7 @@ const logo = `
 func main() {
 	fmt.Print(logo)
 	App := app.GetInstance()
-	App.GUI = gui.NewFyneGUI()
 	App.Storage = storage.NewStorage()
+	App.GUI = gui.NewFyneGUI()
 	App.Run()
 }

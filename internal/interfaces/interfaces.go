@@ -14,8 +14,12 @@ type StorageInterface interface {
 	SetSecret(string)
 	Load() error
 	Save()
-	GetData() models.MIND
-	AddData(models.Cell)
-	UpdateData(string, models.Cell)
-	DeleteData(string)
+}
+
+type DataInterface interface {
+	GetAll() map[string]*models.Cell
+	GetOne(string) (models.Cell, error)
+	Add(models.Cell) (models.Cell, error)
+	Patch(string, models.Cell) (models.Cell, error)
+	Delete(string) (models.Cell, error)
 }
