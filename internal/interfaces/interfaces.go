@@ -9,12 +9,14 @@ type GUIInterface interface {
 }
 
 type StorageInterface interface {
-	SetSecret(string)
-	Load() error
+	SetSecret(string) error
+	Load() ([]byte, error)
 	Save()
 }
 
 type DataInterface interface {
+	SetSecret(string) error
+	Load() error
 	GetAll() map[string]*models.Cell
 	GetOne(string) (*models.Cell, error)
 	Add(string, models.Cell) (*models.Cell, error)

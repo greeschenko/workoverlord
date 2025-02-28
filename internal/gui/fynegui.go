@@ -42,15 +42,13 @@ var COLORSTR = color.NRGBA{R: 0x5f, G: 0x9e, B: 0xa0, A: 0xff}
 type GUI struct {
 	App       fyne.App
 	container *CellWidgetContainer
-	Storage   interfaces.StorageInterface
 	Data      interfaces.DataInterface
 }
 
-func NewFyneGUI(Storage interfaces.StorageInterface, Data interfaces.DataInterface) *GUI {
+func NewFyneGUI(Data interfaces.DataInterface) *GUI {
 	return &GUI{
-		App:     app.New(),
-		Storage: Storage,
-		Data:    Data,
+		App:  app.New(),
+		Data: Data,
 	}
 }
 
@@ -62,9 +60,9 @@ func (g *GUI) Start() {
 	form := widget.NewForm(widget.NewFormItem("Password", passwordEntry))
 
 	form.OnSubmit = func() {
-		g.Storage.SetSecret(passwordEntry.Text)
+		g.Data.SetSecret(passwordEntry.Text)
 
-		if g.Storage.Load() != nil {
+		if g.Data.Load() != nil {
 			dialog.ShowInformation("Error", "Wrong password", w)
 		} else {
 			g.showData(w)
@@ -94,7 +92,10 @@ func (g *GUI) Start() {
 }
 
 func (g *GUI) showData(w fyne.Window) {
-	g.container = NewCellWidgetContainer(g.RecurceAddGuiCells())
+	guicells := g.RecurceAddGuiCells()
+	//TODO guicells count is 0
+	fmt.Println("TTTTTTTT", len(guicells))
+	g.container = NewCellWidgetContainer(guicells, g)
 
 	addbtn := widget.NewButton("ADD", func() {
 		IsCreateSelect = true
@@ -142,7 +143,7 @@ func (g *GUI) AddCell(point [2]int) (string, error) {
 func (g *GUI) UpdateCell(key string) error {
 	text, err := g.Data.GetOne(key)
 	if err != nil {
-		return fmt.Errorf("text with key '%s' not found", key, err)
+		return fmt.Errorf("text with key '%s' not found: %s", key, err)
 	}
 	return g.editContent(key, text.Content, nil)
 }

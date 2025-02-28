@@ -2,12 +2,12 @@ package app
 
 import (
 	"greeschenko/workoverlord2/internal/interfaces"
-	"greeschenko/workoverlord2/internal/models"
+	"greeschenko/workoverlord2/internal/mind"
 	"sync"
 )
 
 type App struct {
-	USERMIND *models.MIND
+	USERMIND *mind.MIND
 	GUI      interfaces.GUIInterface
 	Storage  interfaces.StorageInterface
 }

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"greeschenko/workoverlord2/internal/app"
 	"greeschenko/workoverlord2/internal/gui"
-	"greeschenko/workoverlord2/internal/models"
+	"greeschenko/workoverlord2/internal/mind"
 	"greeschenko/workoverlord2/internal/storage"
 )
 
@@ -20,7 +20,7 @@ func main() {
 	fmt.Print(logo)
 	App := app.GetInstance()
 	App.Storage = storage.NewStorage()
-	App.USERMIND = models.NewMIND()
-	App.GUI = gui.NewFyneGUI(App.Storage, App.USERMIND)
+	App.USERMIND = mind.NewMIND(App.Storage)
+	App.GUI = gui.NewFyneGUI(App.USERMIND)
 	App.Run()
 }

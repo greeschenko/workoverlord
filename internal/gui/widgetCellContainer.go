@@ -61,8 +61,14 @@ func (item *CellWidgetContainer) Tapped(e *fyne.PointEvent) {
 	if IsCreateSelect {
 		realX, realY := realCoordinates(e.Position, item.Container.Position())
 		key, err := item.Gui.AddCell([2]int{realX, realY})
-		checkErr(err)
-		myw := NewCellWidget(key, USERMIND.Cells[key], item.Gui)
+		if err != nil {
+			fmt.Println("filed add new gui cell", err)
+		}
+		cell, err := item.Gui.Data.GetOne(key)
+        if err != nil {
+			fmt.Println("filed data cell not exist", err)
+        }
+		myw := NewCellWidget(key, cell, item.Gui)
 		item.Container.Objects = append(item.Container.Objects, myw)
 		item.Refresh()
 		ZoomRefresh()
