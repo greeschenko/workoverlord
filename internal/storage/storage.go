@@ -1,11 +1,11 @@
 package storage
 
 import (
+	"bufio"
 	"crypto/sha256"
 	"errors"
 	"fmt"
 	"greeschenko/workoverlord2/internal/encriptor"
-	"log"
 	"os"
 )
 
@@ -65,6 +65,17 @@ func (s *Storage) Load() ([]byte, error) {
 	return nil, nil
 }
 
-func (s *Storage) Save() {
-	log.Println("storage saved data")
+func (s *Storage) Save(data []byte) {
+	file, err := os.Create(Dbfile)
+	if err != nil {
+		panic(err)
+	}
+	defer file.Close()
+
+	USERMINDjsonSecret := s.encriptor.Encrypt(data, s.secretkey)
+
+	w := bufio.NewWriter(file)
+	n4, _ := w.Write(USERMINDjsonSecret)
+	fmt.Printf("wrote %d bytes\n", n4)
+	w.Flush()
 }

@@ -124,7 +124,7 @@ func (g *GUI) showData(w fyne.Window) {
 func (g *GUI) RecurceAddGuiCells() []fyne.CanvasObject {
 	var celllist []fyne.CanvasObject
 	for i, e := range g.Data.GetAll() {
-		if e.Status == models.CellStatusConfig {
+		if *e.Status == models.CellStatusConfig {
 			continue
 		}
 		myw := NewCellWidget(i, e, g)
@@ -185,12 +185,13 @@ func (g *GUI) editContent(key string, existingContent string, point *[2]int) err
 	}
 
 	if existingContent == "" {
+		newstatus := models.CellStatusActive
 		_, err := g.Data.Add(
 			key,
 			models.Cell{
 				Content:  string(content),
-				Position: *point,
-				Status:   models.CellStatusActive,
+				Position: point,
+				Status:   &newstatus,
 			},
 		)
 		if err != nil {

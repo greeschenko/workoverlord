@@ -9,9 +9,9 @@ type GUIInterface interface {
 }
 
 type StorageInterface interface {
-	SetSecret(string) error
+	SetSecret(string)
 	Load() ([]byte, error)
-	Save()
+	Save([]byte)
 }
 
 type DataInterface interface {

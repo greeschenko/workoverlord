@@ -152,7 +152,7 @@ func (item *CellWidget) genText() {
 	}
 
 	// Avoid recalculating the size multiple times
-	item.Cell.Size = [2]int{
+	item.Cell.Size = &[2]int{
 		maxLineLength * FONTSIZE * 2 / 3,
 		len(linesList) * FONTSIZE * 6 / 4,
 	}
