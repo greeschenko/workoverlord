@@ -93,8 +93,6 @@ func (g *GUI) Start() {
 
 func (g *GUI) showData(w fyne.Window) {
 	guicells := g.RecurceAddGuiCells()
-	//TODO guicells count is 0
-	fmt.Println("TTTTTTTT", len(guicells))
 	g.container = NewCellWidgetContainer(guicells, g)
 
 	addbtn := widget.NewButton("ADD", func() {

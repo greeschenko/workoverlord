@@ -25,6 +25,9 @@ type CellWidget struct {
 }
 
 func NewCellWidget(key string, cell *models.Cell, gui *GUI) *CellWidget {
+	fmt.Println(key, cell.Size, cell.Position, gui)
+	//return nil
+
 	movebnt := newCellWidgetMoveIcon(theme.Icon(theme.IconNameViewZoomFit))
 	movebnt.Hidden = true
 	obj := canvas.NewRectangle(COLORBRD)
@@ -43,7 +46,9 @@ func NewCellWidget(key string, cell *models.Cell, gui *GUI) *CellWidget {
 
 	list := binding.NewDataListener(func() {
 		zoom, _ := GUIZOOM.Get()
-		item.Resize(fyne.NewSize(float32(cell.Size[0])*float32(zoom), float32(cell.Size[1])*float32(zoom)))
+        if cell.Size != nil {
+		    item.Resize(fyne.NewSize(float32(cell.Size[0])*float32(zoom), float32(cell.Size[1])*float32(zoom)))
+        }
 		item.Move(fyne.NewPos(float32(cell.Position[0])*float32(zoom), float32(cell.Position[1])*float32(zoom)))
 		item.Movebtn.Resize(fyne.NewSize(20, 20))
 		item.Movebtn.Move(fyne.NewPos(-20, -20))
@@ -86,10 +91,11 @@ func (item *CellWidget) CreateRenderer() fyne.WidgetRenderer {
 		item.Move(fyne.NewPos(item.Position().X+d.Dragged.DX, item.Position().Y+d.Dragged.DY))
 	}
 	item.Movebtn.OnDragEnd = func() {
-		fmt.Println("drag is end")
-		//		zoom, _ := GUIZOOM.Get()
-		//		USERMIND.Cells[item.Id].Position = [2]int{int(item.Position().X / float32(zoom)), int(item.Position().Y / float32(zoom))}
-		//		saveData()
+		zoom, _ := GUIZOOM.Get()
+		newpos := [2]int{int(item.Position().X / float32(zoom)), int(item.Position().Y / float32(zoom))}
+		item.Gui.Data.Patch(item.Id, models.Cell{
+			Position: &newpos,
+		})
 	}
 
 	list := binding.NewDataListener(func() {
@@ -156,6 +162,10 @@ func (item *CellWidget) genText() {
 		maxLineLength * FONTSIZE * 2 / 3,
 		len(linesList) * FONTSIZE * 6 / 4,
 	}
+
+    test, _ := item.Gui.Data.GetOne(item.Id)
+
+	fmt.Println("TTTTTTT", test)
 
 	// Update container
 	item.Textcontainer.Objects = lines
