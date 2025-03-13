@@ -1,18 +1,24 @@
-package kdtreepositioner
+package kdtree
 
 import (
 	"math"
 	"sort"
 )
 
-// SpatialObject represents an object in 2D space with an ID
-// and coordinates.
+// KDTree defines the interface for a k-d tree.
+type KDTree interface {
+	NearestNeighbor(target [2]int) string
+	FindNearestInDirection(target SpatialObject, direction string) string
+	Rebuild(objects []SpatialObject)
+}
+
+// SpatialObject represents an object with a unique ID and coordinates.
 type SpatialObject interface {
 	ID() string
 	Coordinates() [2]int
 }
 
-// Node represents a k-d tree node
+// Node represents a k-d tree node.
 type Node struct {
 	Object SpatialObject
 	Left   *Node
@@ -20,7 +26,7 @@ type Node struct {
 	Axis   int
 }
 
-// NewKDTree constructs a k-d tree from a list of spatial objects
+// NewKDTree constructs a k-d tree from a list of spatial objects.
 func NewKDTree(objects []SpatialObject, depth int) *Node {
 	if len(objects) == 0 {
 		return nil
@@ -28,40 +34,43 @@ func NewKDTree(objects []SpatialObject, depth int) *Node {
 
 	axis := depth % 2
 	sort.Slice(objects, func(i, j int) bool {
-		coord1 := objects[i].Coordinates()
-		coord2 := objects[j].Coordinates()
-		if axis == 0 {
-			return coord1[0] < coord2[0]
-		}
-		return coord1[1] < coord2[1]
+		return objects[i].Coordinates()[axis] < objects[j].Coordinates()[axis]
 	})
 
 	mid := len(objects) / 2
-	return &Node{
+	n := &Node{
 		Object: objects[mid],
-		Left:   NewKDTree(objects[:mid], depth+1),
-		Right:  NewKDTree(objects[mid+1:], depth+1),
 		Axis:   axis,
 	}
+	
+	n.Left = NewKDTree(objects[:mid], depth+1)
+	n.Right = NewKDTree(objects[mid+1:], depth+1)
+
+	return n
 }
 
-// Finds the closest object to a given target
-func (n *Node) closestObject(target SpatialObject, best *Node, bestDist float64) *Node {
+// Rebuild reconstructs the KDTree from the given objects.
+func (n *Node) Rebuild(objects []SpatialObject) {
+	newTree := NewKDTree(objects, 0)
+	*n = *newTree
+}
+
+// closestObject finds the nearest object to the given target.
+func (n *Node) closestObject(target [2]int, best *Node, bestDist float64) *Node {
 	if n == nil {
 		return best
 	}
-	dist := distance(n.Object, target)
+	dist := pointDistance(n.Object.Coordinates(), target)
 	if dist < bestDist {
 		best = n
 		bestDist = dist
 	}
 
 	axis := n.Axis
-	var next, other *Node
-	targetCoord := target.Coordinates()
 	nodeCoord := n.Object.Coordinates()
 
-	if (axis == 0 && targetCoord[0] < nodeCoord[0]) || (axis == 1 && targetCoord[1] < nodeCoord[1]) {
+	var next, other *Node
+	if target[axis] < nodeCoord[axis] {
 		next, other = n.Left, n.Right
 	} else {
 		next, other = n.Right, n.Left
@@ -69,26 +78,28 @@ func (n *Node) closestObject(target SpatialObject, best *Node, bestDist float64)
 
 	best = next.closestObject(target, best, bestDist)
 
-	if math.Abs(float64(targetCoord[axis]-nodeCoord[axis])) < bestDist {
+	if math.Abs(float64(target[axis]-nodeCoord[axis])) < bestDist {
 		best = other.closestObject(target, best, bestDist)
 	}
 
 	return best
 }
 
-// NearestNeighbor returns the ID of the closest object to the given target
-func (n *Node) NearestNeighbor(target SpatialObject) string {
-	node := n.closestObject(target, n, distance(n.Object, target))
-	return node.Object.ID()
+// NearestNeighbor finds the closest spatial object to the given target coordinates.
+func (n *Node) NearestNeighbor(target [2]int) string {
+	node := n.closestObject(target, n, pointDistance(n.Object.Coordinates(), target))
+	if node != nil {
+		return node.Object.ID()
+	}
+	return ""
 }
 
-// Find the nearest object in a specified direction
+// FindNearestInDirection finds the nearest object in a specified direction.
 func (n *Node) FindNearestInDirection(target SpatialObject, direction string) string {
-	var best SpatialObject
 	var bestDist = math.Inf(1)
 	bestID := ""
 
-	var search func(*Node)
+	var search func(node *Node)
 	search = func(node *Node) {
 		if node == nil {
 			return
@@ -96,8 +107,8 @@ func (n *Node) FindNearestInDirection(target SpatialObject, direction string) st
 
 		nodeCoord := node.Object.Coordinates()
 		targetCoord := target.Coordinates()
-
 		valid := false
+
 		switch direction {
 		case "up":
 			valid = nodeCoord[1] > targetCoord[1]
@@ -110,9 +121,9 @@ func (n *Node) FindNearestInDirection(target SpatialObject, direction string) st
 		}
 
 		if valid {
-			dist := distance(node.Object, target)
+			dist := pointDistance(nodeCoord, targetCoord)
 			if dist < bestDist {
-				best = node.Object
+	
 				bestDist = dist
 				bestID = node.Object.ID()
 			}
@@ -126,10 +137,10 @@ func (n *Node) FindNearestInDirection(target SpatialObject, direction string) st
 	return bestID
 }
 
-// Computes the Euclidean distance between two spatial objects
-func distance(a, b SpatialObject) float64 {
-	coordA := a.Coordinates()
-	coordB := b.Coordinates()
-	dx, dy := float64(coordA[0]-coordB[0]), float64(coordA[1]-coordB[1])
+// Computes the Euclidean distance between two points.
+func pointDistance(a, b [2]int) float64 {
+	dx := float64(a[0] - b[0])
+	dy := float64(a[1] - b[1])
 	return math.Sqrt(dx*dx + dy*dy)
 }
+

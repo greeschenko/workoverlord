@@ -8,6 +8,17 @@ type GUIInterface interface {
 	Start()
 }
 
+type SpatialObject interface {
+	ID() string
+	Coordinates() [2]int
+}
+
+type Positioner interface {
+	NearestNeighbor(target [2]int) string
+	FindNearestInDirection(target SpatialObject, direction string) string
+	Rebuild(objects []SpatialObject)
+}
+
 type StorageInterface interface {
 	SetSecret(string)
 	Load() ([]byte, error)

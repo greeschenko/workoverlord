@@ -40,12 +40,13 @@ var COLORSTR = color.NRGBA{R: 0x5f, G: 0x9e, B: 0xa0, A: 0xff}
 
 // GUI — стандартна реалізація GUI
 type GUI struct {
-	App       fyne.App
-	container *CellWidgetContainer
-	Data      interfaces.DataInterface
+	App        fyne.App
+	container  *CellWidgetContainer
+	Data       interfaces.DataInterface
+	Positioner interfaces.Positioner
 }
 
-func NewFyneGUI(Data interfaces.DataInterface) *GUI {
+func NewFyneGUI(Data interfaces.DataInterface, Positioner interfaces.Positioner) *GUI {
 	return &GUI{
 		App:  app.New(),
 		Data: Data,
