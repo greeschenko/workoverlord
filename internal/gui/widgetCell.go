@@ -163,10 +163,6 @@ func (item *CellWidget) genText() {
 		len(linesList) * FONTSIZE * 6 / 4,
 	}
 
-    test, _ := item.Gui.Data.GetOne(item.Id)
-
-	fmt.Println("TTTTTTT", test)
-
 	// Update container
 	item.Textcontainer.Objects = lines
 }

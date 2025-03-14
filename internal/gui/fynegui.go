@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"greeschenko/workoverlord2/internal/interfaces"
 	"greeschenko/workoverlord2/internal/models"
+	"greeschenko/workoverlord2/pkg/kdtreepositioner"
 	"image/color"
 	"log"
 	"os"
@@ -43,14 +44,22 @@ type GUI struct {
 	App        fyne.App
 	container  *CellWidgetContainer
 	Data       interfaces.DataInterface
-	Positioner interfaces.Positioner
+	Positioner kdtreepositioner.KDTree
 }
 
-func NewFyneGUI(Data interfaces.DataInterface, Positioner interfaces.Positioner) *GUI {
+func NewFyneGUI(Data interfaces.DataInterface) *GUI {
 	return &GUI{
 		App:  app.New(),
 		Data: Data,
 	}
+}
+
+func mapValuesToSlice(m map[string]*models.Cell) []kdtreepositioner.SpatialObject {
+	values := make([]kdtreepositioner.SpatialObject, 0, len(m))
+	for _, v := range m {
+		values = append(values, v)
+	}
+	return values
 }
 
 func (g *GUI) Start() {
@@ -118,6 +127,9 @@ func (g *GUI) showData(w fyne.Window) {
 
 	content := container.NewBorder(mainmenu, nil, nil, nil, g.container)
 	w.SetContent(content)
+
+	g.Positioner = kdtreepositioner.NewKDTree(mapValuesToSlice(g.Data.GetAll()), 0)
+	fmt.Println("TTTTTTTT", g.Positioner.NearestNeighbor([2]int{1000, 1000}))
 }
 
 func (g *GUI) RecurceAddGuiCells() []fyne.CanvasObject {

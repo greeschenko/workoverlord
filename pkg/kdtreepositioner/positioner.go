@@ -1,4 +1,4 @@
-package kdtree
+package kdtreepositioner
 
 import (
 	"math"
@@ -7,8 +7,8 @@ import (
 
 // KDTree defines the interface for a k-d tree.
 type KDTree interface {
-	NearestNeighbor(target [2]int) string
-	FindNearestInDirection(target SpatialObject, direction string) string
+	NearestNeighbor(target [2]int) *SpatialObject
+	FindNearestInDirection(target SpatialObject, direction string) *SpatialObject
 	Rebuild(objects []SpatialObject)
 }
 
@@ -42,7 +42,7 @@ func NewKDTree(objects []SpatialObject, depth int) *Node {
 		Object: objects[mid],
 		Axis:   axis,
 	}
-	
+
 	n.Left = NewKDTree(objects[:mid], depth+1)
 	n.Right = NewKDTree(objects[mid+1:], depth+1)
 
@@ -86,18 +86,18 @@ func (n *Node) closestObject(target [2]int, best *Node, bestDist float64) *Node 
 }
 
 // NearestNeighbor finds the closest spatial object to the given target coordinates.
-func (n *Node) NearestNeighbor(target [2]int) string {
+func (n *Node) NearestNeighbor(target [2]int) *SpatialObject {
 	node := n.closestObject(target, n, pointDistance(n.Object.Coordinates(), target))
 	if node != nil {
-		return node.Object.ID()
+		return &node.Object
 	}
-	return ""
+	return nil
 }
 
 // FindNearestInDirection finds the nearest object in a specified direction.
-func (n *Node) FindNearestInDirection(target SpatialObject, direction string) string {
+func (n *Node) FindNearestInDirection(target SpatialObject, direction string) *SpatialObject {
 	var bestDist = math.Inf(1)
-	bestID := ""
+	var bestObj *SpatialObject
 
 	var search func(node *Node)
 	search = func(node *Node) {
@@ -123,9 +123,8 @@ func (n *Node) FindNearestInDirection(target SpatialObject, direction string) st
 		if valid {
 			dist := pointDistance(nodeCoord, targetCoord)
 			if dist < bestDist {
-	
 				bestDist = dist
-				bestID = node.Object.ID()
+				bestObj = &node.Object
 			}
 		}
 
@@ -134,7 +133,7 @@ func (n *Node) FindNearestInDirection(target SpatialObject, direction string) st
 	}
 
 	search(n)
-	return bestID
+	return bestObj
 }
 
 // Computes the Euclidean distance between two points.
@@ -143,4 +142,3 @@ func pointDistance(a, b [2]int) float64 {
 	dy := float64(a[1] - b[1])
 	return math.Sqrt(dx*dx + dy*dy)
 }
-
