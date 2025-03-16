@@ -68,6 +68,14 @@ func NewCellWidget(key string, cell *models.Cell, gui *GUI) *CellWidget {
 	return item
 }
 
+func (item *CellWidget) ID() string {
+	return item.Id
+}
+
+func (item *CellWidget) Coordinates() [2]int {
+	return *item.Cell.Position
+}
+
 func (item *CellWidget) Tapped(_ *fyne.PointEvent) {
 	item.Movebtn.Show()
 	item.Background.StrokeColor = COLORLINES
