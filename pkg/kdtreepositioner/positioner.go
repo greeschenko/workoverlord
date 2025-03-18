@@ -3,38 +3,39 @@ package kdtreepositioner
 import (
 	"math"
 	"sort"
-	"fyne.io/fyne/v2"
 )
 
 // KDTree defines the interface for a k-d tree.
 type KDTree interface {
-	NearestNeighbor(target fyne.Position) fyne.CanvasObject
-	FindNearestInDirection(target fyne.CanvasObject, direction string) fyne.CanvasObject
-	Rebuild(objects []fyne.CanvasObject)
+	NearestNeighbor(target [2]int) SpatialObject
+	FindNearestInDirection(target SpatialObject, direction string) SpatialObject
+	Rebuild(objects []SpatialObject)
+}
+
+// SpatialObject represents an object with a unique ID and coordinates.
+type SpatialObject interface {
+	ID() string
+	Coordinates() [2]int
+    SetSelected(bool)
 }
 
 // Node represents a k-d tree node.
 type Node struct {
-	Object fyne.CanvasObject
+	Object SpatialObject
 	Left   *Node
 	Right  *Node
 	Axis   int
 }
 
-// NewKDTree constructs a k-d tree from a list of canvas objects.
-func NewKDTree(objects []fyne.CanvasObject, depth int) *Node {
+// NewKDTree constructs a k-d tree from a list of spatial objects.
+func NewKDTree(objects []SpatialObject, depth int) *Node {
 	if len(objects) == 0 {
 		return nil
 	}
 
 	axis := depth % 2
 	sort.Slice(objects, func(i, j int) bool {
-		posI := objects[i].Position()
-		posJ := objects[j].Position()
-		if axis == 0 {
-			return posI.X < posJ.X
-		}
-		return posI.Y < posJ.Y
+		return objects[i].Coordinates()[axis] < objects[j].Coordinates()[axis]
 	})
 
 	mid := len(objects) / 2
@@ -50,27 +51,27 @@ func NewKDTree(objects []fyne.CanvasObject, depth int) *Node {
 }
 
 // Rebuild reconstructs the KDTree from the given objects.
-func (n *Node) Rebuild(objects []fyne.CanvasObject) {
+func (n *Node) Rebuild(objects []SpatialObject) {
 	newTree := NewKDTree(objects, 0)
 	*n = *newTree
 }
 
 // closestObject finds the nearest object to the given target.
-func (n *Node) closestObject(target fyne.Position, best *Node, bestDist float64) *Node {
+func (n *Node) closestObject(target [2]int, best *Node, bestDist float64) *Node {
 	if n == nil {
 		return best
 	}
-	dist := pointDistance(n.Object.Position(), target)
+	dist := pointDistance(n.Object.Coordinates(), target)
 	if dist < bestDist {
 		best = n
 		bestDist = dist
 	}
 
 	axis := n.Axis
-	nodeCoord := n.Object.Position()
+	nodeCoord := n.Object.Coordinates()
 
 	var next, other *Node
-	if (axis == 0 && target.X < nodeCoord.X) || (axis == 1 && target.Y < nodeCoord.Y) {
+	if target[axis] < nodeCoord[axis] {
 		next, other = n.Left, n.Right
 	} else {
 		next, other = n.Right, n.Left
@@ -78,16 +79,16 @@ func (n *Node) closestObject(target fyne.Position, best *Node, bestDist float64)
 
 	best = next.closestObject(target, best, bestDist)
 
-	if math.Abs(float64(target.X)-float64(nodeCoord.X)) < bestDist || math.Abs(float64(target.Y)-float64(nodeCoord.Y)) < bestDist {
+	if math.Abs(float64(target[axis]-nodeCoord[axis])) < bestDist {
 		best = other.closestObject(target, best, bestDist)
 	}
 
 	return best
 }
 
-// NearestNeighbor finds the closest canvas object to the given target coordinates.
-func (n *Node) NearestNeighbor(target fyne.Position) fyne.CanvasObject {
-	node := n.closestObject(target, n, pointDistance(n.Object.Position(), target))
+// NearestNeighbor finds the closest spatial object to the given target coordinates.
+func (n *Node) NearestNeighbor(target [2]int) SpatialObject {
+	node := n.closestObject(target, n, pointDistance(n.Object.Coordinates(), target))
 	if node != nil {
 		return node.Object
 	}
@@ -95,9 +96,9 @@ func (n *Node) NearestNeighbor(target fyne.Position) fyne.CanvasObject {
 }
 
 // FindNearestInDirection finds the nearest object in a specified direction.
-func (n *Node) FindNearestInDirection(target fyne.CanvasObject, direction string) fyne.CanvasObject {
+func (n *Node) FindNearestInDirection(target SpatialObject, direction string) SpatialObject {
 	var bestDist = math.Inf(1)
-	var bestObj fyne.CanvasObject
+	var bestObj SpatialObject
 
 	var search func(node *Node)
 	search = func(node *Node) {
@@ -105,19 +106,19 @@ func (n *Node) FindNearestInDirection(target fyne.CanvasObject, direction string
 			return
 		}
 
-		nodeCoord := node.Object.Position()
-		targetCoord := target.Position()
+		nodeCoord := node.Object.Coordinates()
+		targetCoord := target.Coordinates()
 		valid := false
 
 		switch direction {
-		case "up":
-			valid = nodeCoord.Y > targetCoord.Y
 		case "down":
-			valid = nodeCoord.Y < targetCoord.Y
+			valid = nodeCoord[1] > targetCoord[1]
+		case "up":
+			valid = nodeCoord[1] < targetCoord[1]
 		case "left":
-			valid = nodeCoord.X < targetCoord.X
+			valid = nodeCoord[0] < targetCoord[0]
 		case "right":
-			valid = nodeCoord.X > targetCoord.X
+			valid = nodeCoord[0] > targetCoord[0]
 		}
 
 		if valid {
@@ -137,8 +138,8 @@ func (n *Node) FindNearestInDirection(target fyne.CanvasObject, direction string
 }
 
 // Computes the Euclidean distance between two points.
-func pointDistance(a, b fyne.Position) float64 {
-	dx := float64(a.X) - float64(b.X)
-	dy := float64(a.Y) - float64(b.Y)
+func pointDistance(a, b [2]int) float64 {
+	dx := float64(a[0] - b[0])
+	dy := float64(a[1] - b[1])
 	return math.Sqrt(dx*dx + dy*dy)
 }

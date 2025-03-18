@@ -30,8 +30,8 @@ func NewCellWidget(key string, cell *models.Cell, gui *GUI) *CellWidget {
 
 	movebnt := newCellWidgetMoveIcon(theme.Icon(theme.IconNameViewZoomFit))
 	movebnt.Hidden = true
-	obj := canvas.NewRectangle(COLORBRD)
-	obj.StrokeColor = COLORSTR
+	obj := canvas.NewRectangle(COLORBG)
+	obj.StrokeColor = COLORBG
 	obj.StrokeWidth = 1
 
 	item := &CellWidget{
@@ -46,9 +46,9 @@ func NewCellWidget(key string, cell *models.Cell, gui *GUI) *CellWidget {
 
 	list := binding.NewDataListener(func() {
 		zoom, _ := GUIZOOM.Get()
-        if cell.Size != nil {
-		    item.Resize(fyne.NewSize(float32(cell.Size[0])*float32(zoom), float32(cell.Size[1])*float32(zoom)))
-        }
+		if cell.Size != nil {
+			item.Resize(fyne.NewSize(float32(cell.Size[0])*float32(zoom), float32(cell.Size[1])*float32(zoom)))
+		}
 		item.Move(fyne.NewPos(float32(cell.Position[0])*float32(zoom), float32(cell.Position[1])*float32(zoom)))
 		item.Movebtn.Resize(fyne.NewSize(20, 20))
 		item.Movebtn.Move(fyne.NewPos(-20, -20))
@@ -59,7 +59,7 @@ func NewCellWidget(key string, cell *models.Cell, gui *GUI) *CellWidget {
 
 	list2 := binding.NewDataListener(func() {
 		item.Movebtn.Hide()
-		item.Background.StrokeColor = COLORSTR
+		item.Background.StrokeColor = COLORBG
 		item.Refresh()
 	})
 
@@ -76,11 +76,29 @@ func (item *CellWidget) Coordinates() [2]int {
 	return *item.Cell.Position
 }
 
+func (item *CellWidget) SetSelected(on bool) {
+	if on {
+		item.Movebtn.Show()
+		item.Background.StrokeColor = COLORLINES
+		item.Refresh()
+		SELECTED = append(SELECTED, item)
+	} else {
+		item.Movebtn.Hide()
+		item.Background.StrokeColor = COLORBG
+		item.Refresh()
+        newsel := []*CellWidget{}
+        for i := range SELECTED {
+            if SELECTED[i].ID() != item.ID() {
+                newsel = append(newsel, SELECTED[i])
+            }
+        }
+		SELECTED = newsel
+	}
+}
+
+
 func (item *CellWidget) Tapped(_ *fyne.PointEvent) {
-	item.Movebtn.Show()
-	item.Background.StrokeColor = COLORLINES
-	item.Refresh()
-	SELECTED = append(SELECTED, item.Id)
+	item.SetSelected(true)
 }
 
 func (item *CellWidget) DoubleTapped(_ *fyne.PointEvent) {
@@ -111,8 +129,8 @@ func (item *CellWidget) CreateRenderer() fyne.WidgetRenderer {
 	})
 	GUIZOOM.AddListener(list)
 
-	//c := container.NewStack(item.Background, item.Textcontainer, container.NewWithoutLayout(item.Movebtn))
-	c := container.NewStack(item.Textcontainer, container.NewWithoutLayout(item.Movebtn))
+	c := container.NewStack(item.Background, item.Textcontainer, container.NewWithoutLayout(item.Movebtn))
+	//c := container.NewStack(item.Textcontainer, container.NewWithoutLayout(item.Movebtn))
 	return widget.NewSimpleRenderer(c)
 }
 

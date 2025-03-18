@@ -28,10 +28,10 @@ var FONTSIZE = 14
 
 var IsCreateSelect = false
 
-var SELECTED = []string{}
+var SELECTED []*CellWidget
 
 // var COLORBG = color.NRGBA{R: 0x28, G: 0x2c, B: 0x34, A: 0xff}
-var COLORBG = color.NRGBA{R: 40, G: 44, B: 52, A: 0xff}
+var COLORBG = color.NRGBA{R: 40, G: 44, B: 52, A: 0x00}
 
 // var COLORTXT = color.NRGBA{R: 0xff, G: 0xb7, B: 0xce, A: 0xff}
 var COLORTXT = color.NRGBA{R: 0xff, G: 0xff, B: 0xff, A: 0xff}
@@ -85,6 +85,33 @@ func (g *GUI) Start() {
 		log.Println("We tapped Ctrl+Tab")
 	})
 
+	w.Canvas().SetOnTypedKey(func(ev *fyne.KeyEvent) {
+		if len(SELECTED) > 0 {
+			if ev.Name == fyne.KeyK {
+			}
+			switch ev.Name {
+			case fyne.KeyK:
+				cur := SELECTED[0]
+				SELECTED[0].SetSelected(false)
+				g.Positioner.FindNearestInDirection(cur, "up").SetSelected(true)
+			case fyne.KeyJ:
+				cur := SELECTED[0]
+				SELECTED[0].SetSelected(false)
+				g.Positioner.FindNearestInDirection(cur, "down").SetSelected(true)
+			case fyne.KeyH:
+				cur := SELECTED[0]
+				SELECTED[0].SetSelected(false)
+				g.Positioner.FindNearestInDirection(cur, "left").SetSelected(true)
+			case fyne.KeyL:
+				cur := SELECTED[0]
+				SELECTED[0].SetSelected(false)
+				g.Positioner.FindNearestInDirection(cur, "right").SetSelected(true)
+			}
+		} else {
+			log.Println("no selected element")
+		}
+	})
+
 	w.SetContent(content)
 
 	w.Canvas().Focus(passwordEntry)
@@ -95,7 +122,12 @@ func (g *GUI) Start() {
 
 func (g *GUI) showData(w fyne.Window) {
 	guicells := g.RecurceAddGuiCells()
-	g.container = NewCellWidgetContainer(guicells, g)
+
+	var canvasObjects []fyne.CanvasObject
+	for _, cell := range guicells {
+		canvasObjects = append(canvasObjects, cell)
+	}
+	g.container = NewCellWidgetContainer(canvasObjects, g)
 
 	addbtn := widget.NewButton("ADD", func() {
 		IsCreateSelect = true
@@ -106,9 +138,16 @@ func (g *GUI) showData(w fyne.Window) {
 			fmt.Println("no cells selected")
 		} else {
 			for _, v := range SELECTED {
-				g.Data.Delete(v)
+				g.Data.Delete(v.ID())
 			}
-			g.container.Container.Objects = g.RecurceAddGuiCells()
+
+			guicells := g.RecurceAddGuiCells()
+
+			var canvasObjects []fyne.CanvasObject
+			for _, cell := range guicells {
+				canvasObjects = append(canvasObjects, cell)
+			}
+			g.container.Container.Objects = canvasObjects
 			g.container.Refresh()
 		}
 	})
@@ -120,12 +159,17 @@ func (g *GUI) showData(w fyne.Window) {
 	content := container.NewBorder(mainmenu, nil, nil, nil, g.container)
 	w.SetContent(content)
 
-	g.Positioner = kdtreepositioner.NewKDTree(guicells, 0)
-	fmt.Println("TTTTTTTT", g.Positioner.NearestNeighbor(fyne.NewPos(1000,1000)))
+	objects := make([]kdtreepositioner.SpatialObject, len(guicells))
+	for i, obj := range guicells {
+		objects[i] = obj
+	}
+
+	g.Positioner = kdtreepositioner.NewKDTree(objects, 0)
+	g.Positioner.NearestNeighbor([2]int{1000, 1000}).SetSelected(true)
 }
 
-func (g *GUI) RecurceAddGuiCells() []fyne.CanvasObject {
-	var celllist []fyne.CanvasObject
+func (g *GUI) RecurceAddGuiCells() []*CellWidget {
+	var celllist []*CellWidget
 	for i, e := range g.Data.GetAll() {
 		if *e.Status == models.CellStatusConfig {
 			continue

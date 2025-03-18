@@ -56,7 +56,7 @@ func (item *CellWidgetContainer) Scrolled(d *fyne.ScrollEvent) {
 func (item *CellWidgetContainer) Tapped(e *fyne.PointEvent) {
 	u, _ := GUIDATAUPDATER.Get()
 	GUIDATAUPDATER.Set(u + 1)
-	SELECTED = []string{}
+	SELECTED = []*CellWidget{}
 
 	if IsCreateSelect {
 		realX, realY := realCoordinates(e.Position, item.Container.Position())
