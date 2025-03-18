@@ -192,3 +192,19 @@ func (item *CellWidget) genText() {
 	// Update container
 	item.Textcontainer.Objects = lines
 }
+
+func (item *CellWidget) CenterInWindow() {
+    winSize := item.Gui.container.Size()
+    objectPos := item.Position()
+    objectSize := item.Size()
+    
+    zoom, _ := GUIZOOM.Get()
+    
+    newContainerPos := fyne.NewPos(
+        (winSize.Width/2 - (objectPos.X + objectSize.Width/2)) * float32(zoom),
+        (winSize.Height/2 - (objectPos.Y + objectSize.Height/2)) * float32(zoom),
+    )
+
+    item.Gui.container.Container.Move(newContainerPos)
+    item.Gui.container.Container.Refresh()
+}

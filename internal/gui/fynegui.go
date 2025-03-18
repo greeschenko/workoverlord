@@ -86,29 +86,61 @@ func (g *GUI) Start() {
 	})
 
 	w.Canvas().SetOnTypedKey(func(ev *fyne.KeyEvent) {
-		if len(SELECTED) > 0 {
-			if ev.Name == fyne.KeyK {
-			}
-			switch ev.Name {
-			case fyne.KeyK:
+		switch ev.Name {
+		case fyne.KeyK:
+			if len(SELECTED) > 0 {
 				cur := SELECTED[0]
 				SELECTED[0].SetSelected(false)
 				g.Positioner.FindNearestInDirection(cur, "up").SetSelected(true)
-			case fyne.KeyJ:
+                SELECTED[0].CenterInWindow()
+			} else {
+				log.Println("no selected element")
+			}
+		case fyne.KeyJ:
+			if len(SELECTED) > 0 {
 				cur := SELECTED[0]
 				SELECTED[0].SetSelected(false)
 				g.Positioner.FindNearestInDirection(cur, "down").SetSelected(true)
-			case fyne.KeyH:
+                SELECTED[0].CenterInWindow()
+			} else {
+				log.Println("no selected element")
+			}
+		case fyne.KeyH:
+			if len(SELECTED) > 0 {
 				cur := SELECTED[0]
 				SELECTED[0].SetSelected(false)
 				g.Positioner.FindNearestInDirection(cur, "left").SetSelected(true)
-			case fyne.KeyL:
+                SELECTED[0].CenterInWindow()
+			} else {
+				log.Println("no selected element")
+			}
+		case fyne.KeyL:
+			if len(SELECTED) > 0 {
 				cur := SELECTED[0]
 				SELECTED[0].SetSelected(false)
 				g.Positioner.FindNearestInDirection(cur, "right").SetSelected(true)
+                SELECTED[0].CenterInWindow()
+			} else {
+				log.Println("no selected element")
 			}
-		} else {
-			log.Println("no selected element")
+		case fyne.KeyMinus:
+			zoom, _ := GUIZOOM.Get()
+			newZoom := zoom
+			if zoom > 0.1 {
+				newZoom = zoom - 0.1
+				GUIZOOM.Set(newZoom)
+			} else {
+				GUIZOOM.Set(0.1)
+			}
+		case fyne.KeyEqual:
+			zoom, _ := GUIZOOM.Get()
+			newZoom := zoom
+			if zoom < 1 {
+				newZoom = zoom + 0.1
+				GUIZOOM.Set(newZoom)
+			} else {
+				GUIZOOM.Set(1)
+			}
 		}
 	})
 
@@ -165,7 +197,7 @@ func (g *GUI) showData(w fyne.Window) {
 	}
 
 	g.Positioner = kdtreepositioner.NewKDTree(objects, 0)
-	g.Positioner.NearestNeighbor([2]int{1000, 1000}).SetSelected(true)
+	g.Positioner.NearestNeighbor([2]int{1000, 500}).SetSelected(true)
 }
 
 func (g *GUI) RecurceAddGuiCells() []*CellWidget {
