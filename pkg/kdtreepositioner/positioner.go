@@ -12,10 +12,11 @@ type KDTree interface {
 	Rebuild(objects []SpatialObject)
 }
 
-// SpatialObject represents an object with a unique ID and coordinates.
+// SpatialObject represents an object with a unique ID, coordinates, and size.
 type SpatialObject interface {
 	ID() string
 	Coordinates() [2]int
+	WHSize() [2]int
     SetSelected(bool)
 }
 
@@ -61,14 +62,15 @@ func (n *Node) closestObject(target [2]int, best *Node, bestDist float64) *Node 
 	if n == nil {
 		return best
 	}
-	dist := pointDistance(n.Object.Coordinates(), target)
+	nodeCenter := getObjectCenter(n.Object)
+	dist := pointDistance(nodeCenter, target)
 	if dist < bestDist {
 		best = n
 		bestDist = dist
 	}
 
 	axis := n.Axis
-	nodeCoord := n.Object.Coordinates()
+	nodeCoord := nodeCenter
 
 	var next, other *Node
 	if target[axis] < nodeCoord[axis] {
@@ -88,7 +90,7 @@ func (n *Node) closestObject(target [2]int, best *Node, bestDist float64) *Node 
 
 // NearestNeighbor finds the closest spatial object to the given target coordinates.
 func (n *Node) NearestNeighbor(target [2]int) SpatialObject {
-	node := n.closestObject(target, n, pointDistance(n.Object.Coordinates(), target))
+	node := n.closestObject(target, n, pointDistance(getObjectCenter(n.Object), target))
 	if node != nil {
 		return node.Object
 	}
@@ -100,29 +102,30 @@ func (n *Node) FindNearestInDirection(target SpatialObject, direction string) Sp
 	var bestDist = math.Inf(1)
 	var bestObj SpatialObject
 
+	targetCenter := getObjectCenter(target)
+
 	var search func(node *Node)
 	search = func(node *Node) {
 		if node == nil {
 			return
 		}
 
-		nodeCoord := node.Object.Coordinates()
-		targetCoord := target.Coordinates()
+		nodeCenter := getObjectCenter(node.Object)
 		valid := false
 
 		switch direction {
 		case "down":
-			valid = nodeCoord[1] > targetCoord[1]
+			valid = nodeCenter[1] > targetCenter[1]
 		case "up":
-			valid = nodeCoord[1] < targetCoord[1]
+			valid = nodeCenter[1] < targetCenter[1]
 		case "left":
-			valid = nodeCoord[0] < targetCoord[0]
+			valid = nodeCenter[0] < targetCenter[0]
 		case "right":
-			valid = nodeCoord[0] > targetCoord[0]
+			valid = nodeCenter[0] > targetCenter[0]
 		}
 
 		if valid {
-			dist := pointDistance(nodeCoord, targetCoord)
+			dist := pointDistance(nodeCenter, targetCenter)
 			if dist < bestDist {
 				bestDist = dist
 				bestObj = node.Object
@@ -135,6 +138,13 @@ func (n *Node) FindNearestInDirection(target SpatialObject, direction string) Sp
 
 	search(n)
 	return bestObj
+}
+
+// getObjectCenter calculates the center of a SpatialObject
+func getObjectCenter(obj SpatialObject) [2]int {
+	coord := obj.Coordinates()
+	size := obj.WHSize()
+	return [2]int{coord[0] + size[0]/2, coord[1] + size[1]/2}
 }
 
 // Computes the Euclidean distance between two points.

@@ -76,6 +76,10 @@ func (item *CellWidget) Coordinates() [2]int {
 	return *item.Cell.Position
 }
 
+func (item *CellWidget) WHSize() [2]int {
+	return *item.Cell.Size
+}
+
 func (item *CellWidget) SetSelected(on bool) {
 	if on {
 		item.Movebtn.Show()
@@ -86,16 +90,15 @@ func (item *CellWidget) SetSelected(on bool) {
 		item.Movebtn.Hide()
 		item.Background.StrokeColor = COLORBG
 		item.Refresh()
-        newsel := []*CellWidget{}
-        for i := range SELECTED {
-            if SELECTED[i].ID() != item.ID() {
-                newsel = append(newsel, SELECTED[i])
-            }
-        }
+		newsel := []*CellWidget{}
+		for i := range SELECTED {
+			if SELECTED[i].ID() != item.ID() {
+				newsel = append(newsel, SELECTED[i])
+			}
+		}
 		SELECTED = newsel
 	}
 }
-
 
 func (item *CellWidget) Tapped(_ *fyne.PointEvent) {
 	item.SetSelected(true)
@@ -194,17 +197,33 @@ func (item *CellWidget) genText() {
 }
 
 func (item *CellWidget) CenterInWindow() {
-    winSize := item.Gui.container.Size()
-    objectPos := item.Position()
-    objectSize := item.Size()
-    
-    zoom, _ := GUIZOOM.Get()
-    
-    newContainerPos := fyne.NewPos(
-        (winSize.Width/2 - (objectPos.X + objectSize.Width/2)) * float32(zoom),
-        (winSize.Height/2 - (objectPos.Y + objectSize.Height/2)) * float32(zoom),
-    )
+	winSize := item.Gui.container.Size() // Розмір вікна
+	objectPos := item.Coordinates()      // Верхній лівий кут об'єкта
+	objectSize := item.WHSize()          // Ширина та висота об'єкта
 
-    item.Gui.container.Container.Move(newContainerPos)
-    item.Gui.container.Container.Refresh()
+	zoomFloat64, _ := GUIZOOM.Get()
+	zoom := float32(zoomFloat64) // Конвертуємо zoom у float32
+
+	// Центр об'єкта з урахуванням масштабу
+	objectCenterX := (float32(objectPos[0]) + float32(objectSize[0])/2) * zoom
+	objectCenterY := (float32(objectPos[1]) + float32(objectSize[1])/2) * zoom
+
+	// Центр вікна
+	winCenterX := winSize.Width / 2
+	winCenterY := winSize.Height / 2
+
+	// Визначаємо зміщення контейнера
+	newContainerPos := fyne.NewPos(
+		winCenterX-objectCenterX,
+		winCenterY-objectCenterY,
+	)
+
+	fmt.Println("winSize:", winSize)
+	fmt.Println("objectPos:", objectPos)
+	fmt.Println("objectSize:", objectSize)
+	fmt.Println("zoom:", zoom)
+	fmt.Println("newContainerPos:", newContainerPos)
+
+	item.Gui.container.Container.Move(newContainerPos)
+	item.Gui.container.Container.Refresh()
 }
