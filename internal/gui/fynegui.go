@@ -87,12 +87,26 @@ func (g *GUI) Start() {
 
 	w.Canvas().SetOnTypedKey(func(ev *fyne.KeyEvent) {
 		switch ev.Name {
+		case fyne.KeyO:
+			if len(SELECTED) > 0 {
+                item := SELECTED[0]
+				err := g.UpdateCell(item.ID())
+				if err != nil {
+					panic(err)
+				} else {
+					item.genText()
+					item.Refresh()
+					ZoomRefresh()
+				}
+			} else {
+				log.Println("no selected element")
+			}
 		case fyne.KeyK:
 			if len(SELECTED) > 0 {
 				cur := SELECTED[0]
 				SELECTED[0].SetSelected(false)
 				g.Positioner.FindNearestInDirection(cur, "up").SetSelected(true)
-                SELECTED[0].CenterInWindow()
+				SELECTED[0].CenterInWindow()
 			} else {
 				log.Println("no selected element")
 			}
@@ -101,7 +115,7 @@ func (g *GUI) Start() {
 				cur := SELECTED[0]
 				SELECTED[0].SetSelected(false)
 				g.Positioner.FindNearestInDirection(cur, "down").SetSelected(true)
-                SELECTED[0].CenterInWindow()
+				SELECTED[0].CenterInWindow()
 			} else {
 				log.Println("no selected element")
 			}
@@ -110,7 +124,7 @@ func (g *GUI) Start() {
 				cur := SELECTED[0]
 				SELECTED[0].SetSelected(false)
 				g.Positioner.FindNearestInDirection(cur, "left").SetSelected(true)
-                SELECTED[0].CenterInWindow()
+				SELECTED[0].CenterInWindow()
 			} else {
 				log.Println("no selected element")
 			}
@@ -119,7 +133,7 @@ func (g *GUI) Start() {
 				cur := SELECTED[0]
 				SELECTED[0].SetSelected(false)
 				g.Positioner.FindNearestInDirection(cur, "right").SetSelected(true)
-                SELECTED[0].CenterInWindow()
+				SELECTED[0].CenterInWindow()
 			} else {
 				log.Println("no selected element")
 			}
