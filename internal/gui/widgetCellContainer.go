@@ -1,10 +1,16 @@
 package gui
 
 import (
+	"encoding/base64"
 	"fmt"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/widget"
+	"io"
+	"time"
+
+	"greeschenko/workoverlord2/internal/models"
 )
 
 // cell widget container
@@ -65,14 +71,54 @@ func (item *CellWidgetContainer) Tapped(e *fyne.PointEvent) {
 			fmt.Println("filed add new gui cell", err)
 		}
 		cell, err := item.Gui.Data.GetOne(key)
-        if err != nil {
+		if err != nil {
 			fmt.Println("filed data cell not exist", err)
-        }
+		}
 		myw := NewCellWidget(key, cell, item.Gui)
 		item.Container.Objects = append(item.Container.Objects, myw)
 		item.Refresh()
 		ZoomRefresh()
 		IsCreateSelect = false
+	}
+
+	if IsAddImgSelect {
+		dialog.ShowFileOpen(func(reader fyne.URIReadCloser, err error) {
+			if err != nil {
+				fmt.Println("Error:", err)
+				return
+			}
+			if reader == nil {
+				return
+			}
+			defer reader.Close()
+
+			// Зчитуємо файл у []byte
+			imgData, err := io.ReadAll(reader)
+			if err != nil {
+				fmt.Println("Error reading file:", err)
+				return
+			}
+
+			newkey := time.Now().Format(time.RFC3339)
+			realX, realY := realCoordinates(e.Position, item.Container.Position())
+
+			newstatus := models.CellStatusActive
+			newtype := models.CellTypeImg
+			_, err = item.Gui.Data.Add(
+				newkey,
+				models.Cell{
+					Content:  base64.StdEncoding.EncodeToString(imgData),
+					Position: &[2]int{realX, realY},
+					Status:   &newstatus,
+					Type:     &newtype,
+				},
+			)
+			if err != nil {
+				fmt.Printf("failed to add cell to data: %v", err)
+			}
+
+		}, *item.Gui.Window)
+		IsAddImgSelect = false
 	}
 }
 

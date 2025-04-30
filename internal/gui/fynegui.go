@@ -24,9 +24,13 @@ var GUIZOOM = binding.NewFloat()
 var GUIDATAUPDATER = binding.NewInt()
 var GUICONTAINER *CellWidgetContainer
 
+var MAXIMGWIDTH = 400
+var MAXIMGHEIGHT = 400
+
 var FONTSIZE = 14
 
 var IsCreateSelect = false
+var IsAddImgSelect = false
 
 var SELECTED []*CellWidget
 
@@ -45,6 +49,7 @@ type GUI struct {
 	container  *CellWidgetContainer
 	Data       interfaces.DataInterface
 	Positioner kdtreepositioner.KDTree
+	Window     *fyne.Window
 }
 
 func NewFyneGUI(Data interfaces.DataInterface) *GUI {
@@ -89,12 +94,12 @@ func (g *GUI) Start() {
 		switch ev.Name {
 		case fyne.KeyO:
 			if len(SELECTED) > 0 {
-                item := SELECTED[0]
+				item := SELECTED[0]
 				err := g.UpdateCell(item.ID())
 				if err != nil {
 					panic(err)
 				} else {
-					item.genText()
+					item.genContent()
 					item.Refresh()
 					ZoomRefresh()
 				}
@@ -158,6 +163,8 @@ func (g *GUI) Start() {
 		}
 	})
 
+	g.Window = &w
+
 	w.SetContent(content)
 
 	w.Canvas().Focus(passwordEntry)
@@ -177,6 +184,7 @@ func (g *GUI) showData(w fyne.Window) {
 
 	addbtn := widget.NewButton("ADD", func() {
 		IsCreateSelect = true
+		IsAddImgSelect = false
 	})
 	deletebtn := widget.NewButton("DELETE", func() {
 		fmt.Println("delete btn click")
@@ -197,10 +205,14 @@ func (g *GUI) showData(w fyne.Window) {
 			g.container.Refresh()
 		}
 	})
+	addimgbtn := widget.NewButton("ADDIMG", func() {
+		IsAddImgSelect = true
+		IsCreateSelect = false
+	})
 	closebtn := widget.NewButton("CLOSE", func() {
 		w.Close()
 	})
-	mainmenu := container.NewHBox(addbtn, deletebtn, closebtn)
+	mainmenu := container.NewHBox(addbtn, deletebtn, addimgbtn, closebtn)
 
 	content := container.NewBorder(mainmenu, nil, nil, nil, g.container)
 	w.SetContent(content)

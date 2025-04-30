@@ -1,6 +1,7 @@
 package gui
 
 import (
+	"encoding/base64"
 	"fmt"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
@@ -26,7 +27,6 @@ type CellWidget struct {
 
 func NewCellWidget(key string, cell *models.Cell, gui *GUI) *CellWidget {
 	fmt.Println(key, cell.Size, cell.Position, gui)
-	//return nil
 
 	movebnt := newCellWidgetMoveIcon(theme.Icon(theme.IconNameViewZoomFit))
 	movebnt.Hidden = true
@@ -109,7 +109,7 @@ func (item *CellWidget) DoubleTapped(_ *fyne.PointEvent) {
 	if err != nil {
 		panic(err)
 	} else {
-		item.genText()
+		item.genContent()
 		item.Refresh()
 		ZoomRefresh()
 	}
@@ -128,7 +128,7 @@ func (item *CellWidget) CreateRenderer() fyne.WidgetRenderer {
 	}
 
 	list := binding.NewDataListener(func() {
-		go item.genText()
+		go item.genContent()
 	})
 	GUIZOOM.AddListener(list)
 
@@ -158,6 +158,47 @@ func (icon *CellWidgetMoveIcon) Dragged(d *fyne.DragEvent) {
 
 func (icon *CellWidgetMoveIcon) DragEnd() {
 	icon.OnDragEnd()
+}
+
+func (item *CellWidget) genContent() {
+	switch *item.Cell.Type {
+	case models.CellTypeText:
+		item.genText()
+	case models.CellTypeImg:
+		item.genImg()
+	}
+}
+
+func (item *CellWidget) genImg() {
+	content := item.Cell.Content
+	if content == "" {
+		return
+	}
+
+	// Декодуємо base64
+	imageData, err := base64.StdEncoding.DecodeString(content)
+	if err != nil {
+		fmt.Println("Failed to decode base64:", err)
+		return
+	}
+
+	// Завантажуємо зображення як fyne.Resource
+	resource := fyne.NewStaticResource("image", imageData)
+
+	// Створюємо fyne Image
+	img := canvas.NewImageFromResource(resource)
+	img.FillMode = canvas.ImageFillContain                                // або ImageFillOriginal якщо потрібен точний розмір
+	img.SetMinSize(fyne.NewSize(0, 0))                                    // дозволити ресайз
+	img.Resize(fyne.NewSize(float32(MAXIMGWIDTH), float32(MAXIMGHEIGHT))) // якщо хочеш обмежити макс. розмір
+	img.Move(fyne.NewPos(0, 0))
+
+	// Збереження розміру (можна також зчитати справжній розмір зображення, якщо потрібно точніше)
+	item.Cell.Size = &[2]int{
+		MAXIMGWIDTH,
+		MAXIMGHEIGHT,
+	}
+
+	item.Textcontainer.Objects = []fyne.CanvasObject{img}
 }
 
 func (item *CellWidget) genText() {
