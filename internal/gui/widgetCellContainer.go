@@ -104,18 +104,29 @@ func (item *CellWidgetContainer) Tapped(e *fyne.PointEvent) {
 
 			newstatus := models.CellStatusActive
 			newtype := models.CellTypeImg
+			newmodel := models.Cell{
+				Content:  base64.StdEncoding.EncodeToString(imgData),
+				Position: &[2]int{realX, realY},
+				Status:   &newstatus,
+				Type:     &newtype,
+			}
 			_, err = item.Gui.Data.Add(
 				newkey,
-				models.Cell{
-					Content:  base64.StdEncoding.EncodeToString(imgData),
-					Position: &[2]int{realX, realY},
-					Status:   &newstatus,
-					Type:     &newtype,
-				},
+				newmodel,
 			)
 			if err != nil {
 				fmt.Printf("failed to add cell to data: %v", err)
 			}
+
+			cell, err := item.Gui.Data.GetOne(newkey)
+			if err != nil {
+				fmt.Println("filed data cell not exist", err)
+			}
+
+			myw := NewCellWidget(newkey, cell, item.Gui)
+			item.Container.Objects = append(item.Container.Objects, myw)
+			item.Refresh()
+			ZoomRefresh()
 
 		}, *item.Gui.Window)
 		IsAddImgSelect = false

@@ -25,7 +25,7 @@ var GUIDATAUPDATER = binding.NewInt()
 var GUICONTAINER *CellWidgetContainer
 
 var MAXIMGWIDTH = 400
-var MAXIMGHEIGHT = 400
+var MAXIMGHEIGHT = 300
 
 var FONTSIZE = 14
 

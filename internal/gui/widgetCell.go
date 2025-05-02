@@ -161,15 +161,15 @@ func (icon *CellWidgetMoveIcon) DragEnd() {
 }
 
 func (item *CellWidget) genContent() {
-	switch *item.Cell.Type {
-	case models.CellTypeText:
+	if item.Cell.Type == nil || *item.Cell.Type == models.CellTypeText {
 		item.genText()
-	case models.CellTypeImg:
+	} else if *item.Cell.Type == models.CellTypeImg {
 		item.genImg()
 	}
 }
 
 func (item *CellWidget) genImg() {
+	zoom, _ := GUIZOOM.Get()
 	content := item.Cell.Content
 	if content == "" {
 		return
@@ -187,9 +187,9 @@ func (item *CellWidget) genImg() {
 
 	// Створюємо fyne Image
 	img := canvas.NewImageFromResource(resource)
-	img.FillMode = canvas.ImageFillContain                                // або ImageFillOriginal якщо потрібен точний розмір
-	img.SetMinSize(fyne.NewSize(0, 0))                                    // дозволити ресайз
-	img.Resize(fyne.NewSize(float32(MAXIMGWIDTH), float32(MAXIMGHEIGHT))) // якщо хочеш обмежити макс. розмір
+	img.FillMode = canvas.ImageFillContain                                                            // або ImageFillOriginal якщо потрібен точний розмір
+	img.SetMinSize(fyne.NewSize(0, 0))                                                                // дозволити ресайз
+	img.Resize(fyne.NewSize(float32(MAXIMGWIDTH)*float32(zoom), float32(MAXIMGHEIGHT)*float32(zoom))) // якщо хочеш обмежити макс. розмір
 	img.Move(fyne.NewPos(0, 0))
 
 	// Збереження розміру (можна також зчитати справжній розмір зображення, якщо потрібно точніше)
