@@ -173,6 +173,17 @@ func (g *GUI) Start() {
 	w.ShowAndRun()
 }
 
+func (g *GUI) rebuild() {
+	guicells := g.RecurceAddGuiCells()
+
+	var canvasObjects []fyne.CanvasObject
+	for _, cell := range guicells {
+		canvasObjects = append(canvasObjects, cell)
+	}
+	g.container.Container.Objects = canvasObjects
+	g.container.Refresh()
+}
+
 func (g *GUI) showData(w fyne.Window) {
 	guicells := g.RecurceAddGuiCells()
 
@@ -195,24 +206,60 @@ func (g *GUI) showData(w fyne.Window) {
 				g.Data.Delete(v.ID())
 			}
 
-			guicells := g.RecurceAddGuiCells()
-
-			var canvasObjects []fyne.CanvasObject
-			for _, cell := range guicells {
-				canvasObjects = append(canvasObjects, cell)
-			}
-			g.container.Container.Objects = canvasObjects
-			g.container.Refresh()
+			g.rebuild()
 		}
 	})
 	addimgbtn := widget.NewButton("ADDIMG", func() {
 		IsAddImgSelect = true
 		IsCreateSelect = false
 	})
+	mergebtn := widget.NewButton("MERGE", func() {
+		fmt.Println("merge btn click")
+		if len(SELECTED) == 0 {
+			fmt.Println("no cells selected")
+		} else {
+			var mergedstring string
+			for i, v := range SELECTED {
+				onedata, err := g.Data.GetOne(v.ID())
+				if err != nil {
+					fmt.Println("cell data not found ", v.ID())
+				} else {
+					mergedstring += onedata.Content
+				}
+				if i != 0 {
+					g.Data.Delete(v.ID())
+				}
+			}
+
+			g.Data.Patch(SELECTED[0].ID(), models.Cell{Content: mergedstring})
+			g.rebuild()
+		}
+	})
+	colorbtn := widget.NewButton("COLOR", func() {
+		fmt.Println("color btn click")
+		if len(SELECTED) == 0 {
+			fmt.Println("no cells selected")
+		} else {
+			dialog.NewColorPicker("Choose Color", "Pick a color you like", func(c color.Color) {
+				for _, v := range SELECTED {
+					g.Data.Patch(v.ID(), models.Cell{Style: &models.Style{Color: ColorToHex(c)}})
+				}
+				g.rebuild()
+			}, w).Show()
+		}
+	})
+	undobtn := widget.NewButton("UNDO", func() {
+		g.Data.Undo()
+		g.rebuild()
+	})
+	redobtn := widget.NewButton("REDO", func() {
+		g.Data.Redo()
+		g.rebuild()
+	})
 	closebtn := widget.NewButton("CLOSE", func() {
 		w.Close()
 	})
-	mainmenu := container.NewHBox(addbtn, deletebtn, addimgbtn, closebtn)
+	mainmenu := container.NewHBox(addbtn, deletebtn, addimgbtn, colorbtn, mergebtn, undobtn, redobtn, closebtn)
 
 	content := container.NewBorder(mainmenu, nil, nil, nil, g.container)
 	w.SetContent(content)

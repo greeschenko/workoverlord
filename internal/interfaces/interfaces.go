@@ -22,4 +22,6 @@ type DataInterface interface {
 	Add(string, models.Cell) (*models.Cell, error)
 	Patch(string, models.Cell) (*models.Cell, error)
 	Delete(string) error
+    Undo()
+    Redo()
 }

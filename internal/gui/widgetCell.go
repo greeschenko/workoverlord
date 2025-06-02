@@ -26,7 +26,7 @@ type CellWidget struct {
 }
 
 func NewCellWidget(key string, cell *models.Cell, gui *GUI) *CellWidget {
-	fmt.Println(key, cell.Size, cell.Position, gui)
+	//fmt.Println(key, cell.Size, cell.Position, gui)
 
 	movebnt := newCellWidgetMoveIcon(theme.Icon(theme.IconNameViewZoomFit))
 	movebnt.Hidden = true
@@ -218,7 +218,17 @@ func (item *CellWidget) genText() {
 			maxLineLength = lineLength
 		}
 
-		text := canvas.NewText(line, COLORTXT)
+		tmpcolor := COLORTXT
+
+		if item.Cell.Style != nil {
+			nrgba, err := HexToNRGBA(item.Cell.Style.Color)
+			if err != nil {
+				fmt.Println("Invalid color:", err)
+			}
+            tmpcolor = nrgba
+		}
+
+		text := canvas.NewText(line, tmpcolor)
 		text.TextStyle.Monospace = true
 		text.TextSize = textSize
 		text.Move(fyne.NewPos(0, y))

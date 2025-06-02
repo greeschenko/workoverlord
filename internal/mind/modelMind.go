@@ -8,8 +8,10 @@ import (
 )
 
 type MIND struct {
-	Cells   map[string]*models.Cell     `json:"cells"`
-	Storage interfaces.StorageInterface `json:"-"`
+	Cells     map[string]*models.Cell     `json:"cells"`
+	Storage   interfaces.StorageInterface `json:"-"`
+	undoStack []string                    `json:"-"`
+	redoStack []string                    `json:"-"`
 }
 
 func NewMIND(storageints interfaces.StorageInterface) *MIND {
@@ -85,9 +87,86 @@ func (m *MIND) Delete(key string) error {
 }
 
 func (m *MIND) saveData() {
-	USERMINDjson, err := json.MarshalIndent(m, " ", " ")
+	fmt.Println("TTTTTTTTTSAVE", len(m.undoStack), len(m.redoStack))
+	// Завантажуємо поточний (старий) стан з файлу
+	data, err := m.Storage.Load()
+	if err == nil && len(data) > 0 {
+		// Додаємо до undoStack
+		m.undoStack = append(m.undoStack, string(data))
+
+		// Обмежуємо undoStack до 5 елементів
+		if len(m.undoStack) > 5 {
+			m.undoStack = m.undoStack[len(m.undoStack)-5:]
+		}
+
+		// Очищаємо redoStack при новій дії
+		m.redoStack = nil
+	}
+
+	// Зберігаємо новий стан
+	newData, err := json.MarshalIndent(m, " ", " ")
 	if err != nil {
 		panic(err)
 	}
-	m.Storage.Save(USERMINDjson)
+	m.Storage.Save(newData)
+}
+
+func (m *MIND) saveWithoutStack() {
+	data, err := json.MarshalIndent(m, " ", " ")
+	if err != nil {
+		panic(err)
+	}
+	m.Storage.Save(data)
+}
+
+func (m *MIND) Undo() {
+	fmt.Println("TTTTTTTTTUNDO", len(m.undoStack), len(m.redoStack))
+	if len(m.undoStack) == 0 {
+		return
+	}
+
+	// Зберігаємо поточний стан у redoStack
+	currentData, err := m.Storage.Load()
+	if err == nil && len(currentData) > 0 {
+		m.redoStack = append(m.redoStack, string(currentData))
+	}
+
+	// Відкат
+	last := m.undoStack[len(m.undoStack)-1]
+	m.undoStack = m.undoStack[:len(m.undoStack)-1]
+
+	if err := json.Unmarshal([]byte(last), m); err != nil {
+		panic(err)
+	}
+	m.saveWithoutStack() // Зберігаємо без зміни undo/redo стеків
+}
+
+func (m *MIND) Redo() {
+	fmt.Println("TTTTTTTTTREDO", len(m.undoStack), len(m.redoStack))
+	if len(m.redoStack) == 0 {
+		return
+	}
+
+	// Зберігаємо поточний стан у undoStack
+	currentData, err := m.Storage.Load()
+	if err == nil && len(currentData) > 0 {
+		m.undoStack = append(m.undoStack, string(currentData))
+	}
+
+	// Відновлення
+	last := m.redoStack[len(m.redoStack)-1]
+	m.redoStack = m.redoStack[:len(m.redoStack)-1]
+
+	if err := json.Unmarshal([]byte(last), m); err != nil {
+		panic(err)
+	}
+	m.saveWithoutStack() // Зберігаємо без зміни стеків
+}
+
+func (m *MIND) CanUndo() bool {
+	return len(m.undoStack) > 0
+}
+
+func (m *MIND) CanRedo() bool {
+	return len(m.redoStack) > 0
 }
